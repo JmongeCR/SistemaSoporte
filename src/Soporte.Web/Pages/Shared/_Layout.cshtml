@@ -1,0 +1,65 @@
+@using Soporte.Abstracciones.Enumeraciones
+@using Soporte.Web.Servicios
+@inject IUsuarioSesion Sesion
+@{
+    var paginaActual = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+    var esCliente = Sesion.Rol == RolTipo.Cliente;
+    var esAdministrador = Sesion.Rol == RolTipo.Administrador;
+
+    string Activo(string prefijo) => paginaActual.StartsWith(prefijo) ? "activo" : string.Empty;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Soporte</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app">
+        <aside class="app-sidebar">
+            <div class="app-marca-fila">
+                <a class="app-marca" asp-page="/Dashboard/Index"><span aria-hidden="true">🎫</span> Soporte</a>
+                <vc:campana />
+            </div>
+
+            <nav aria-label="Navegación principal">
+                <ul class="app-nav">
+                    <li><a class="app-nav-enlace @Activo("/Dashboard")" asp-page="/Dashboard/Index"><span class="app-nav-icono" aria-hidden="true">▦</span> Dashboard</a></li>
+                    <li><a class="app-nav-enlace @Activo("/Tickets")" asp-page="/Tickets/Index"><span class="app-nav-icono" aria-hidden="true">🎫</span> @(esCliente ? "Mis tickets" : "Tickets")</a></li>
+                    <li><a class="app-nav-enlace @Activo("/Notificaciones")" asp-page="/Notificaciones/Index"><span class="app-nav-icono" aria-hidden="true">🔔</span> Notificaciones</a></li>
+                    @if (esAdministrador)
+                    {
+                        <li><a class="app-nav-enlace @Activo("/Roles")" asp-page="/Roles/Index"><span class="app-nav-icono" aria-hidden="true">🛡️</span> Roles y permisos</a></li>
+                    }
+                </ul>
+            </nav>
+
+            <div class="app-usuario">
+                <span class="avatar avatar-grande avatar-oscuro">@Formato.Iniciales(Sesion.Nombre)</span>
+                <div>
+                    <div class="app-usuario-nombre">@Sesion.Nombre</div>
+                    <div class="app-usuario-rol">@Sesion.Rol</div>
+                </div>
+            </div>
+            <form method="post" asp-page="/Cuenta/Salir" class="app-salir">
+                <button type="submit" class="app-salir-boton">Cerrar sesión</button>
+            </form>
+        </aside>
+
+        <main class="app-contenido" role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

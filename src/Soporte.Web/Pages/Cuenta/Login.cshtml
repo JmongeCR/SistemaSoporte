@@ -1,0 +1,44 @@
+@page
+@model Soporte.Web.Pages.Cuenta.LoginModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+
+<h1>Bienvenido de nuevo</h1>
+<p class="cuenta-subtitulo">Ingresa tus credenciales para continuar</p>
+
+@if (TempData["MensajeExito"] is string mensajeExito)
+{
+    <div class="alerta-exito" role="status">@mensajeExito</div>
+}
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">@Model.MensajeError</div>
+}
+
+<form method="post">
+    <input type="hidden" asp-for="ReturnUrl" />
+
+    <div class="grupo-campo">
+        <label asp-for="Credenciales.Correo" class="etiqueta">Correo electrónico</label>
+        <input asp-for="Credenciales.Correo" class="campo campo-alto campo-completo" placeholder="nombre@empresa.com" autocomplete="username" autofocus />
+        <span asp-validation-for="Credenciales.Correo"></span>
+    </div>
+
+    <div class="grupo-campo">
+        <label asp-for="Credenciales.Contrasena" class="etiqueta">Contraseña</label>
+        <div class="campo-contrasena">
+            <input asp-for="Credenciales.Contrasena" id="contrasena" class="campo campo-alto campo-completo" placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" class="boton-ver" data-mostrar-contrasena="#contrasena" aria-label="Mostrar contraseña" aria-pressed="false">👁️</button>
+        </div>
+        <span asp-validation-for="Credenciales.Contrasena"></span>
+    </div>
+
+    <button type="submit" class="boton-primario boton-bloque">Iniciar sesión</button>
+</form>
+
+<a asp-page="./Recuperar" class="enlace cuenta-enlace">¿Olvidaste tu contraseña?</a>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

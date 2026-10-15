@@ -1,0 +1,35 @@
+@page
+@model Soporte.Web.Pages.Cuenta.RecuperarModel
+@{
+    ViewData["Title"] = "Recuperar contraseña";
+}
+
+<h1>¿Olvidaste tu contraseña?</h1>
+<p class="cuenta-subtitulo">Ingresá tu correo y te enviaremos un enlace para crear una nueva.</p>
+
+@if (Model.MensajeExito is not null)
+{
+    <div class="alerta-exito" role="status">@Model.MensajeExito</div>
+}
+else
+{
+    @if (Model.MensajeError is not null)
+    {
+        <div class="alerta-error" role="alert">@Model.MensajeError</div>
+    }
+
+    <form method="post">
+        <div class="grupo-campo">
+            <label asp-for="Solicitud.Correo" class="etiqueta">Correo electrónico</label>
+            <input asp-for="Solicitud.Correo" class="campo campo-alto campo-completo" placeholder="nombre@empresa.com" autocomplete="email" autofocus />
+            <span asp-validation-for="Solicitud.Correo"></span>
+        </div>
+        <button type="submit" class="boton-primario boton-bloque">Enviar enlace</button>
+    </form>
+}
+
+<a asp-page="./Login" class="enlace cuenta-enlace">← Volver a iniciar sesión</a>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Soporte.API",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/src/Soporte.API/Soporte.API.csproj",
+      "launchConfigurationId": "TargetFramework=;http"
+    },
+    {
+      "name": "Soporte.Web",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/src/Soporte.Web/Soporte.Web.csproj",
+      "launchConfigurationId": "TargetFramework=;http"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "API + Web",
+      "configurations": ["Soporte.API", "Soporte.Web"],
+      "stopAll": true
+    }
+  ]
+}

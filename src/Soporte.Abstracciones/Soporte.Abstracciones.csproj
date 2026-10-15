@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- CS1591: no exigir comentario XML en cada miembro público -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

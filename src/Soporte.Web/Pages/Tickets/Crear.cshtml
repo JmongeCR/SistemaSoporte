@@ -1,0 +1,118 @@
+@page
+@model Soporte.Web.Pages.Tickets.CrearModel
+@{
+    ViewData["Title"] = "Crear ticket";
+}
+
+<nav class="migas" aria-label="Ruta">
+    <a asp-page="./Index">Tickets</a>
+    <span aria-hidden="true">/</span>
+    <span class="migas-actual">Crear ticket</span>
+</nav>
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Crear ticket</h1>
+        <p>Registrá una nueva solicitud de soporte</p>
+    </div>
+</header>
+
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">
+        @Model.MensajeError
+        @if (Model.Errores.Count > 0)
+        {
+            <ul>@foreach (var error in Model.Errores) { <li>@error</li> }</ul>
+        }
+        @if (Model.Adjuntos.Count > 0)
+        {
+            <div>Por seguridad, el navegador no conserva los archivos: vuelva a seleccionarlos.</div>
+        }
+    </div>
+}
+
+<div class="diseno-formulario">
+    <form method="post" enctype="multipart/form-data" class="tarjeta formulario" data-envio-unico>
+        <input type="hidden" asp-for="ClaveEnvio" />
+        @if (Model.EligeSolicitante)
+        {
+            <div class="grupo-campo">
+                <label asp-for="Ticket.ClienteId" class="etiqueta">Solicitante <span class="requerido">*</span></label>
+                <select asp-for="Ticket.ClienteId" asp-items="Model.Clientes" class="campo campo-completo"
+                        data-val="true" data-val-required="Seleccione el cliente solicitante.">
+                    <option value="">Seleccioná el cliente</option>
+                </select>
+                <p class="ayuda">Solo Administrador y Agente pueden elegir el solicitante.</p>
+                <span asp-validation-for="Ticket.ClienteId"></span>
+            </div>
+        }
+
+        <div class="grupo-campo">
+            <label asp-for="Ticket.Asunto" class="etiqueta">Asunto <span class="requerido">*</span></label>
+            <input asp-for="Ticket.Asunto" class="campo campo-completo" placeholder="Ej. No puedo acceder a mi cuenta" />
+            <span asp-validation-for="Ticket.Asunto"></span>
+        </div>
+
+        <div class="grupo-campo">
+            <label asp-for="Ticket.Descripcion" class="etiqueta">Descripción del problema <span class="requerido">*</span></label>
+            <textarea asp-for="Ticket.Descripcion" class="campo campo-completo" rows="5"
+                      placeholder="Describí el problema con el mayor detalle posible: qué ocurre, cuándo empezó y qué intentaste hacer."></textarea>
+            <span asp-validation-for="Ticket.Descripcion"></span>
+        </div>
+
+        <div class="fila-campos">
+            <div class="grupo-campo">
+                <label asp-for="Ticket.CategoriaId" class="etiqueta">Categoría <span class="requerido">*</span></label>
+                <select asp-for="Ticket.CategoriaId" asp-items="Model.Categorias" class="campo campo-completo">
+                    <option value="0">Seleccioná una categoría</option>
+                </select>
+                <span asp-validation-for="Ticket.CategoriaId"></span>
+            </div>
+            <div class="grupo-campo">
+                <span class="etiqueta" id="etiqueta-prioridad">Prioridad <span class="requerido">*</span></span>
+                <div class="segmentado" role="radiogroup" aria-labelledby="etiqueta-prioridad">
+                    @foreach (var prioridad in Model.Prioridades)
+                    {
+                        <input type="radio" class="segmentado-opcion" id="prioridad-@prioridad.Id" name="Ticket.PrioridadId"
+                               value="@prioridad.Id" checked="@(Model.Ticket.PrioridadId == prioridad.Id)" />
+                        <label for="prioridad-@prioridad.Id">@prioridad.Nombre</label>
+                    }
+                </div>
+                <p class="ayuda">Media: se atenderá en el plazo estándar. Urgente: bloquea una operación crítica del negocio.</p>
+                <span asp-validation-for="Ticket.PrioridadId"></span>
+            </div>
+        </div>
+
+        <div class="grupo-campo">
+            <span class="etiqueta">Adjuntos (opcional)</span>
+            <div class="zona-archivos" data-zona-archivos data-extensiones=".pdf,.png,.jpg,.jpeg" data-max-mb="10"
+                 data-max-archivos="5" data-lista="#lista-adjuntos" data-error="#error-adjuntos">
+                <input type="file" name="Adjuntos" multiple accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+                       aria-label="Adjuntar archivos" />
+                <p class="zona-archivos-texto">📎 Arrastrá archivos aquí o hacé clic para seleccionar</p>
+                <p class="zona-archivos-ayuda">PDF, PNG o JPG — máx. 10 MB por archivo</p>
+            </div>
+            <p class="error-archivos" id="error-adjuntos" role="alert"></p>
+            <ul class="lista-archivos" id="lista-adjuntos"></ul>
+        </div>
+
+        <div class="acciones-formulario">
+            <a asp-page="./Index" class="boton-secundario">Cancelar</a>
+            <button type="submit" class="boton-primario">Crear ticket</button>
+        </div>
+    </form>
+
+    <aside class="tarjeta tarjeta-consejos">
+        <h2>Antes de enviar</h2>
+        <ul>
+            <li>Sé específico en el asunto para facilitar la búsqueda posterior.</li>
+            <li>Adjuntá capturas si el problema es visual.</li>
+            <li>La prioridad Urgente debe reservarse para bloqueos críticos del negocio.</li>
+        </ul>
+    </aside>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

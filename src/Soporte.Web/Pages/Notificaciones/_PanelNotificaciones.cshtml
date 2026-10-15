@@ -1,0 +1,35 @@
+@model Soporte.Web.Presentacion.PanelNotificaciones
+<div class="panel-encabezado">
+    <strong>Notificaciones</strong>
+    @if (Model.Elementos.Any(n => !n.Leida))
+    {
+        <form method="post" asp-page="/Notificaciones/Index" asp-page-handler="MarcarTodas" asp-route-volverA="@Model.VolverA">
+            <button type="submit" class="enlace boton-enlace">Marcar todas como leídas</button>
+        </form>
+    }
+</div>
+@if (Model.MensajeError is not null)
+{
+    <p class="panel-estado">No se pudieron cargar las notificaciones. <a asp-page="/Notificaciones/Index" class="enlace">Reintentar</a></p>
+}
+else if (Model.Elementos.Count == 0)
+{
+    <p class="panel-estado">No tenés notificaciones.</p>
+}
+else
+{
+    <ul class="panel-lista">
+        @foreach (var notificacion in Model.Elementos)
+        {
+            <li class="@(notificacion.Leida ? "" : "no-leida")">
+                <form method="post" asp-page="/Notificaciones/Index" asp-page-handler="Abrir" asp-route-id="@notificacion.Id">
+                    <button type="submit" class="notificacion-item">
+                        <span class="notificacion-mensaje">@notificacion.Mensaje</span>
+                        <span class="notificacion-meta">@Formato.Hace(notificacion.FechaCreacion)@(notificacion.Leida ? "" : " · sin leer")</span>
+                    </button>
+                </form>
+            </li>
+        }
+    </ul>
+}
+<a asp-page="/Notificaciones/Index" class="panel-pie enlace">Ver todas</a>

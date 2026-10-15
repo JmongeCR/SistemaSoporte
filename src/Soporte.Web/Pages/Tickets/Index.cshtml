@@ -1,0 +1,113 @@
+@page
+@model Soporte.Web.Pages.Tickets.IndexModel
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>@Model.Titulo</h1>
+        @if (Model.Tickets is not null)
+        {
+            <p>
+                @Model.Tickets.Total @(Model.Tickets.Total == 1 ? "ticket" : "tickets")@(Model.HayFiltros ? " con estos filtros" : " en total")
+                @if (Model.TotalAbiertos is not null)
+                {
+                    <text>· @Model.TotalAbiertos @(Model.TotalAbiertos == 1 ? "abierto" : "abiertos")</text>
+                }
+            </p>
+        }
+    </div>
+    <a asp-page="./Crear" class="boton-primario">+ Nuevo Ticket</a>
+</header>
+
+@if (TempData["MensajeExito"] is string mensajeExito)
+{
+    <div class="alerta-exito" role="status">@mensajeExito</div>
+}
+
+<form method="get" class="barra-filtros" role="search">
+    <div class="buscador">
+        <input asp-for="Filtro.Texto" class="campo" placeholder="Buscar ticket, cliente..." aria-label="Buscar por asunto o cliente" />
+    </div>
+    <select asp-for="Filtro.PrioridadId" asp-items="Model.Prioridades" class="campo" aria-label="Prioridad" onchange="this.form.requestSubmit()">
+        <option value="">Prioridad</option>
+    </select>
+    <button type="submit" name="Filtro.EstadoId" value="" class="chip @(Model.Filtro.EstadoId is null ? "activo" : "")">Todos</button>
+    @foreach (var estado in Model.Estados)
+    {
+        <button type="submit" name="Filtro.EstadoId" value="@estado.Id" class="chip @(Model.Filtro.EstadoId == estado.Id ? "activo" : "")">@estado.Nombre</button>
+    }
+</form>
+
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">@Model.MensajeError</div>
+}
+else if (Model.Tickets is not null)
+{
+    <div class="tarjeta">
+        @if (Model.Tickets.Total == 0)
+        {
+            <div class="estado-vacio" role="status">No hay tickets que coincidan con los filtros.</div>
+        }
+        else
+        {
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Cliente</th>
+                        <th>Prioridad</th>
+                        <th>Estado</th>
+                        <th>Agente</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ticket in Model.Tickets.Elementos)
+                    {
+                        <tr>
+                            <td class="ticket-id"><a asp-page="./Detalle" asp-route-id="@ticket.Id">#@ticket.Id</a></td>
+                            <td>
+                                <a asp-page="./Detalle" asp-route-id="@ticket.Id" class="enlace-fila">@ticket.Asunto</a>
+                                @if (ticket.EsperaRespuestaCliente)
+                                {
+                                    <span class="pill pill-alerta ms-1">@(Model.EsCliente ? "Espera tu respuesta" : "Espera respuesta del cliente")</span>
+                                }
+                                @if (ticket.SlaVencido && !Model.EsCliente)
+                                {
+                                    <span class="pill pill-alerta ms-1" title="Superó el tiempo de atención de su prioridad">SLA vencido</span>
+                                }
+                            </td>
+                            <td class="texto-secundario">@ticket.Cliente</td>
+                            <td><span class="prioridad @Formato.ClasePrioridad(ticket.PrioridadId)">@ticket.Prioridad</span></td>
+                            <td><span class="pill @Formato.ClaseEstado(ticket.EstadoId)">@ticket.Estado</span></td>
+                            <td>
+                                @if (ticket.AgenteAsignado is null)
+                                {
+                                    <span class="texto-tenue">Sin asignar</span>
+                                }
+                                else
+                                {
+                                    <span class="avatar" title="@ticket.AgenteAsignado">@Formato.Iniciales(ticket.AgenteAsignado)</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (Model.Tickets.TotalPaginas > 1)
+            {
+                <nav class="paginacion" aria-label="Paginación de tickets">
+                    <span>Página @Model.Tickets.Pagina de @Model.Tickets.TotalPaginas</span>
+                    <div class="paginacion-acciones">
+                        <a class="chip @(Model.Tickets.Pagina <= 1 ? "deshabilitado" : "")" asp-page="./Index" asp-all-route-data="Model.RutaPagina(Model.Tickets.Pagina - 1)">Anterior</a>
+                        <a class="chip @(Model.Tickets.Pagina >= Model.Tickets.TotalPaginas ? "deshabilitado" : "")" asp-page="./Index" asp-all-route-data="Model.RutaPagina(Model.Tickets.Pagina + 1)">Siguiente</a>
+                    </div>
+                </nav>
+            }
+        }
+    </div>
+}

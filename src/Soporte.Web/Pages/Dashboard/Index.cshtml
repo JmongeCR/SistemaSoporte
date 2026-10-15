@@ -1,0 +1,107 @@
+@page
+@model Soporte.Web.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        @if (Model.EsCliente)
+        {
+            <h1>Hola, @Model.Nombre.Split(' ')[0]</h1>
+            <p>Seguimiento de tus casos de soporte</p>
+        }
+        else
+        {
+            <h1>Dashboard</h1>
+            <p>@(Model.EsAdministrador ? "Resumen general de soporte técnico" : "Tu ámbito: tickets asignados a vos y sin asignar")</p>
+        }
+    </div>
+    <a asp-page="/Tickets/Crear" class="boton-primario">+ Nuevo Ticket</a>
+</header>
+
+@if (Model.NotificacionesNoLeidas > 0)
+{
+    <a asp-page="/Notificaciones/Index" class="aviso-info">
+        🔔 Tenés @Model.NotificacionesNoLeidas @(Model.NotificacionesNoLeidas == 1 ? "notificación sin leer" : "notificaciones sin leer") · Ver
+    </a>
+}
+
+@* ---------------- Indicadores ---------------- *@
+@if (Model.EsCliente)
+{
+    @if (Model.ResumenCliente is { Exito: false })
+    {
+        <div class="alerta-error" role="alert">No se pudo cargar el resumen de tus casos. <a asp-page="./Index" class="enlace">Reintentar</a></div>
+    }
+    else if (Model.ResumenCliente?.Datos is { } resumen)
+    {
+        <div class="kpi-grid">
+            <partial name="_Kpi" model='("Abiertos", resumen.Abiertos, "azul", "Esperando atención")' />
+            <partial name="_Kpi" model='("En progreso", resumen.EnProgreso, "ambar", "El equipo está trabajando")' />
+            <partial name="_Kpi" model='("Esperan tu respuesta", resumen.EsperanTuRespuesta, "rojo", resumen.EsperanTuRespuesta > 0 ? "El equipo te pidió información" : "Nada pendiente de tu parte")' />
+            <partial name="_Kpi" model='("Resueltos", resumen.Resueltos, "verde", resumen.Cerrados > 0 ? $"{resumen.Cerrados} cerrados" : "Podés reabrirlos si sigue el problema")' />
+        </div>
+    }
+}
+else
+{
+    @if (Model.Metricas is { Exito: false })
+    {
+        <div class="alerta-error" role="alert">No se pudieron calcular las métricas. <a asp-page="./Index" class="enlace">Reintentar</a></div>
+    }
+    else if (Model.Metricas?.Datos is { } metricas)
+    {
+        <div class="kpi-grid">
+            <partial name="_Kpi" model='("Abiertos", metricas.Abiertos, "azul", (string?)null)' />
+            <partial name="_Kpi" model='("En progreso", metricas.EnProgreso, "ambar", (string?)null)' />
+            <partial name="_Kpi" model='("Resueltos hoy", metricas.ResueltosHoy, "verde", (string?)null)' />
+            <partial name="_Kpi" model='("SLA vencido", metricas.SlaVencido, "rojo", metricas.SlaVencido > 0 ? "requiere atención" : null)' />
+        </div>
+    }
+}
+
+<div class="columnas-dashboard @(Model.EsCliente ? "" : "dos-columnas")">
+    @if (!Model.EsCliente)
+    {
+        <section>
+            <h2 class="titulo-seccion">Requieren atención</h2>
+            <partial name="_ListaTicketsDashboard" model='(Model.RequierenAtencion, "Nada urgente: no hay tickets sin asignar ni con el SLA vencido.", false)' />
+        </section>
+    }
+    <section>
+        <h2 class="titulo-seccion">@(Model.EsCliente ? "Tus casos recientes" : "Actividad reciente")</h2>
+        <partial name="_ListaTicketsDashboard" model='(Model.Recientes, Model.EsCliente ? "Todavía no reportaste ningún problema." : "Todavía no hay actividad.", Model.EsCliente)' />
+    </section>
+</div>
+
+@if (Model.CargaAgentes is { } carga)
+{
+    <section>
+        <h2 class="titulo-seccion">Carga por agente</h2>
+        @if (!carga.Exito)
+        {
+            <div class="alerta-error" role="alert">No se pudo cargar la carga por agente. <a asp-page="./Index" class="enlace">Reintentar</a></div>
+        }
+        else
+        {
+            <div class="tarjeta">
+                <table class="tabla">
+                    <thead><tr><th>Agente</th><th>Abiertos</th><th>En progreso</th><th>Resueltos</th><th>Cerrados</th></tr></thead>
+                    <tbody>
+                        @foreach (var agente in carga.Datos!)
+                        {
+                            <tr>
+                                <td><span class="avatar me-2">@Formato.Iniciales(agente.Agente)</span>@agente.Agente</td>
+                                <td>@agente.Abiertos</td>
+                                <td>@agente.EnProgreso</td>
+                                <td>@agente.Resueltos</td>
+                                <td>@agente.Cerrados</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+}

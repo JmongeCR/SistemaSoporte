@@ -1,0 +1,46 @@
+@page
+@model Soporte.Web.Pages.Cuenta.RestablecerModel
+@{
+    ViewData["Title"] = "Nueva contraseña";
+}
+
+<h1>Nueva contraseña</h1>
+<p class="cuenta-subtitulo">Elegí una contraseña de al menos 8 caracteres.</p>
+
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">
+        @Model.MensajeError
+        <div><a asp-page="./Recuperar" class="enlace">Solicitar un nuevo enlace</a></div>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.Datos.Token))
+{
+    <form method="post">
+        <input type="hidden" asp-for="Datos.Token" />
+
+        <div class="grupo-campo">
+            <label asp-for="Datos.NuevaContrasena" class="etiqueta">Nueva contraseña</label>
+            <div class="campo-contrasena">
+                <input asp-for="Datos.NuevaContrasena" id="nueva" class="campo campo-alto campo-completo" autocomplete="new-password" autofocus />
+                <button type="button" class="boton-ver" data-mostrar-contrasena="#nueva" aria-label="Mostrar contraseña" aria-pressed="false">👁️</button>
+            </div>
+            <span asp-validation-for="Datos.NuevaContrasena"></span>
+        </div>
+
+        <div class="grupo-campo">
+            <label asp-for="Datos.ConfirmarContrasena" class="etiqueta">Confirmar contraseña</label>
+            <input asp-for="Datos.ConfirmarContrasena" class="campo campo-alto campo-completo" autocomplete="new-password" />
+            <span asp-validation-for="Datos.ConfirmarContrasena"></span>
+        </div>
+
+        <button type="submit" class="boton-primario boton-bloque">Guardar contraseña</button>
+    </form>
+}
+
+<a asp-page="./Login" class="enlace cuenta-enlace">← Volver a iniciar sesión</a>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

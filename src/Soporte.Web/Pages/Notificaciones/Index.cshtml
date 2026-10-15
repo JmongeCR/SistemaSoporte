@@ -1,0 +1,59 @@
+@page
+@model Soporte.Web.Pages.Notificaciones.IndexModel
+@{
+    ViewData["Title"] = "Notificaciones";
+    var noLeidas = Model.Notificaciones.Count(n => !n.Leida);
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Notificaciones</h1>
+        <p>@(noLeidas == 0 ? "Estás al día." : $"{noLeidas} sin leer")</p>
+    </div>
+    @if (noLeidas > 0)
+    {
+        <form method="post" asp-page-handler="MarcarTodas" data-envio-unico>
+            <button type="submit" class="boton-secundario">Marcar todas como leídas</button>
+        </form>
+    }
+</header>
+
+@if (TempData["MensajeError"] is string errorTemporal)
+{
+    <div class="alerta-error" role="alert">@errorTemporal</div>
+}
+
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">@Model.MensajeError <a asp-page="./Index" class="enlace">Reintentar</a></div>
+}
+else if (Model.Notificaciones.Count == 0)
+{
+    <div class="tarjeta estado-vacio">No tenés notificaciones.</div>
+}
+else
+{
+    <ul class="tarjeta lista-notificaciones">
+        @foreach (var notificacion in Model.Notificaciones)
+        {
+            <li class="notificacion-fila @(notificacion.Leida ? "" : "no-leida")">
+                <form method="post" asp-page-handler="Abrir" asp-route-id="@notificacion.Id" class="notificacion-abrir">
+                    <button type="submit" class="notificacion-item">
+                        <span class="notificacion-mensaje">@notificacion.Mensaje</span>
+                        <span class="notificacion-meta">#@notificacion.TicketId · @notificacion.TicketAsunto · @Formato.Hace(notificacion.FechaCreacion)</span>
+                    </button>
+                </form>
+                @if (!notificacion.Leida)
+                {
+                    <form method="post" asp-page-handler="MarcarLeida" asp-route-id="@notificacion.Id">
+                        <button type="submit" class="enlace boton-enlace">Marcar como leída</button>
+                    </form>
+                }
+                else
+                {
+                    <span class="texto-tenue notificacion-estado">Leída</span>
+                }
+            </li>
+        }
+    </ul>
+}

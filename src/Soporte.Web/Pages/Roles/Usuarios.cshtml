@@ -1,0 +1,119 @@
+@page
+@model Soporte.Web.Pages.Roles.UsuariosModel
+@{
+    ViewData["Title"] = "Usuarios y asignaciones";
+}
+
+@if (TempData["Aviso"] is string aviso)
+{
+    <div class="toast-exito" role="status" data-autocerrar><span class="toast-icono" aria-hidden="true">✓</span>@aviso</div>
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Roles y permisos</h1>
+        <p>Definí qué puede hacer cada usuario dentro de la plataforma</p>
+    </div>
+</header>
+
+<partial name="_PestanasRoles" model='"usuarios"' />
+
+@if (TempData["ErrorTitulo"] is string errorTitulo)
+{
+    <div class="alerta-error alerta-con-titulo" role="alert">
+        <strong><span aria-hidden="true">⚠</span> @errorTitulo</strong>
+        <p>@TempData["ErrorDetalle"]</p>
+    </div>
+}
+
+<form method="get" class="barra-usuarios" role="search">
+    <div class="buscador">
+        <input asp-for="Filtro.Texto" class="campo" placeholder="Buscar por nombre o correo..." aria-label="Buscar por nombre o correo" />
+    </div>
+    <select asp-for="Filtro.RolId" class="campo" aria-label="Filtrar por rol" onchange="this.form.requestSubmit()">
+        <option value="">Todos los roles</option>
+        @foreach (var rol in Model.Roles)
+        {
+            <option value="@rol.Id">@DescripcionRoles.De(rol.Id).Titulo</option>
+        }
+    </select>
+    @if (Model.Usuarios is not null)
+    {
+        <span class="texto-secundario barra-usuarios-total">@Model.Usuarios.Count @(Model.Usuarios.Count == 1 ? "usuario" : "usuarios")</span>
+    }
+</form>
+
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">@Model.MensajeError <a asp-page="./Usuarios" class="enlace">Reintentar</a></div>
+}
+else if (Model.Usuarios is { Count: 0 })
+{
+    <div class="tarjeta estado-vacio">No hay usuarios que coincidan con la búsqueda.</div>
+}
+else if (Model.Usuarios is not null)
+{
+    <div class="tarjeta">
+        <table class="tabla">
+            <thead>
+                <tr><th>Usuario</th><th>Correo electrónico</th><th>Rol actual</th><th><span class="visually-hidden">Acciones</span></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var usuario in Model.Usuarios)
+                {
+                    <tr>
+                        <td>
+                            <span class="avatar avatar-grande @DescripcionRoles.ClaseRol(usuario.RolId) me-2">@Formato.Iniciales(usuario.Nombre)</span>
+                            @usuario.Nombre
+                            @if (usuario.Id == Model.UsuarioActualId) { <span class="etiqueta-mini">(vos)</span> }
+                        </td>
+                        <td class="texto-secundario">@usuario.Correo</td>
+                        <td><span class="pill-rol @DescripcionRoles.ClaseRol(usuario.RolId)">@usuario.Rol</span></td>
+                        <td class="text-end">
+                            <button type="button" class="boton-contorno" data-cambiar-rol
+                                    data-usuario-id="@usuario.Id" data-nombre="@usuario.Nombre" data-correo="@usuario.Correo"
+                                    data-rol-id="@usuario.RolId" data-rol="@usuario.Rol" data-clase-rol="@DescripcionRoles.ClaseRol(usuario.RolId)">
+                                Cambiar rol
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@* Modal "Cambiar rol" (diseño 06c). Cancelar o ✕ cierra sin aplicar cambios (HU-15 esc. 3). *@
+<dialog class="dialogo" id="modal-cambiar-rol" aria-labelledby="titulo-modal-rol">
+    <form method="post" asp-page-handler="CambiarRol" data-envio-unico>
+        <input type="hidden" name="volverTexto" value="@Model.Filtro.Texto" />
+        <input type="hidden" name="volverRolId" value="@Model.Filtro.RolId" />
+        <header class="modal-encabezado">
+            <h2 id="titulo-modal-rol">Cambiar rol</h2>
+            <button type="button" class="modal-cerrar" data-cerrar-modal aria-label="Cerrar">✕</button>
+        </header>
+        <input type="hidden" name="usuarioId" data-campo="usuario-id" />
+        <input type="hidden" name="rolActualId" data-campo="rol-actual-id" />
+        <div class="modal-usuario">
+            <span class="avatar avatar-grande" data-campo="iniciales"></span>
+            <div>
+                <strong data-campo="nombre"></strong>
+                <span class="texto-secundario" data-campo="correo"></span>
+            </div>
+        </div>
+        <p class="modal-rol-actual">Rol actual: <span class="pill-rol" data-campo="rol-actual"></span></p>
+        <label class="etiqueta" for="nuevo-rol">Nuevo rol</label>
+        <select id="nuevo-rol" name="nuevoRolId" class="campo campo-completo">
+            @foreach (var rol in Model.Roles)
+            {
+                <option value="@rol.Id">@DescripcionRoles.De(rol.Id).Titulo</option>
+            }
+        </select>
+        <p class="aviso-info modal-aviso" data-campo="aviso"></p>
+        <div class="modal-acciones">
+            <button type="button" class="boton-secundario" data-cerrar-modal>Cancelar</button>
+            <button type="submit" class="boton-primario" data-campo="guardar">Guardar cambio</button>
+        </div>
+    </form>
+</dialog>
+<script type="application/json" id="avisos-rol">@Html.Raw(Model.AvisosPorRolJson)</script>

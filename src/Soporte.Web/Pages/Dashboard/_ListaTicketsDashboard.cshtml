@@ -1,0 +1,45 @@
+@using Soporte.Abstracciones.DTOs
+@model (ResultadoOperacion<ResultadoPaginado<TicketResumenDto>>? Resultado, string TextoVacio, bool EsCliente)
+@if (Model.Resultado is { Exito: false })
+{
+    <div class="alerta-error" role="alert">@Model.Resultado.Mensaje <a asp-page="/Dashboard/Index" class="enlace">Reintentar</a></div>
+}
+else if (Model.Resultado?.Datos is { } datos)
+{
+    @if (datos.Total == 0)
+    {
+        <div class="tarjeta estado-vacio">
+            @Model.TextoVacio
+        </div>
+    }
+    else
+    {
+        <ul class="tarjeta lista-tickets">
+            @foreach (var ticket in datos.Elementos)
+            {
+                <li>
+                    <a asp-page="/Tickets/Detalle" asp-route-id="@ticket.Id" class="lista-tickets-fila">
+                        <span class="ticket-id">#@ticket.Id</span>
+                        <span class="lista-tickets-asunto">
+                            @ticket.Asunto
+                            <span class="lista-tickets-meta">
+                                Actualizado @Formato.Hace(ticket.FechaActualizacion ?? ticket.FechaCreacion)
+                                @if (ticket.EsperaRespuestaCliente) { <span class="pill pill-alerta ms-1">@(Model.EsCliente ? "Espera tu respuesta" : "Espera respuesta del cliente")</span> }
+                                @if (ticket.SlaVencido && !Model.EsCliente) { <span class="pill pill-alerta ms-1">SLA vencido</span> }
+                            </span>
+                        </span>
+                        <span class="pill @Formato.ClaseEstado(ticket.EstadoId)">@ticket.Estado</span>
+                        @if (ticket.AgenteAsignado is null)
+                        {
+                            <span class="texto-tenue lista-tickets-agente">Sin asignar</span>
+                        }
+                        else
+                        {
+                            <span class="avatar" title="@ticket.AgenteAsignado">@Formato.Iniciales(ticket.AgenteAsignado)</span>
+                        }
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+}

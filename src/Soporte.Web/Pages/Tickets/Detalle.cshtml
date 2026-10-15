@@ -1,0 +1,231 @@
+@page "{id:int}"
+@model Soporte.Web.Pages.Tickets.DetalleModel
+@{
+    ViewData["Title"] = Model.Ticket is null ? "Ticket" : $"#{Model.Ticket.Id} {Model.Ticket.Asunto}";
+    var t = Model.Ticket;
+}
+
+<nav class="migas" aria-label="Ruta">
+    <a asp-page="./Index">@(Model.EsCliente ? "Mis tickets" : "Tickets")</a>
+    <span aria-hidden="true">/</span>
+    <span class="migas-actual">#@Model.Id</span>
+</nav>
+
+@if (TempData["MensajeExito"] is string exito)
+{
+    <div class="alerta-exito" role="status">@exito</div>
+}
+@if (TempData["MensajeError"] is string errorTemporal)
+{
+    <div class="alerta-error" role="alert">@errorTemporal</div>
+}
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">
+        @Model.MensajeError
+        @if (t is null) { <div><a asp-page="./Index" class="enlace">Volver a la lista</a></div> }
+    </div>
+}
+
+@if (t is not null)
+{
+<div class="detalle">
+    <div class="detalle-principal">
+        <header class="detalle-encabezado">
+            <h1>@t.Asunto</h1>
+            <span class="prioridad @Formato.ClasePrioridad(t.PrioridadId) pill-prioridad">Prioridad @t.Prioridad.ToLowerInvariant()</span>
+        </header>
+        <p class="detalle-meta">
+            <span class="ticket-id">#@t.Id</span> · Reportado por @t.Cliente · @Formato.Hace(t.FechaCreacion)
+            @if (t.SlaVencido && Model.EsEquipo) { <span class="pill pill-alerta ms-1">SLA vencido</span> }
+        </p>
+
+        @if (t.EsperaRespuestaCliente)
+        {
+            <div class="aviso-info" role="status">
+                @(Model.EsCliente ? "El equipo necesita información adicional para avanzar con tu caso. Respondé en la conversación." : "Se pidió información adicional al cliente y todavía no respondió.")
+            </div>
+        }
+
+        <section class="tarjeta tarjeta-seccion">
+            <h2 class="etiqueta-seccion"><span class="punto-azul" aria-hidden="true"></span>Descripción</h2>
+            <p class="detalle-descripcion">@t.Descripcion</p>
+            @if (t.Adjuntos.Count > 0)
+            {
+                <partial name="_AdjuntosTicket" model="(t.Adjuntos, t.Id)" />
+            }
+        </section>
+
+        <h2 class="titulo-seccion" id="actividad">
+            Actividad <span class="contador-gris">@Model.Actividad.Count</span>
+        </h2>
+
+        <ol class="actividad">
+            @foreach (var item in Model.Actividad)
+            {
+                if (item.Evento is { } evento)
+                {
+                    <li class="evento">
+                        <span class="evento-punto" aria-hidden="true"></span>
+                        @if (evento.EstadoAnterior is null)
+                        {
+                            <span><strong>@evento.Usuario</strong> creó el ticket</span>
+                        }
+                        else
+                        {
+                            <span><strong>@evento.Usuario</strong> cambió el estado a <span class="pill @Formato.ClaseEstado(evento.EstadoNuevoId)">@evento.EstadoNuevo</span></span>
+                        }
+                        <time class="texto-tenue" datetime="@evento.FechaCambio.ToString("O")" title="@Model.FechaLocal(evento.FechaCambio)">@Formato.Hace(evento.FechaCambio)</time>
+                    </li>
+                }
+                else if (item.Comentario is { } c)
+                {
+                    <li class="comentario @(c.EsNotaInterna ? "comentario-interno" : "") @(c.SolicitaInformacion ? "comentario-solicitud" : "")">
+                        <span class="avatar avatar-grande @(c.RolAutor == "Cliente" ? "" : "avatar-equipo")">@Formato.Iniciales(c.Autor)</span>
+                        <div class="comentario-cuerpo">
+                            <div class="comentario-encabezado">
+                                <strong>@c.Autor</strong>
+                                <span class="etiqueta-mini">@c.RolAutor</span>
+                                @if (c.EsNotaInterna) { <span class="etiqueta-mini etiqueta-interna">Nota interna · solo el equipo</span> }
+                                @if (c.SolicitaInformacion) { <span class="etiqueta-mini etiqueta-solicitud">Solicitud de información</span> }
+                                @if (!c.Leido) { <span class="etiqueta-mini etiqueta-nuevo">Nuevo</span> }
+                                <time class="texto-tenue comentario-hora" datetime="@c.FechaCreacion.ToString("O")" title="@Model.FechaLocal(c.FechaCreacion)">@Formato.Hace(c.FechaCreacion)</time>
+                            </div>
+                            <p class="comentario-texto">@c.Texto</p>
+                            @if (c.Adjuntos.Count > 0)
+                            {
+                                <partial name="_AdjuntosTicket" model="(c.Adjuntos, t.Id)" />
+                            }
+                        </div>
+                    </li>
+                }
+            }
+        </ol>
+
+        @if (Model.PuedeResponder)
+        {
+            <form method="post" asp-page-handler="Comentar" asp-route-id="@t.Id" enctype="multipart/form-data" class="tarjeta caja-respuesta" data-envio-unico>
+                @if (Model.EsEquipo)
+                {
+                    <div class="segmentado segmentado-compacto" role="radiogroup" aria-label="Tipo de mensaje">
+                        @if (!Model.EstaCerrado)
+                        {
+                            <input type="radio" class="segmentado-opcion" id="tipo-publica" name="tipoRespuesta" value="publica" checked="@(Model.TipoRespuesta == "publica")" />
+                            <label for="tipo-publica">Respuesta al cliente</label>
+                            <input type="radio" class="segmentado-opcion" id="tipo-solicitud" name="tipoRespuesta" value="solicitud" checked="@(Model.TipoRespuesta == "solicitud")" />
+                            <label for="tipo-solicitud">Solicitar información</label>
+                        }
+                        <input type="radio" class="segmentado-opcion" id="tipo-interna" name="tipoRespuesta" value="interna" checked="@(Model.TipoRespuesta == "interna" || Model.EstaCerrado)" />
+                        <label for="tipo-interna">Nota interna</label>
+                    </div>
+                }
+                <div class="caja-respuesta-fila">
+                    <span class="avatar avatar-grande">@Formato.Iniciales(User.Identity?.Name)</span>
+                    <div class="caja-respuesta-campos">
+                        <label for="Respuesta_Texto" class="visually-hidden">Mensaje</label>
+                        <textarea name="Respuesta.Texto" id="Respuesta_Texto" class="campo campo-completo" rows="3" maxlength="4000" required
+                                  data-val="true" data-val-required="El comentario no puede estar vacío."
+                                  placeholder="@(Model.EsCliente ? "Escribí tu respuesta o agregá información…" : "Escribe un comentario o actualización…")">@Model.Respuesta.Texto</textarea>
+                        <span class="field-validation-valid" data-valmsg-for="Respuesta.Texto" data-valmsg-replace="true"></span>
+
+                        <div class="zona-archivos zona-archivos-compacta" data-zona-archivos data-extensiones=".pdf,.png,.jpg,.jpeg" data-max-mb="10"
+                             data-max-archivos="5" data-lista="#lista-adjuntos-respuesta" data-error="#error-adjuntos-respuesta">
+                            <input type="file" name="adjuntos" multiple accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" aria-label="Adjuntar archivos" />
+                            <p class="zona-archivos-ayuda">📎 Adjuntar PDF, PNG o JPG (máx. 10 MB)</p>
+                        </div>
+                        <p class="error-archivos" id="error-adjuntos-respuesta" role="alert"></p>
+                        <ul class="lista-archivos" id="lista-adjuntos-respuesta"></ul>
+                    </div>
+                    <button type="submit" class="boton-primario">Enviar</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="tarjeta estado-vacio">Este ticket está cerrado y no admite nuevas respuestas. Si el problema continúa, creá un ticket nuevo.</div>
+        }
+    </div>
+
+    <aside class="detalle-lateral">
+        <div class="tarjeta">
+            <div class="dato-bloque">
+                <span class="etiqueta-seccion">Estado</span>
+                <span class="pill pill-grande @Formato.ClaseEstado(t.EstadoId)">@t.Estado</span>
+            </div>
+            <div class="dato-bloque">
+                <span class="etiqueta-seccion">Prioridad</span>
+                <span class="prioridad @Formato.ClasePrioridad(t.PrioridadId)">@t.Prioridad</span>
+                <span class="etiqueta-seccion">Categoría</span>
+                <span>@t.Categoria</span>
+                <span class="etiqueta-seccion">Cliente</span>
+                <span>@t.Cliente</span>
+                <span class="etiqueta-seccion">Agente asignado</span>
+                @if (t.AgenteAsignado is null)
+                {
+                    <span class="texto-tenue">Sin asignar</span>
+                }
+                else
+                {
+                    <span><span class="avatar me-1">@Formato.Iniciales(t.AgenteAsignado)</span>@t.AgenteAsignado</span>
+                }
+            </div>
+            <div class="dato-bloque dato-fechas">
+                <span class="texto-secundario">Creado</span><strong>@Model.FechaLocal(t.FechaCreacion)</strong>
+                <span class="texto-secundario">Actualizado</span><strong>@(t.FechaActualizacion is null ? "—" : Model.FechaLocal(t.FechaActualizacion.Value))</strong>
+            </div>
+        </div>
+
+        @if (Model.PuedeTomar)
+        {
+            <form method="post" asp-page-handler="Tomar" asp-route-id="@t.Id" class="tarjeta tarjeta-accion" data-envio-unico>
+                <p>Este ticket no tiene agente asignado.</p>
+                <button type="submit" class="boton-primario boton-bloque">Asignarme ticket</button>
+            </form>
+        }
+
+        @if (Model.PuedeReabrir)
+        {
+            <form method="post" asp-page-handler="Reabrir" asp-route-id="@t.Id" class="tarjeta tarjeta-accion" data-envio-unico>
+                <input type="hidden" name="rowVersion" value="@t.RowVersion" />
+                <p><strong>¿Sigue el problema?</strong> Podés reabrir el ticket.</p>
+                <textarea name="motivo" class="campo campo-completo" rows="2" maxlength="4000" placeholder="Contanos qué sigue fallando (opcional)"></textarea>
+                <button type="submit" class="boton-secundario boton-bloque">Reabrir ticket</button>
+            </form>
+        }
+
+        @if (Model.PuedeGestionar)
+        {
+            <form method="post" asp-page-handler="Actualizar" asp-route-id="@t.Id" class="tarjeta tarjeta-accion" data-envio-unico>
+                <h2 class="etiqueta-seccion">Gestionar ticket</h2>
+                <input type="hidden" name="Cambios.RowVersion" value="@Model.Cambios.RowVersion" />
+                <label class="etiqueta" for="Cambios_EstadoId">Estado</label>
+                <select name="Cambios.EstadoId" id="Cambios_EstadoId" class="campo campo-completo" asp-items="@(new SelectList(Model.Estados, "Value", "Text", Model.Cambios.EstadoId))"></select>
+                <label class="etiqueta" for="Cambios_PrioridadId">Prioridad</label>
+                <select name="Cambios.PrioridadId" id="Cambios_PrioridadId" class="campo campo-completo" asp-items="@(new SelectList(Model.Prioridades, "Value", "Text", Model.Cambios.PrioridadId))"></select>
+                <label class="etiqueta" for="Cambios_CategoriaId">Categoría</label>
+                <select name="Cambios.CategoriaId" id="Cambios_CategoriaId" class="campo campo-completo" asp-items="@(new SelectList(Model.Categorias, "Value", "Text", Model.Cambios.CategoriaId))"></select>
+                @if (Model.EsAdministrador)
+                {
+                    <label class="etiqueta" for="Cambios_AgenteAsignadoId">Agente asignado</label>
+                    <select name="Cambios.AgenteAsignadoId" id="Cambios_AgenteAsignadoId" class="campo campo-completo" asp-items="@(new SelectList(Model.Agentes, "Value", "Text", Model.Cambios.AgenteAsignadoId))">
+                        <option value="">Sin asignar</option>
+                    </select>
+                }
+                else
+                {
+                    <input type="hidden" name="Cambios.AgenteAsignadoId" value="@Model.Cambios.AgenteAsignadoId" />
+                }
+                <label class="etiqueta" for="Cambios_MensajePublico">Mensaje para el cliente (opcional)</label>
+                <textarea name="Cambios.MensajePublico" id="Cambios_MensajePublico" class="campo campo-completo" rows="3" maxlength="4000"
+                          placeholder="Ej. explicación de la resolución">@Model.Cambios.MensajePublico</textarea>
+                <p class="ayuda">Cambiar prioridad, categoría o agente no se notifica al cliente. El estado y el mensaje sí.</p>
+                <button type="submit" class="boton-primario boton-bloque">Guardar cambios</button>
+            </form>
+        }
+    </aside>
+</div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

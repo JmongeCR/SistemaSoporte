@@ -1,0 +1,76 @@
+@page
+@model Soporte.Web.Pages.Roles.IndexModel
+@{
+    ViewData["Title"] = "Roles y permisos";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Roles y permisos</h1>
+        <p>Definí qué puede hacer cada usuario dentro de la plataforma</p>
+    </div>
+</header>
+
+<partial name="_PestanasRoles" model='"matriz"' />
+
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">@Model.MensajeError <a asp-page="./Index" class="enlace">Reintentar</a></div>
+}
+
+<div class="roles-diseno">
+    <nav class="roles-lista" aria-label="Roles del sistema">
+        @foreach (var rol in Model.Roles)
+        {
+            var descripcion = DescripcionRoles.De(rol.Id);
+            var seleccionado = rol.Id == Model.RolId;
+            <a asp-page="./Index" asp-route-rolId="@rol.Id" class="tarjeta-rol @(seleccionado ? "seleccionada" : "")" aria-current="@(seleccionado ? "true" : null)">
+                <strong>@descripcion.Titulo</strong>
+                <span>@descripcion.Resumen</span>
+                @if (Model.UsuariosPorRol is { } conteo)
+                {
+                    var cantidad = conteo.GetValueOrDefault(rol.Id);
+                    <small>@cantidad @(cantidad == 1 ? "usuario" : "usuarios")</small>
+                }
+            </a>
+        }
+    </nav>
+
+    @if (Model.Matriz is { } matriz)
+    {
+        var descripcion = DescripcionRoles.De(matriz.RolId);
+        var letra = 'A';
+        <section class="tarjeta matriz" aria-labelledby="titulo-matriz">
+            <header class="matriz-encabezado">
+                <div class="matriz-titulo">
+                    <h2 id="titulo-matriz">@descripcion.Titulo</h2>
+                    <span class="chip-sistema">Rol del sistema</span>
+                </div>
+                <p>@descripcion.Detalle</p>
+                <p class="ayuda">🔒 Los permisos de los roles del sistema son de solo lectura y no se pueden editar.</p>
+            </header>
+            @foreach (var grupo in matriz.Grupos)
+            {
+                <div class="matriz-grupo">
+                    <h3><span class="letra-grupo" aria-hidden="true">@(letra++)</span>@grupo.Grupo</h3>
+                    <ul>
+                        @foreach (var permiso in grupo.Permisos)
+                        {
+                            <li>
+                                <span>@permiso.Descripcion</span>
+                                @if (permiso.Concedido)
+                                {
+                                    <span class="estado-permiso permitido">✓ Permitido</span>
+                                }
+                                else
+                                {
+                                    <span class="estado-permiso">— No permitido</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </section>
+    }
+</div>

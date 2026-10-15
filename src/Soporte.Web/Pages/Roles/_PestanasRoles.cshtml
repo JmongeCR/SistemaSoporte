@@ -1,0 +1,5 @@
+@model string
+<nav class="pestanas" aria-label="Secciones de roles y permisos">
+    <a asp-page="/Roles/Index" class="pestana @(Model == "matriz" ? "activa" : "")" aria-current="@(Model == "matriz" ? "page" : null)">Roles y permisos</a>
+    <a asp-page="/Roles/Usuarios" class="pestana @(Model == "usuarios" ? "activa" : "")" aria-current="@(Model == "usuarios" ? "page" : null)">Usuarios y asignaciones</a>
+</nav>

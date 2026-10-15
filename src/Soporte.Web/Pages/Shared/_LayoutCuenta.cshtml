@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Soporte</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="cuenta">
+        <section class="cuenta-panel" aria-hidden="true">
+            <div>
+                <h2>Cada solicitud, bajo control.</h2>
+                <p>Centralizá tus tickets, organizá la atención y seguí cada caso hasta su resolución.</p>
+            </div>
+        </section>
+
+        <main class="cuenta-contenido" role="main">
+            <div class="cuenta-logo">
+                <svg width="38" height="32" viewBox="0 0 38 32" aria-hidden="true">
+                    <path d="M7 2h24a5 5 0 0 1 5 5v13a5 5 0 0 1-5 5H15l-8 6v-6a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" fill="#296BED" />
+                    <rect x="10" y="9" width="16" height="3.2" rx="1.6" fill="#FFFFFF" />
+                    <rect x="10" y="15.5" width="10" height="3.2" rx="1.6" fill="#FFFFFF" />
+                </svg>
+                Soporte
+            </div>
+            <div class="cuenta-tarjeta">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

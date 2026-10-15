@@ -1,0 +1,13 @@
+@using Soporte.Abstracciones.DTOs
+@model (IReadOnlyList<AdjuntoDto> Adjuntos, int TicketId)
+<ul class="adjuntos">
+    @foreach (var adjunto in Model.Adjuntos)
+    {
+        <li>
+            <a asp-page="/Tickets/Detalle" asp-page-handler="Adjunto" asp-route-id="@Model.TicketId" asp-route-adjuntoId="@adjunto.Id" class="adjunto">
+                📎 @adjunto.NombreOriginal
+                <span class="texto-tenue">@(adjunto.TamanoBytes < 1024 * 1024 ? $"{Math.Ceiling(adjunto.TamanoBytes / 1024d)} KB" : $"{adjunto.TamanoBytes / 1024d / 1024d:0.0} MB")</span>
+            </a>
+        </li>
+    }
+</ul>

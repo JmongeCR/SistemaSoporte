@@ -1,0 +1,16 @@
+@model (string Etiqueta, int Valor, string Color, string? Nota)
+@{
+    // Una nota informativa sobre un valor en cero no se pinta con el color de alerta.
+    var colorNota = Model.Valor == 0 ? "gris" : Model.Color;
+}
+<div class="kpi">
+    <div class="kpi-encabezado">
+        <span>@Model.Etiqueta</span>
+        <span class="kpi-punto kpi-@Model.Color" aria-hidden="true"></span>
+    </div>
+    <div class="kpi-valor">@Model.Valor</div>
+    @if (Model.Nota is not null)
+    {
+        <div class="kpi-nota kpi-texto-@colorNota">@Model.Nota</div>
+    }
+</div>
