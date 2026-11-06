@@ -50,4 +50,30 @@ else
     <div class="tarjeta kb-contenido">
         @Html.Raw(Model.ContenidoHtml)
     </div>
+
+    @if (Model.Sesion.EstaAutenticado)
+    {
+        <div class="kb-votos-bloque">
+            <span class="kb-votos-pregunta">¿Te fue útil este artículo?</span>
+            <form method="post" asp-page-handler="Votar" class="kb-votos-form">
+                <input type="hidden" name="articuloId" value="@Model.Articulo.Id" />
+                <input type="hidden" name="slug" value="@Model.Articulo.Slug" />
+                <button type="submit" name="esUtil" value="true"
+                        class="btn-voto @(Model.Votos?.MiVoto == true ? "btn-voto-activo" : "")">
+                    👍 <span class="votos-count">@(Model.Votos?.UtilCount ?? 0)</span>
+                </button>
+                <button type="submit" name="esUtil" value="false"
+                        class="btn-voto @(Model.Votos?.MiVoto == false ? "btn-voto-activo" : "")">
+                    👎 <span class="votos-count">@(Model.Votos?.NoUtilCount ?? 0)</span>
+                </button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="kb-votos-bloque kb-votos-anonimo">
+            <span class="kb-votos-pregunta">¿Te fue útil? <a asp-page="/Cuenta/Login">Inicia sesión</a> para calificar.</span>
+            <span>👍 @(Model.Votos?.UtilCount ?? 0) · 👎 @(Model.Votos?.NoUtilCount ?? 0)</span>
+        </div>
+    }
 }

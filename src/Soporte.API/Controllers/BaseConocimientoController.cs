@@ -93,4 +93,23 @@ public class BaseConocimientoController : SoporteControllerBase
         await _flujo.DesvincularAsync(ticketId, articuloId, usuario);
         return NoContent();
     }
+
+    [AllowAnonymous]
+    [HttpGet("{id:int}/votos")]
+    [ProducesResponseType(typeof(VotoKbResultadoDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<VotoKbResultadoDto>> ObtenerVotosAsync(int id)
+    {
+        var usuario = _usuarioActual.Obtener();
+        return Ok(await _flujo.ObtenerVotosAsync(id, usuario?.UsuarioId));
+    }
+
+    [HttpPost("{id:int}/votos")]
+    [ProducesResponseType(typeof(VotoKbResultadoDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<VotoKbResultadoDto>> VotarAsync(int id, [FromBody] bool esUtil)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
+        var resultado = await _flujo.VotarAsync(id, esUtil, usuario);
+        return resultado.Exito ? Ok(resultado.Datos) : RespuestaError(resultado);
+    }
 }

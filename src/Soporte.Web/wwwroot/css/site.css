@@ -997,3 +997,38 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
 .kb-vincular-fila { display: flex; gap: 6px; align-items: center; }
 .kb-vincular-select { flex: 1; min-width: 0; font-size: 12px; padding: 5px 8px; }
 .kb-vincular-btn { padding: 5px 12px; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+
+/* ---- Respuestas enlatadas (Plantillas) ---- */
+.plantillas-selector { margin-bottom: 10px; }
+.plantillas-select { width: 100%; font-size: 13px; padding: 6px 8px; border: 1px solid var(--color-borde); border-radius: 6px; background: var(--color-fondo-elevado); color: var(--color-texto); cursor: pointer; }
+.plantillas-select:focus { outline: none; border-color: var(--color-primario); box-shadow: 0 0 0 2px var(--color-primario-suave); }
+
+/* ---- CSAT — bloque de calificación ---- */
+.tarjeta-csat { margin-top: 16px; padding: 16px; background: var(--color-fondo-elevado); border: 1px solid var(--color-borde); border-radius: 10px; }
+.tarjeta-csat h3 { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+
+.estrellas-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; margin-bottom: 12px; }
+.estrellas-rating input[type="radio"] { display: none; }
+.estrellas-rating label { font-size: 28px; cursor: pointer; color: var(--color-texto-tenue); line-height: 1; transition: color .15s; }
+.estrellas-rating input:checked ~ label,
+.estrellas-rating label:hover,
+.estrellas-rating label:hover ~ label { color: #f5a623; }
+
+.csat-comentario { margin-bottom: 12px; }
+.csat-comentario textarea { width: 100%; font-size: 13px; padding: 8px; border: 1px solid var(--color-borde); border-radius: 6px; background: var(--color-fondo-elevado); color: var(--color-texto); resize: vertical; min-height: 60px; }
+
+.csat-resultado { padding: 12px; background: var(--color-fondo-elevado); border: 1px solid var(--color-borde); border-radius: 10px; margin-top: 16px; }
+.csat-resultado h3 { font-size: 13px; font-weight: 600; color: var(--color-texto-tenue); text-transform: uppercase; letter-spacing: .04em; margin: 0 0 8px; }
+.csat-estrellas { font-size: 20px; margin-bottom: 6px; letter-spacing: 2px; }
+.csat-comentario-texto { font-size: 13px; color: var(--color-texto-secundario); font-style: italic; margin: 0; }
+
+/* ---- Votos KB ---- */
+.kb-votos-bloque { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding: 14px 16px; background: var(--color-fondo-elevado); border: 1px solid var(--color-borde); border-radius: 10px; }
+.kb-votos-pregunta { font-size: 14px; font-weight: 500; }
+.kb-votos-form { display: flex; gap: 8px; }
+.btn-voto { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1px solid var(--color-borde); border-radius: 20px; background: var(--color-fondo); color: var(--color-texto); font-size: 14px; cursor: pointer; transition: all .15s; }
+.btn-voto:hover { border-color: var(--color-primario); color: var(--color-primario); background: var(--color-primario-suave); }
+.btn-voto-activo { border-color: var(--color-primario); color: var(--color-primario); background: var(--color-primario-suave); font-weight: 600; }
+.votos-count { font-size: 13px; font-weight: 600; }
+.kb-votos-anonimo { flex-wrap: wrap; }
+.kb-votos-anonimo .kb-votos-pregunta { font-size: 13px; color: var(--color-texto-secundario); }

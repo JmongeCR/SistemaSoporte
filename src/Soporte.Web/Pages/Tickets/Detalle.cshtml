@@ -103,7 +103,7 @@
 
         @if (Model.PuedeResponder)
         {
-            <form method="post" asp-page-handler="Comentar" asp-route-id="@t.Id" enctype="multipart/form-data" class="tarjeta caja-respuesta" data-envio-unico>
+            <form method="post" asp-page-handler="Comentar" asp-route-id="@t.Id" enctype="multipart/form-data" class="tarjeta caja-respuesta" data-envio-unico id="form-respuesta">
                 @if (Model.EsEquipo)
                 {
                     <div class="segmentado segmentado-compacto" role="radiogroup" aria-label="Tipo de mensaje">
@@ -116,6 +116,18 @@
                         }
                         <input type="radio" class="segmentado-opcion" id="tipo-interna" name="tipoRespuesta" value="interna" checked="@(Model.TipoRespuesta == "interna" || Model.EstaCerrado)" />
                         <label for="tipo-interna">Nota interna</label>
+                    </div>
+                }
+                @if (Model.EsEquipo && Model.Plantillas.Any())
+                {
+                    <div class="plantillas-selector">
+                        <select id="selector-plantilla" class="campo campo-compacto plantillas-select" aria-label="Insertar plantilla">
+                            <option value="">📋 Insertar plantilla…</option>
+                            @foreach (var p in Model.Plantillas)
+                            {
+                                <option value="@p.Texto">@p.Titulo</option>
+                            }
+                        </select>
                     </div>
                 }
                 <div class="caja-respuesta-fila">
@@ -203,6 +215,39 @@
                 </form>
             }
         </div>
+
+        @if (Model.PuedeCalificar)
+        {
+            <div class="tarjeta tarjeta-csat" id="csat">
+                <h2 class="etiqueta-seccion">¿Cómo fue la atención?</h2>
+                <form method="post" asp-page-handler="Calificar" asp-route-id="@t.Id" data-envio-unico>
+                    <div class="estrellas-rating" role="group" aria-label="Calificación">
+                        @for (int i = 5; i >= 1; i--)
+                        {
+                            <input type="radio" id="star-@i" name="calificacion" value="@i" class="star-input" required />
+                            <label for="star-@i" title="@i estrella@(i == 1 ? "" : "s")">★</label>
+                        }
+                    </div>
+                    <textarea name="comentarioCsat" class="campo campo-completo csat-comentario" rows="2" maxlength="500"
+                              placeholder="Comentario opcional…"></textarea>
+                    <button type="submit" class="boton-primario boton-bloque">Enviar calificación</button>
+                </form>
+            </div>
+        }
+        else if (Model.Csat is not null && Model.EsEquipo)
+        {
+            <div class="tarjeta tarjeta-csat">
+                <h2 class="etiqueta-seccion">Calificación del cliente</h2>
+                <div class="csat-resultado">
+                    <span class="csat-estrellas">@string.Concat(Enumerable.Repeat("★", Model.Csat.Calificacion))@string.Concat(Enumerable.Repeat("☆", 5 - Model.Csat.Calificacion))</span>
+                    <span class="celda-secundaria">@Formato.Hace(Model.Csat.FechaCalificacion)</span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.Csat.Comentario))
+                {
+                    <p class="csat-comentario-texto">@Model.Csat.Comentario</p>
+                }
+            </div>
+        }
 
         @if (Model.PuedeTomar)
         {

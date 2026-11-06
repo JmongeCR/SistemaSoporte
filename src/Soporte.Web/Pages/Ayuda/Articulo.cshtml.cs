@@ -17,12 +17,15 @@ public class ArticuloModel : PageModel
 
     public ArticuloModel(IBaseConocimientoApiServicio kb, IUsuarioSesion sesion)
     {
-        _kb = kb;
+        _kb     = kb;
         _sesion = sesion;
     }
 
-    public ArticuloKbDto? Articulo { get; private set; }
-    public string ContenidoHtml { get; private set; } = string.Empty;
+    public ArticuloKbDto?    Articulo      { get; private set; }
+    public string            ContenidoHtml { get; private set; } = string.Empty;
+    public VotoKbResultadoDto? Votos       { get; private set; }
+    public IUsuarioSesion    Sesion        => _sesion;
+
     public bool PuedeGestionar =>
         _sesion.EstaAutenticado &&
         (_sesion.Rol == RolTipo.Administrador || _sesion.Rol == RolTipo.Agente);
@@ -34,12 +37,20 @@ public class ArticuloModel : PageModel
         {
             Articulo = resultado.Datos;
             ContenidoHtml = Markdown.ToHtml(Articulo.Contenido, Pipeline);
+            var votosR = await _kb.ObtenerVotosAsync(Articulo.Id);
+            if (votosR.Exito) Votos = votosR.Datos;
         }
     }
 
     public async Task<IActionResult> OnPostCambiarPublicadoAsync(int id, bool publicado, string slug)
     {
         await _kb.CambiarPublicadoAsync(id, publicado);
+        return RedirectToPage(new { slug });
+    }
+
+    public async Task<IActionResult> OnPostVotarAsync(int articuloId, bool esUtil, string slug)
+    {
+        await _kb.VotarAsync(articuloId, esUtil);
         return RedirectToPage(new { slug });
     }
 }

@@ -36,4 +36,10 @@ public class BaseConocimientoApiServicio : IBaseConocimientoApiServicio
 
     public Task<ResultadoOperacion<ArticuloKbDto>> CambiarPublicadoAsync(int id, bool publicado) =>
         _api.PatchJsonAsync<ArticuloKbDto>($"api/kb/{id}/publicado", publicado);
+
+    public Task<ResultadoOperacion<VotoKbResultadoDto>> VotarAsync(int articuloId, bool esUtil) =>
+        _api.PostJsonAsync<VotoKbResultadoDto>($"api/kb/{articuloId}/votos", esUtil);
+
+    public Task<ResultadoOperacion<VotoKbResultadoDto>> ObtenerVotosAsync(int articuloId) =>
+        _api.GetAsync<VotoKbResultadoDto>($"api/kb/{articuloId}/votos");
 }

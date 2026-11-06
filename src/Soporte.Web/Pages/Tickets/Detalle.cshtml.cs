@@ -22,6 +22,7 @@ public class DetalleModel : PageModel
     private readonly ICatalogosApiServicio _catalogosApi;
     private readonly IUsuariosApiServicio _usuariosApi;
     private readonly IBaseConocimientoApiServicio _kbApi;
+    private readonly IPlantillaApiServicio _plantillasApi;
     private readonly IUsuarioSesion _sesion;
     private readonly IZonaHoraria _zonaHoraria;
 
@@ -30,6 +31,7 @@ public class DetalleModel : PageModel
         ICatalogosApiServicio catalogosApi,
         IUsuariosApiServicio usuariosApi,
         IBaseConocimientoApiServicio kbApi,
+        IPlantillaApiServicio plantillasApi,
         IUsuarioSesion sesion,
         IZonaHoraria zonaHoraria)
     {
@@ -37,6 +39,7 @@ public class DetalleModel : PageModel
         _catalogosApi = catalogosApi;
         _usuariosApi = usuariosApi;
         _kbApi = kbApi;
+        _plantillasApi = plantillasApi;
         _sesion = sesion;
         _zonaHoraria = zonaHoraria;
     }
@@ -46,8 +49,13 @@ public class DetalleModel : PageModel
 
     public TicketDetalleDto? Ticket { get; private set; }
     public IReadOnlyList<ItemActividad> Actividad { get; private set; } = Array.Empty<ItemActividad>();
-    public IReadOnlyList<ArticuloKbResumenDto> ArticulosVinculados { get; private set; } = Array.Empty<ArticuloKbResumenDto>();
+    public IReadOnlyList<ArticuloKbResumenDto> ArticulosVinculados  { get; private set; } = Array.Empty<ArticuloKbResumenDto>();
     public IReadOnlyList<ArticuloKbResumenDto> ArticulosDisponibles { get; private set; } = Array.Empty<ArticuloKbResumenDto>();
+    public IReadOnlyList<PlantillaRespuestaDto> Plantillas          { get; private set; } = Array.Empty<PlantillaRespuestaDto>();
+    public CalificacionCsatDto? Csat { get; private set; }
+    public bool PuedeCalificar => EsCliente && Ticket is not null &&
+        Ticket.EstadoId is (int)EstadoTicketTipo.Resuelto or (int)EstadoTicketTipo.Cerrado &&
+        Csat is null;
     public string? MensajeError { get; private set; }
 
     /// <summary>Formularios: se conservan si el envío falla, para no perder lo escrito.</summary>
@@ -155,6 +163,13 @@ public class DetalleModel : PageModel
         return RedirectToPage(null, null, new { id = Id }, "kb");
     }
 
+    public async Task<IActionResult> OnPostCalificarAsync(int calificacion, string? comentarioCsat)
+    {
+        var resultado = await _ticketsApi.CalificarAsync(Id, new CrearCsatDto { Calificacion = calificacion, Comentario = comentarioCsat });
+        TempData[resultado.Exito ? "MensajeExito" : "MensajeError"] = resultado.Exito ? "¡Gracias por tu calificación!" : resultado.Mensaje;
+        return RedirectToPage(null, null, new { id = Id }, null);
+    }
+
     public async Task<IActionResult> OnPostDesvincularKbAsync(int articuloId)
     {
         var resultado = await _kbApi.DesvincularAsync(Id, articuloId);
@@ -228,12 +243,13 @@ public class DetalleModel : PageModel
         };
 
         var vinculadosTask = _kbApi.ListarPorTicketAsync(Id);
+        var csatTask       = _ticketsApi.ObtenerCsatAsync(Id);
 
         if (!PuedeGestionar)
         {
-            await vinculadosTask;
-            if (vinculadosTask.Result.Exito)
-                ArticulosVinculados = vinculadosTask.Result.Datos!;
+            await Task.WhenAll(vinculadosTask, csatTask);
+            if (vinculadosTask.Result.Exito) ArticulosVinculados = vinculadosTask.Result.Datos!;
+            if (csatTask.Result.Exito)       Csat                = csatTask.Result.Datos;
             return;
         }
 
@@ -243,8 +259,9 @@ public class DetalleModel : PageModel
         var agentes = EsAdministrador
             ? _usuariosApi.ListarAgentesAsync()
             : Task.FromResult(ResultadoOperacion<IReadOnlyList<UsuarioDto>>.Ok(Array.Empty<UsuarioDto>()));
-        var todosKb = _kbApi.ListarAsync();
-        await Task.WhenAll(estados, prioridades, categorias, agentes, vinculadosTask, todosKb);
+        var todosKb      = _kbApi.ListarAsync();
+        var plantillasTask = _plantillasApi.ListarAsync();
+        await Task.WhenAll(estados, prioridades, categorias, agentes, vinculadosTask, todosKb, csatTask, plantillasTask);
 
         Estados = Opciones(estados.Result.Datos);
         Prioridades = Opciones(prioridades.Result.Datos);
@@ -264,6 +281,9 @@ public class DetalleModel : PageModel
                 .Where(a => !vinculadosIds.Contains(a.Id))
                 .ToList();
         }
+
+        if (csatTask.Result.Exito)       Csat      = csatTask.Result.Datos;
+        if (plantillasTask.Result.Exito) Plantillas = plantillasTask.Result.Datos!;
     }
 
     private static IReadOnlyList<SelectListItem> Opciones(IReadOnlyList<CatalogoDto>? catalogo) =>

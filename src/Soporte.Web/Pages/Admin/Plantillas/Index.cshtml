@@ -1,0 +1,111 @@
+@page
+@model Soporte.Web.Pages.Admin.Plantillas.PlantillasModel
+@{
+    ViewData["Title"] = "Respuestas enlatadas";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Respuestas enlatadas</h1>
+        <p>Plantillas de texto rápido para los agentes</p>
+    </div>
+    <button type="button" class="boton-primario" data-abrir-form-plantilla>+ Nueva plantilla</button>
+</header>
+
+@if (TempData["MensajeExito"] is string exito)
+{
+    <div class="alerta-exito" role="status" data-autocerrar>@exito</div>
+}
+@if (TempData["MensajeError"] is string err)
+{
+    <div class="alerta-error" role="alert">@err</div>
+}
+
+<div class="tarjeta" id="form-plantilla" style="display:none;max-width:600px;margin-bottom:20px">
+    <form method="post" asp-page-handler="Crear" data-envio-unico>
+        <h2 class="etiqueta-seccion">Nueva plantilla</h2>
+        <label class="etiqueta" for="nueva-titulo">Título</label>
+        <input type="text" id="nueva-titulo" name="Dto.Titulo" class="campo campo-completo" maxlength="100" required placeholder="Ej. Cierre por inactividad" />
+        <label class="etiqueta" for="nueva-texto">Texto</label>
+        <textarea id="nueva-texto" name="Dto.Texto" class="campo campo-completo" rows="4" maxlength="4000" required placeholder="Escribí el mensaje completo…"></textarea>
+        <div class="modal-acciones">
+            <button type="button" class="boton-secundario" data-cerrar-form-plantilla>Cancelar</button>
+            <button type="submit" class="boton-primario">Guardar</button>
+        </div>
+    </form>
+</div>
+
+@if (!Model.Plantillas.Any())
+{
+    <div class="estado-vacio">No hay plantillas todavía.</div>
+}
+else
+{
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Vista previa</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Plantillas)
+            {
+                <tr>
+                    <td><strong>@p.Titulo</strong></td>
+                    <td class="celda-secundaria">@(p.Texto.Length > 80 ? p.Texto[..80] + "…" : p.Texto)</td>
+                    <td class="col-acciones">
+                        <button type="button" class="boton-secundario boton-compacto"
+                                data-editar-plantilla
+                                data-id="@p.Id"
+                                data-titulo="@p.Titulo"
+                                data-texto="@p.Texto">Editar</button>
+                        <form method="post" asp-page-handler="Eliminar" style="display:inline" data-envio-unico>
+                            <input type="hidden" name="id" value="@p.Id" />
+                            <button type="submit" class="boton-secundario boton-compacto boton-peligro"
+                                    onclick="return confirm('¿Desactivar esta plantilla?')">Desactivar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<dialog id="modal-editar-plantilla" class="dialogo" aria-labelledby="titulo-modal-plantilla">
+    <form method="post" asp-page-handler="Actualizar" data-envio-unico>
+        <header class="modal-encabezado">
+            <h2 id="titulo-modal-plantilla">Editar plantilla</h2>
+            <button type="button" class="modal-cerrar" data-cerrar-modal aria-label="Cerrar">✕</button>
+        </header>
+        <input type="hidden" name="id" id="edit-plantilla-id" />
+        <label class="etiqueta" for="edit-titulo">Título</label>
+        <input type="text" id="edit-titulo" name="Dto.Titulo" class="campo campo-completo" maxlength="100" required />
+        <label class="etiqueta" for="edit-texto">Texto</label>
+        <textarea id="edit-texto" name="Dto.Texto" class="campo campo-completo" rows="4" maxlength="4000" required></textarea>
+        <div class="modal-acciones">
+            <button type="button" class="boton-secundario" data-cerrar-modal>Cancelar</button>
+            <button type="submit" class="boton-primario">Guardar</button>
+        </div>
+    </form>
+</dialog>
+
+@section Scripts {
+<script>
+document.querySelector('[data-abrir-form-plantilla]')?.addEventListener('click', () => {
+    document.getElementById('form-plantilla').style.display = '';
+});
+document.querySelector('[data-cerrar-form-plantilla]')?.addEventListener('click', () => {
+    document.getElementById('form-plantilla').style.display = 'none';
+});
+document.querySelectorAll('[data-editar-plantilla]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById('edit-plantilla-id').value = btn.dataset.id;
+        document.getElementById('edit-titulo').value        = btn.dataset.titulo;
+        document.getElementById('edit-texto').value         = btn.dataset.texto;
+        document.getElementById('modal-editar-plantilla').showModal();
+    });
+});
+</script>
+}

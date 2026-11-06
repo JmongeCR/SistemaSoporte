@@ -87,4 +87,10 @@ public class TicketsApiServicio : ITicketsApiServicio
             contenido.Add(parte, "adjuntos", adjunto.FileName);
         }
     }
+
+    public Task<ResultadoOperacion<CalificacionCsatDto>> CalificarAsync(int ticketId, CrearCsatDto dto) =>
+        _api.PostJsonAsync<CalificacionCsatDto>($"{Ruta}/{ticketId}/csat", dto);
+
+    public Task<ResultadoOperacion<CalificacionCsatDto>> ObtenerCsatAsync(int ticketId) =>
+        _api.GetAsync<CalificacionCsatDto>($"{Ruta}/{ticketId}/csat");
 }

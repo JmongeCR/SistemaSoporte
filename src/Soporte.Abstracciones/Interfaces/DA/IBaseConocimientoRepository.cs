@@ -15,4 +15,6 @@ public interface IBaseConocimientoRepository
     Task IncrementarVistasAsync(int id);
     Task<ArticuloKbDto> CrearAsync(ArticuloKb articulo);
     Task<bool> ExisteSlugAsync(string slug);
+    Task<VotoKbResultadoDto> VotarAsync(int articuloId, int usuarioId, bool esUtil);
+    Task<VotoKbResultadoDto> ObtenerVotosAsync(int articuloId, int? usuarioId);
 }

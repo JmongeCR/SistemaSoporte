@@ -42,6 +42,7 @@
                     @if (esAdministrador)
                     {
                         <li><a class="app-nav-enlace @Activo("/Admin/Usuarios")" asp-page="/Admin/Usuarios/Index">Usuarios</a></li>
+                        <li><a class="app-nav-enlace @Activo("/Admin/Plantillas")" asp-page="/Admin/Plantillas/Index">Plantillas</a></li>
                         <li><a class="app-nav-enlace @Activo("/Admin/Configuracion")" asp-page="/Admin/Configuracion/Sla">Configuración</a></li>
                     }
                     <li><a class="app-nav-enlace @Activo("/Ayuda")" asp-page="/Ayuda/Index">Ayuda</a></li>
@@ -64,6 +65,7 @@
                             @if (esAdministrador)
                             {
                                 <a asp-page="/Admin/Usuarios/Index" class="menu-usuario-item" role="menuitem">Gestión de usuarios</a>
+                                <a asp-page="/Admin/Configuracion/Sla" class="menu-usuario-item" role="menuitem">Configuración SLA</a>
                             }
                             <div class="menu-usuario-sep" role="separator"></div>
                             <form method="post" asp-page="/Cuenta/Salir">

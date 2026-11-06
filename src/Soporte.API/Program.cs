@@ -36,6 +36,8 @@ builder.Services.AddScoped<IComentarioRepository, ComentarioRepository>();
 builder.Services.AddScoped<INotificacionRepository, NotificacionRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IBaseConocimientoRepository, BaseConocimientoRepository>();
+builder.Services.AddScoped<IPlantillaRespuestaRepository, PlantillaRespuestaRepository>();
+builder.Services.AddScoped<ICalificacionCsatRepository, CalificacionCsatRepository>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 
 var rutaAdjuntos = builder.Configuration["Adjuntos:RutaBase"]
@@ -61,6 +63,8 @@ builder.Services.AddScoped<IComentarioFlujo, ComentarioFlujo>();
 builder.Services.AddScoped<INotificacionFlujo, NotificacionFlujo>();
 builder.Services.AddScoped<IDashboardFlujo, DashboardFlujo>();
 builder.Services.AddScoped<IBaseConocimientoFlujo, BaseConocimientoFlujo>();
+builder.Services.AddScoped<IPlantillaRespuestaFlujo, PlantillaRespuestaFlujo>();
+builder.Services.AddScoped<ICsatFlujo, CsatFlujo>();
 builder.Services.AddSingleton(new ConfiguracionRecuperacionDto
 {
     UrlRestablecer = builder.Configuration["Recuperacion:UrlRestablecer"]

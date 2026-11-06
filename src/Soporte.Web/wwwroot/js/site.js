@@ -354,3 +354,20 @@ document.addEventListener("click", (e) => {
     const href = fila.dataset.href;
     if (href) window.location.href = href;
 });
+
+// Selector de plantillas de respuesta
+(function () {
+    const selector = document.getElementById("selector-plantilla");
+    if (!selector) return;
+    const textarea = document.getElementById("Respuesta_Texto");
+    if (!textarea) return;
+
+    selector.addEventListener("change", () => {
+        const texto = selector.value;
+        if (texto) {
+            textarea.value = texto;
+            textarea.focus();
+        }
+        selector.selectedIndex = 0;
+    });
+})();

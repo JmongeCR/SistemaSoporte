@@ -163,4 +163,39 @@ public class BaseConocimientoRepository : IBaseConocimientoRepository
             .ExecuteUpdateAsync(s => s
                 .SetProperty(a => a.Publicado, publicado)
                 .SetProperty(a => a.FechaActualizacion, DateTime.UtcNow));
+
+    public async Task<VotoKbResultadoDto> VotarAsync(int articuloId, int usuarioId, bool esUtil)
+    {
+        var voto = await _contexto.VotosKb.FindAsync(articuloId, usuarioId);
+        if (voto is null)
+        {
+            _contexto.VotosKb.Add(new VotoKb { ArticuloKbId = articuloId, UsuarioId = usuarioId, EsUtil = esUtil, FechaVoto = DateTime.UtcNow });
+        }
+        else
+        {
+            voto.EsUtil   = esUtil;
+            voto.FechaVoto = DateTime.UtcNow;
+        }
+        await _contexto.SaveChangesAsync();
+        return await ObtenerVotosAsync(articuloId, usuarioId);
+    }
+
+    public async Task<VotoKbResultadoDto> ObtenerVotosAsync(int articuloId, int? usuarioId)
+    {
+        var votos = await _contexto.VotosKb
+            .Where(v => v.ArticuloKbId == articuloId)
+            .Select(v => new { v.UsuarioId, v.EsUtil })
+            .ToListAsync();
+
+        bool? miVoto = usuarioId.HasValue
+            ? votos.Where(v => v.UsuarioId == usuarioId).Select(v => (bool?)v.EsUtil).FirstOrDefault()
+            : null;
+
+        return new VotoKbResultadoDto
+        {
+            UtilCount   = votos.Count(v => v.EsUtil),
+            NoUtilCount = votos.Count(v => !v.EsUtil),
+            MiVoto      = miVoto
+        };
+    }
 }

@@ -58,6 +58,15 @@ public class BaseConocimientoFlujo : IBaseConocimientoFlujo
             : ResultadoOperacion<ArticuloKbDto>.NoEncontrado("Artículo no encontrado.");
     }
 
+    public async Task<ResultadoOperacion<VotoKbResultadoDto>> VotarAsync(int articuloId, bool esUtil, UsuarioContextoDto usuario)
+    {
+        var resultado = await _repo.VotarAsync(articuloId, usuario.UsuarioId, esUtil);
+        return ResultadoOperacion<VotoKbResultadoDto>.Ok(resultado);
+    }
+
+    public Task<VotoKbResultadoDto> ObtenerVotosAsync(int articuloId, int? usuarioId) =>
+        _repo.ObtenerVotosAsync(articuloId, usuarioId);
+
     private async Task<string> SlugPorIdAsync(int id)
     {
         var a = await _repo.ObtenerPorIdAsync(id, incluyeNoBublicados: true);

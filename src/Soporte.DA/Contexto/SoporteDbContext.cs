@@ -28,8 +28,11 @@ public class SoporteDbContext : DbContext
     public DbSet<RolPermiso> RolesPermisos => Set<RolPermiso>();
     public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
     public DbSet<UsuarioPermiso> UsuariosPermisos => Set<UsuarioPermiso>(); // tabla: UsuarioPermiso
-    public DbSet<ArticuloKb>     ArticulosKb     => Set<ArticuloKb>();
-    public DbSet<TicketArticuloKb> TicketsArticulosKb => Set<TicketArticuloKb>();
+    public DbSet<ArticuloKb>          ArticulosKb          => Set<ArticuloKb>();
+    public DbSet<TicketArticuloKb>    TicketsArticulosKb   => Set<TicketArticuloKb>();
+    public DbSet<PlantillaRespuesta>  PlantillasRespuesta  => Set<PlantillaRespuesta>();
+    public DbSet<CalificacionCsat>    CalificacionesCsat   => Set<CalificacionCsat>();
+    public DbSet<VotoKb>              VotosKb              => Set<VotoKb>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

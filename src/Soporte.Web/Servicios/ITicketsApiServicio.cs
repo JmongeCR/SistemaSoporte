@@ -22,4 +22,6 @@ public interface ITicketsApiServicio
     Task<ResultadoOperacion<ComentarioDto>> ComentarAsync(int id, CrearComentarioDto comentario, IReadOnlyList<IFormFile> adjuntos);
 
     Task<ResultadoOperacion<ArchivoDescargaDto>> DescargarAdjuntoAsync(int adjuntoId);
+    Task<ResultadoOperacion<CalificacionCsatDto>> CalificarAsync(int ticketId, CrearCsatDto dto);
+    Task<ResultadoOperacion<CalificacionCsatDto>> ObtenerCsatAsync(int ticketId);
 }
