@@ -28,45 +28,53 @@
 </head>
 <body>
     <div class="app">
-        <aside class="app-sidebar">
-            <div class="app-marca-fila">
+        <header class="app-header">
+            <div class="app-header-izq">
                 <a class="app-marca" asp-page="/Dashboard/Index"><span aria-hidden="true">🎫</span> Soporte</a>
-                <div class="app-marca-acciones">
-                    <button type="button" class="app-btn-tema" id="btn-tema" aria-label="Cambiar tema" title="Cambiar tema"></button>
-                    <vc:campana />
-                </div>
             </div>
 
-            <nav aria-label="Navegación principal">
+            <nav class="app-nav-wrap" aria-label="Navegación principal">
                 <ul class="app-nav">
-                    <li><a class="app-nav-enlace @Activo("/Dashboard")" asp-page="/Dashboard/Index"><span class="app-nav-icono" aria-hidden="true">▦</span> Dashboard</a></li>
-                    <li><a class="app-nav-enlace @Activo("/Tickets")" asp-page="/Tickets/Index"><span class="app-nav-icono" aria-hidden="true">🎫</span> @(esCliente ? "Mis tickets" : "Tickets")</a></li>
-                    <li><a class="app-nav-enlace @Activo("/Notificaciones")" asp-page="/Notificaciones/Index"><span class="app-nav-icono" aria-hidden="true">🔔</span> Notificaciones</a></li>
+                    <li><a class="app-nav-enlace @Activo("/Dashboard")" asp-page="/Dashboard/Index">Dashboard</a></li>
+                    <li><a class="app-nav-enlace @Activo("/Tickets")" asp-page="/Tickets/Index">@(esCliente ? "Mis tickets" : "Tickets")</a></li>
                     @if (esAdministrador)
                     {
-                        <li><a class="app-nav-enlace @Activo("/Roles")" asp-page="/Roles/Index"><span class="app-nav-icono" aria-hidden="true">🛡️</span> Roles y permisos</a></li>
+                        <li><a class="app-nav-enlace @Activo("/Admin")" asp-page="/Admin/Usuarios/Index">Usuarios</a></li>
                     }
                 </ul>
             </nav>
 
-            <a asp-page="/Cuenta/Perfil" class="app-usuario app-usuario-enlace">
-                <span class="avatar avatar-grande avatar-oscuro">@Formato.Iniciales(Sesion.Nombre)</span>
-                <div>
-                    <div class="app-usuario-nombre">@Sesion.Nombre</div>
-                    <div class="app-usuario-rol">@Sesion.Rol</div>
+            <div class="app-header-der">
+                <vc:campana />
+                <div class="menu-usuario" id="menu-usuario">
+                    <button type="button" class="menu-usuario-toggle" id="menu-usuario-toggle"
+                            aria-haspopup="true" aria-expanded="false">
+                        <span class="avatar avatar-sm">@Formato.Iniciales(Sesion.Nombre)</span>
+                        <span class="menu-usuario-nombre">@Sesion.Nombre</span>
+                        <span class="menu-usuario-flecha" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="menu-usuario-dropdown" id="menu-usuario-dropdown" role="menu">
+                        <a asp-page="/Cuenta/Perfil" class="menu-usuario-item" role="menuitem">Configuración</a>
+                        @if (esAdministrador)
+                        {
+                            <a asp-page="/Admin/Usuarios/Index" class="menu-usuario-item" role="menuitem">Gestión de usuarios</a>
+                        }
+                        <div class="menu-usuario-sep" role="separator"></div>
+                        <form method="post" asp-page="/Cuenta/Salir">
+                            <button type="submit" class="menu-usuario-item salir" role="menuitem">Salir</button>
+                        </form>
+                    </div>
                 </div>
-            </a>
-            <form method="post" asp-page="/Cuenta/Salir" class="app-salir">
-                <button type="submit" class="app-salir-boton">Cerrar sesión</button>
-            </form>
-        </aside>
+                <button type="button" class="app-btn-tema" id="btn-tema" aria-label="Cambiar tema" title="Cambiar tema"></button>
+            </div>
+        </header>
 
         <main class="app-contenido" role="main">
             @RenderBody()
         </main>
     </div>
 
-    <dialog id="modal-crear-ticket" class="modal-dialog">
+    <dialog id="modal-crear-ticket" class="app-dialog">
         <div class="modal-cabecera">
             <h2 class="modal-titulo">Nuevo ticket</h2>
             <button type="button" class="modal-cerrar" data-cerrar-modal-crear aria-label="Cerrar">✕</button>

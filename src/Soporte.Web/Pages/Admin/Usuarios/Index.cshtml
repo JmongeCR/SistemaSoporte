@@ -1,0 +1,160 @@
+@page
+@model Soporte.Web.Pages.Admin.Usuarios.IndexModel
+@{
+    ViewData["Title"] = "Usuarios";
+    string RolLabel(int rolId) => rolId switch { 1 => "Administrador", 2 => "Agente", 3 => "Cliente", _ => "—" };
+    string RolClase(int rolId) => rolId switch { 1 => "pill-abierto", 2 => "pill-progreso", 3 => "pill-cerrado", _ => "" };
+    string UrlUsuario(int id) => $"?UsuarioId={id}{(Model.Filtro.Texto is { Length: > 0 } t ? $"&Filtro.Texto={Uri.EscapeDataString(t)}" : "")}{(Model.Filtro.RolId.HasValue ? $"&Filtro.RolId={Model.Filtro.RolId}" : "")}";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Usuarios</h1>
+        <p>@Model.Usuarios.Count @(Model.Usuarios.Count == 1 ? "usuario" : "usuarios")@(Model.Filtro.RolId.HasValue || !string.IsNullOrEmpty(Model.Filtro.Texto) ? " con estos filtros" : " registrados")</p>
+    </div>
+</header>
+
+@if (TempData["MensajeExito"] is string exito)
+{
+    <div class="alerta-exito" role="status" data-autocerrar>@exito</div>
+}
+@if (TempData["MensajeError"] is string errorTemp)
+{
+    <div class="alerta-error" role="alert">@errorTemp</div>
+}
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">@Model.MensajeError <a asp-page="./Index" class="enlace">Reintentar</a></div>
+}
+
+<form method="get" class="barra-filtros">
+    @if (Model.UsuarioId.HasValue)
+    {
+        <input type="hidden" name="UsuarioId" value="@Model.UsuarioId" />
+    }
+    <input type="text" name="Filtro.Texto" value="@Model.Filtro.Texto" class="campo buscador-campo" placeholder="Buscar por nombre o correo…" />
+    <div class="segmentado" role="radiogroup" aria-label="Filtrar por rol">
+        <input type="radio" class="segmentado-opcion" id="rol-todos" name="Filtro.RolId" value="" checked="@(Model.Filtro.RolId is null)" onchange="this.form.submit()" />
+        <label for="rol-todos">Todos</label>
+        <input type="radio" class="segmentado-opcion" id="rol-admin" name="Filtro.RolId" value="1" checked="@(Model.Filtro.RolId == 1)" onchange="this.form.submit()" />
+        <label for="rol-admin">Administrador</label>
+        <input type="radio" class="segmentado-opcion" id="rol-agente" name="Filtro.RolId" value="2" checked="@(Model.Filtro.RolId == 2)" onchange="this.form.submit()" />
+        <label for="rol-agente">Agente</label>
+        <input type="radio" class="segmentado-opcion" id="rol-cliente" name="Filtro.RolId" value="3" checked="@(Model.Filtro.RolId == 3)" onchange="this.form.submit()" />
+        <label for="rol-cliente">Cliente</label>
+    </div>
+    <button type="submit" class="boton-secundario">Buscar</button>
+    @if (Model.Filtro.RolId.HasValue || !string.IsNullOrEmpty(Model.Filtro.Texto))
+    {
+        <a asp-page="./Index" class="boton-enlace enlace">Limpiar</a>
+    }
+</form>
+
+@if (Model.Usuarios.Count == 0 && Model.MensajeError is null)
+{
+    <div class="tarjeta estado-vacio">No se encontraron usuarios con estos filtros.</div>
+}
+else if (Model.Usuarios.Count > 0)
+{
+    <div class="split-usuarios">
+
+        @* Panel izquierdo: lista de usuarios *@
+        <div class="tarjeta lista-usuarios-panel">
+            @foreach (var u in Model.Usuarios)
+            {
+                <a href="@UrlUsuario(u.Id)" class="usuario-fila-btn @(Model.UsuarioId == u.Id ? "activo" : "")">
+                    <span class="avatar avatar-sm">@Formato.Iniciales(u.Nombre)</span>
+                    <span class="usuario-fila-info">
+                        <span class="usuario-fila-nombre">@u.Nombre</span>
+                        <span class="usuario-fila-correo">@u.Correo</span>
+                    </span>
+                    <span class="pill @RolClase(u.RolId) usuario-fila-rol">@RolLabel(u.RolId)</span>
+                </a>
+            }
+        </div>
+
+        @* Panel derecho: detalle y permisos del usuario seleccionado *@
+        @if (Model.UsuarioSeleccionado is null)
+        {
+            <div class="tarjeta panel-placeholder">
+                <p class="texto-secundario">Seleccioná un usuario para ver sus permisos.</p>
+            </div>
+        }
+        else
+        {
+            var u = Model.UsuarioSeleccionado;
+            <div class="tarjeta">
+                <div class="panel-detalle-usuario">
+
+                    <div class="panel-usuario-cab">
+                        <span class="avatar avatar-xl">@Formato.Iniciales(u.Nombre)</span>
+                        <div class="panel-usuario-data">
+                            <span class="panel-usuario-nombre">@u.Nombre</span>
+                            <span class="panel-usuario-correo">@u.Correo</span>
+                        </div>
+                        <span class="pill @RolClase(u.RolId)">@RolLabel(u.RolId)</span>
+                        @if (u.Activo)
+                        {
+                            <span class="pill pill-resuelto">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="pill pill-cerrado">Inactivo</span>
+                        }
+                    </div>
+
+                    @* Cambiar rol *@
+                    <p class="panel-usuario-seccion-titulo">Rol</p>
+                    <form method="post" asp-page-handler="CambiarRol" class="fila-acciones-usuario" style="margin-bottom:24px">
+                        <input type="hidden" name="usuarioId" value="@u.Id" />
+                        <select name="rolId" class="campo campo-compacto" aria-label="Rol de @u.Nombre">
+                            <option value="1" selected="@(u.RolId == 1)">Administrador</option>
+                            <option value="2" selected="@(u.RolId == 2)">Agente</option>
+                            <option value="3" selected="@(u.RolId == 3)">Cliente</option>
+                        </select>
+                        <button type="submit" class="boton-secundario boton-compacto">Cambiar rol</button>
+                    </form>
+
+                    @* Permisos *@
+                    @if (Model.Permisos is not null)
+                    {
+                        <p class="panel-usuario-seccion-titulo">Permisos</p>
+                        <form method="post" asp-page-handler="GuardarPermisos">
+                            <input type="hidden" name="usuarioId" value="@u.Id" />
+                            @foreach (var grupo in Model.Permisos.Grupos)
+                            {
+                                <div class="permiso-grupo">
+                                    <p class="permiso-grupo-titulo">@grupo.Grupo</p>
+                                    @foreach (var p in grupo.Permisos)
+                                    {
+                                        <label class="permiso-fila">
+                                            <input type="checkbox" name="permisosHabilitados" value="@p.Id"
+                                                   checked="@p.Concedido" class="permiso-check" />
+                                            <span class="permiso-desc @(!p.Concedido ? "sin-permiso" : "")">
+                                                @p.Descripcion
+                                                @if (p.EsOverride)
+                                                {
+                                                    <span class="estado-permiso" title="Override personalizado">personalizado</span>
+                                                }
+                                            </span>
+                                        </label>
+                                    }
+                                </div>
+                            }
+                            <div class="fila-acciones-usuario" style="margin-top:16px">
+                                <button type="submit" class="boton-primario boton-compacto">Guardar permisos</button>
+                            </div>
+                        </form>
+                        <form method="post" asp-page-handler="RestablecerPermisos" style="margin-top:8px">
+                            <input type="hidden" name="usuarioId" value="@u.Id" />
+                            <button type="submit" class="boton-secundario boton-compacto"
+                                    onclick="return confirm('¿Restablecer los permisos al rol por defecto?')">
+                                Restablecer a rol
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

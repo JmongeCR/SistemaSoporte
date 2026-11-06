@@ -33,12 +33,42 @@
     <div class="detalle-principal">
         <header class="detalle-encabezado">
             <h1>@t.Asunto</h1>
-            <span class="prioridad @Formato.ClasePrioridad(t.PrioridadId) pill-prioridad">Prioridad @t.Prioridad.ToLowerInvariant()</span>
+            @if (t.SlaVencido && Model.EsEquipo) { <span class="pill pill-alerta">SLA vencido</span> }
         </header>
         <p class="detalle-meta">
             <span class="ticket-id">#@t.Id</span> · Reportado por @t.Cliente · @Formato.Hace(t.FechaCreacion)
-            @if (t.SlaVencido && Model.EsEquipo) { <span class="pill pill-alerta ms-1">SLA vencido</span> }
         </p>
+
+        <div class="ticket-info-grid">
+            <div class="ticket-info-fila">
+                <span class="ticket-info-label">Estado:</span>
+                <span class="pill @Formato.ClaseEstado(t.EstadoId)">@t.Estado</span>
+            </div>
+            <div class="ticket-info-fila">
+                <span class="ticket-info-label">Cliente:</span>
+                <span>@t.Cliente</span>
+            </div>
+            <div class="ticket-info-fila">
+                <span class="ticket-info-label">Prioridad:</span>
+                <span class="prioridad @Formato.ClasePrioridad(t.PrioridadId)">@t.Prioridad</span>
+            </div>
+            <div class="ticket-info-fila">
+                <span class="ticket-info-label">Agente:</span>
+                @if (t.AgenteAsignado is null) {
+                    <span class="texto-tenue">Sin asignar</span>
+                } else {
+                    <span><span class="avatar me-1">@Formato.Iniciales(t.AgenteAsignado)</span>@t.AgenteAsignado</span>
+                }
+            </div>
+            <div class="ticket-info-fila">
+                <span class="ticket-info-label">Categoría:</span>
+                <span>@t.Categoria</span>
+            </div>
+            <div class="ticket-info-fila">
+                <span class="ticket-info-label">Creado:</span>
+                <span>@Model.FechaLocal(t.FechaCreacion)</span>
+            </div>
+        </div>
 
         @if (t.EsperaRespuestaCliente)
         {
@@ -148,27 +178,6 @@
 
     <aside class="detalle-lateral">
         <div class="tarjeta">
-            <div class="dato-bloque">
-                <span class="etiqueta-seccion">Estado</span>
-                <span class="pill pill-grande @Formato.ClaseEstado(t.EstadoId)">@t.Estado</span>
-            </div>
-            <div class="dato-bloque">
-                <span class="etiqueta-seccion">Prioridad</span>
-                <span class="prioridad @Formato.ClasePrioridad(t.PrioridadId)">@t.Prioridad</span>
-                <span class="etiqueta-seccion">Categoría</span>
-                <span>@t.Categoria</span>
-                <span class="etiqueta-seccion">Cliente</span>
-                <span>@t.Cliente</span>
-                <span class="etiqueta-seccion">Agente asignado</span>
-                @if (t.AgenteAsignado is null)
-                {
-                    <span class="texto-tenue">Sin asignar</span>
-                }
-                else
-                {
-                    <span><span class="avatar me-1">@Formato.Iniciales(t.AgenteAsignado)</span>@t.AgenteAsignado</span>
-                }
-            </div>
             <div class="dato-bloque dato-fechas">
                 <span class="texto-secundario">Creado</span><strong>@Model.FechaLocal(t.FechaCreacion)</strong>
                 <span class="texto-secundario">Actualizado</span><strong>@(t.FechaActualizacion is null ? "—" : Model.FechaLocal(t.FechaActualizacion.Value))</strong>

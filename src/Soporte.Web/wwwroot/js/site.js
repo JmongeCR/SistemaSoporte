@@ -331,3 +331,17 @@ document.querySelectorAll("[data-autocerrar]").forEach((aviso) => {
         });
     }
 })();
+
+// ---------- Menú de usuario ----------
+(function () {
+    const contenedor = document.getElementById("menu-usuario");
+    const boton = document.getElementById("menu-usuario-toggle");
+    if (!contenedor || !boton) return;
+
+    const abrir = () => { contenedor.classList.add("abierto"); boton.setAttribute("aria-expanded", "true"); };
+    const cerrar = () => { contenedor.classList.remove("abierto"); boton.setAttribute("aria-expanded", "false"); };
+
+    boton.addEventListener("click", () => contenedor.classList.contains("abierto") ? cerrar() : abrir());
+    document.addEventListener("click", (e) => { if (!contenedor.contains(e.target)) cerrar(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrar(); });
+})();

@@ -8,20 +8,12 @@ namespace Soporte.Web.Pages;
 [IgnoreAntiforgeryToken]
 public class ErrorModel : PageModel
 {
-    public string? RequestId { get; set; }
+    public bool Es404 { get; private set; }
+    public string? RequestId { get; private set; }
 
-    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
-
-    private readonly ILogger<ErrorModel> _logger;
-
-    public ErrorModel(ILogger<ErrorModel> logger)
+    public void OnGet(int? codigo)
     {
-        _logger = logger;
-    }
-
-    public void OnGet()
-    {
+        Es404 = codigo == 404;
         RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
     }
 }
-

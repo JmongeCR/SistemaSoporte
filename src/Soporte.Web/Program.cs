@@ -12,7 +12,7 @@ builder.Services.AddRazorPages(opciones =>
 {
     opciones.Conventions.AuthorizeFolder("/");
     // HU-14 a HU-16: la sección de roles se protege en el servidor, no solo ocultando el menú.
-    opciones.Conventions.AuthorizeFolder("/Roles", PoliticaSoloAdministrador);
+    opciones.Conventions.AuthorizeFolder("/Admin", PoliticaSoloAdministrador);
     opciones.Conventions.AllowAnonymousToFolder("/Cuenta");
     opciones.Conventions.AllowAnonymousToPage("/Error");
 });
@@ -103,12 +103,13 @@ builder.Services.AddSingleton<IZonaHoraria>(new ZonaHoraria(builder.Configuratio
 
 var app = builder.Build();
 
+app.UseExceptionHandler("/Error");
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
     app.UseHsts();
     app.UseHttpsRedirection();
 }
+app.UseStatusCodePagesWithReExecute("/Error", "?codigo={0}");
 
 app.UseStaticFiles();
 app.UseRouting();

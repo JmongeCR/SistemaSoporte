@@ -20,12 +20,6 @@
     <button type="button" class="boton-primario" data-abrir-modal-crear>+ Nuevo Ticket</button>
 </header>
 
-@if (Model.NotificacionesNoLeidas > 0)
-{
-    <a asp-page="/Notificaciones/Index" class="aviso-info">
-        🔔 Tenés @Model.NotificacionesNoLeidas @(Model.NotificacionesNoLeidas == 1 ? "notificación sin leer" : "notificaciones sin leer") · Ver
-    </a>
-}
 
 @* ---------------- Indicadores ---------------- *@
 @if (Model.EsCliente)
