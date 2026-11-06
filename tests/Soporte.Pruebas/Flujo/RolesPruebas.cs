@@ -36,6 +36,7 @@ public class RolesPruebas
             Task.FromResult<IReadOnlyList<UsuarioDto>>(Usuarios.Select(u => new UsuarioDto { Id = u.Id, Nombre = u.Nombre, RolId = u.RolId }).ToList());
         public Task<Usuario?> ObtenerPorCorreoAsync(string correo) => throw new NotSupportedException();
         public Task ActualizarPasswordAsync(int usuarioId, string passwordHash) => throw new NotSupportedException();
+        public Task ActualizarNombreAsync(int usuarioId, string nombre) => throw new NotSupportedException();
     }
 
     private sealed class CatalogoConRoles : ICatalogoRepository
@@ -56,7 +57,7 @@ public class RolesPruebas
     }
 
     private readonly UsuariosEnMemoria _usuarios = new();
-    private UsuarioFlujo Flujo() => new(_usuarios, new CatalogoConRoles(), new UsuarioReglas(_usuarios));
+    private UsuarioFlujo Flujo() => new(_usuarios, new CatalogoConRoles(), new UsuarioReglas(_usuarios), new Soporte.Reglas.Reglas.SeguridadContrasenas());
 
     [Fact]
     public async Task No_se_puede_quitar_el_rol_al_unico_administrador()

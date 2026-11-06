@@ -21,6 +21,8 @@ public class UsuarioSesionCookie : IUsuarioSesion
 
     public string Nombre => Usuario?.FindFirstValue(ClaimTypes.Name) ?? string.Empty;
 
+    public string Correo => Usuario?.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
+
     /// <summary>Sin rol válido se asume Cliente (el de menos privilegios); el API vuelve a validar igualmente.</summary>
     public RolTipo Rol => Enum.TryParse<RolTipo>(Usuario?.FindFirstValue(ClaimTypes.Role), out var rol) ? rol : RolTipo.Cliente;
 }

@@ -73,4 +73,11 @@ public class UsuarioRepository : IUsuarioRepository
                 .SetProperty(u => u.PasswordHash, passwordHash)
                 .SetProperty(u => u.ContrasenaVersion, u => u.ContrasenaVersion + 1));
     }
+
+    public async Task ActualizarNombreAsync(int usuarioId, string nombre)
+    {
+        await _contexto.Usuarios
+            .Where(u => u.Id == usuarioId)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.Nombre, nombre));
+    }
 }

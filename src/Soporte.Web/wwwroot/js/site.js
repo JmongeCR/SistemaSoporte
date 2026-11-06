@@ -182,3 +182,117 @@ window.addEventListener("pageshow", () => {
 document.querySelectorAll("[data-autocerrar]").forEach((aviso) => {
     setTimeout(() => { aviso.style.opacity = "0"; setTimeout(() => aviso.remove(), 400); }, 4000);
 });
+
+// Modal "Crear ticket". Se carga el formulario de /Tickets/Crear?modal vía fetch.
+(() => {
+    const modal = document.getElementById("modal-crear-ticket");
+    if (!modal) return;
+
+    const contenido = document.getElementById("modal-crear-contenido");
+    let cargado = false;
+
+    const abrir = async () => {
+        modal.showModal();
+        if (cargado) return;
+        contenido.innerHTML = '<div class="modal-cargando">Cargando formulario…</div>';
+        try {
+            const respuesta = await fetch("/Tickets/Crear?modal");
+            if (!respuesta.ok || respuesta.redirected) throw new Error();
+            const html = await respuesta.text();
+            const doc = new DOMParser().parseFromString(html, "text/html");
+            const formulario = doc.querySelector(".diseno-formulario");
+            if (!formulario) throw new Error("formulario no encontrado");
+            contenido.innerHTML = "";
+            contenido.appendChild(document.importNode(formulario, true));
+            // Re-ejecutar comportamientos de zona de archivos dentro del modal
+            contenido.querySelectorAll("[data-zona-archivos]").forEach((zona) => zona.dispatchEvent(new Event("zona-init")));
+            cargado = true;
+        } catch {
+            contenido.innerHTML = '<div class="modal-cargando">No se pudo cargar el formulario. <a class="enlace" href="/Tickets/Crear">Ir a la página</a></div>';
+        }
+    };
+
+    const cerrar = () => { modal.close(); };
+
+    document.querySelectorAll("[data-abrir-modal-crear]").forEach((btn) => btn.addEventListener("click", abrir));
+    document.querySelectorAll("[data-cerrar-modal-crear]").forEach((btn) => btn.addEventListener("click", cerrar));
+    modal.addEventListener("click", (e) => { if (e.target === modal) cerrar(); });
+
+    // Cuando el formulario redirige tras crear el ticket, el modal se cierra automáticamente.
+    modal.addEventListener("close", () => {
+        // Si viene un TempData de éxito, el navegador refresca la página destino; aquí es un noop.
+    });
+})();
+
+// Tema oscuro / claro. Persiste en localStorage.
+(() => {
+    const raiz = document.getElementById("html-raiz");
+    const boton = document.getElementById("btn-tema");
+    if (!raiz || !boton) return;
+
+    const toggleTema = () => {
+        const oscuro = raiz.getAttribute("data-tema") !== "oscuro";
+        if (oscuro) {
+            raiz.setAttribute("data-tema", "oscuro");
+            localStorage.setItem("tema", "oscuro");
+        } else {
+            raiz.removeAttribute("data-tema");
+            localStorage.removeItem("tema");
+        }
+    };
+
+    boton.addEventListener("click", toggleTema);
+})();
+
+// Gráficas Chart.js del dashboard (si existen los canvas y los datos).
+(() => {
+    const datosSrc = document.getElementById("datos-graficas");
+    if (!datosSrc || typeof Chart === "undefined") return;
+
+    let datos;
+    try { datos = JSON.parse(datosSrc.textContent); } catch { return; }
+
+    const paleta = ["#2161EB", "#B87805", "#1A8C40", "#BF2E24"];
+    const opcionesBase = {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { position: "bottom", labels: { font: { family: "Inter, system-ui", size: 12 }, padding: 16 } } }
+    };
+
+    // Dona — estados
+    const canvasEstados = document.getElementById("grafica-estados");
+    if (canvasEstados && datos.estados) {
+        const e = datos.estados;
+        new Chart(canvasEstados, {
+            type: "doughnut",
+            data: {
+                labels: ["Abiertos", "En progreso", "Resueltos hoy", "SLA vencido"],
+                datasets: [{ data: [e.abiertos, e.enProgreso, e.resueltos, e.slaVencido], backgroundColor: paleta, borderWidth: 0 }]
+            },
+            options: { ...opcionesBase, cutout: "68%" }
+        });
+    }
+
+    // Barras — carga por agente
+    const canvasAgentes = document.getElementById("grafica-agentes");
+    if (canvasAgentes && Array.isArray(datos.agentes) && datos.agentes.length) {
+        new Chart(canvasAgentes, {
+            type: "bar",
+            data: {
+                labels: datos.agentes.map((a) => a.Agente.split(" ")[0]),
+                datasets: [
+                    { label: "Abiertos", data: datos.agentes.map((a) => a.Abiertos), backgroundColor: "#2161EB", borderRadius: 4 },
+                    { label: "En progreso", data: datos.agentes.map((a) => a.EnProgreso), backgroundColor: "#B87805", borderRadius: 4 }
+                ]
+            },
+            options: {
+                ...opcionesBase,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: false, grid: { display: false }, ticks: { font: { family: "Inter, system-ui", size: 11 } } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: "Inter, system-ui", size: 11 } }, grid: { color: "#E5E8ED" } }
+                }
+            }
+        });
+    }
+})();

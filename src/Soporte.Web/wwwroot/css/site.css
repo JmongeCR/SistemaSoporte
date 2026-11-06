@@ -623,6 +623,117 @@ a.aviso-info:hover { color: var(--color-primario-hover); }
 .alerta-con-titulo strong { display: block; }
 .alerta-con-titulo p { margin: 4px 0 0 22px; color: #9B2A22; }
 
+/* ---------- Dark mode (tema oscuro) ---------- */
+[data-tema="oscuro"] {
+    --color-texto: #E8EAED;
+    --color-texto-secundario: #A0A8B8;
+    --color-texto-tenue: #6B7280;
+    --color-texto-prioridad: #A0A8B8;
+    --color-encabezado-tabla: #6B7280;
+    --color-borde: #2D3344;
+    --color-fondo-suave: #1A1F2E;
+    --color-avatar: #2D3344;
+    --color-avatar-texto: #A0A8B8;
+    --color-etiqueta: #C8CDD8;
+    --color-ayuda: #6B7280;
+    --color-segmentado: #232838;
+    --color-zona: #1E2334;
+    --color-zona-texto: #8A95A8;
+    --azul-fondo: #172447;  --azul: #5A95F5;
+    --ambar-fondo: #3D2E00; --ambar: #E8A020;
+    --verde-fondo: #0D2E18; --verde: #3CB865;
+    --gris-fondo: #232838;  --gris: #8A95A8;
+    --rojo-fondo: #2E0F0D;  --rojo: #E05C55;
+}
+[data-tema="oscuro"] body { background: #0F1320; }
+[data-tema="oscuro"] .kpi,
+[data-tema="oscuro"] .tarjeta,
+[data-tema="oscuro"] .panel-notificaciones,
+[data-tema="oscuro"] .boton-secundario,
+[data-tema="oscuro"] .cuenta-tarjeta { background: #161B2A; border-color: #2D3344; }
+[data-tema="oscuro"] .campo { background: #1A1F2E; border-color: #2D3344; color: var(--color-texto); }
+[data-tema="oscuro"] .campo:focus { border-color: var(--color-primario); }
+[data-tema="oscuro"] .encabezado-pagina { border-color: #2D3344; }
+[data-tema="oscuro"] .tabla thead th { background: #1A1F2E; }
+[data-tema="oscuro"] .tabla tbody tr:hover { background: #1A1F2E; }
+[data-tema="oscuro"] .tabla tbody tr { border-color: #2D3344; }
+[data-tema="oscuro"] .modal-dialog { background: #161B2A; border-color: #2D3344; }
+[data-tema="oscuro"] .modal-cabecera { border-color: #2D3344; }
+[data-tema="oscuro"] .notificacion-item:hover { background: #1A1F2E; }
+[data-tema="oscuro"] .no-leida .notificacion-item { background: #161E30; }
+[data-tema="oscuro"] .lista-tickets-fila:hover { background: #1A1F2E; }
+[data-tema="oscuro"] .boton-secundario { color: var(--color-texto); }
+[data-tema="oscuro"] .segmentado-opcion:checked + label { background: #2D3344; }
+
+/* ---------- Botón cambio de tema (sidebar) ---------- */
+.app-marca-acciones { display: flex; align-items: center; gap: 4px; }
+.app-btn-tema {
+    padding: 4px 6px;
+    border: 0;
+    border-radius: var(--radio);
+    background: none;
+    color: var(--color-sidebar-texto);
+    font-size: 15px;
+    cursor: pointer;
+    line-height: 1;
+}
+.app-btn-tema:hover { background: rgba(255, 255, 255, 0.08); color: #FFFFFF; }
+.app-btn-tema::before { content: "☀️"; }
+[data-tema="oscuro"] .app-btn-tema::before { content: "🌙"; }
+
+/* Usuario como enlace al perfil */
+.app-usuario-enlace {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px;
+    border-radius: var(--radio);
+    text-decoration: none;
+}
+.app-usuario-enlace:hover { background: rgba(255, 255, 255, 0.07); }
+
+/* ---------- Modal crear ticket ---------- */
+.modal-dialog {
+    width: min(680px, calc(100vw - 32px));
+    max-height: calc(100vh - 48px);
+    padding: 0;
+    border: 1px solid var(--color-borde);
+    border-radius: 16px;
+    background: #FFFFFF;
+    box-shadow: 0 24px 60px rgba(13, 21, 40, 0.25);
+    overflow: hidden;
+}
+.modal-dialog::backdrop { background: rgba(13, 21, 40, 0.5); }
+.modal-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--color-borde);
+}
+.modal-titulo { margin: 0; font-size: 18px; font-weight: 700; }
+.modal-cerrar { padding: 4px 8px; border: 0; border-radius: var(--radio); background: none; color: var(--color-texto-tenue); font-size: 16px; cursor: pointer; }
+.modal-cerrar:hover { background: var(--color-fondo-suave); color: var(--color-texto); }
+.modal-cuerpo { padding: 0; overflow-y: auto; max-height: calc(100vh - 160px); }
+.modal-cargando { padding: 32px; text-align: center; color: var(--color-texto-secundario); }
+.modal-cuerpo .diseno-formulario { grid-template-columns: 1fr; padding: 20px 24px; gap: 0; }
+.modal-cuerpo .tarjeta-consejos { display: none; }
+.modal-cuerpo .formulario { border: 0; border-radius: 0; padding: 0; box-shadow: none; }
+
+/* ---------- Gráficas (Chart.js) ---------- */
+.graficas-seccion { margin-bottom: 28px; }
+.graficas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grafica-tarjeta { padding: 20px 22px; }
+.grafica-contenedor-dona { width: 100%; max-width: 240px; margin: 0 auto; }
+.grafica-contenedor-barras { width: 100%; height: 220px; }
+
+/* ---------- Perfil de usuario ---------- */
+.perfil-layout { max-width: 560px; }
+.perfil-avatar-fila { display: flex; align-items: center; gap: 20px; padding: 20px 24px; border-bottom: 1px solid var(--color-borde); margin-bottom: 24px; }
+.avatar-xl { width: 60px; height: 60px; font-size: 20px; flex-shrink: 0; }
+.perfil-nombre { font-size: 16px; font-weight: 700; }
+.perfil-correo { margin: 2px 0 6px; font-size: 13px; color: var(--color-texto-secundario); }
+
 /* ---------- Pantallas angostas ---------- */
 @media (max-width: 768px) {
     .app { flex-direction: column; }
@@ -644,4 +755,6 @@ a.aviso-info:hover { color: var(--color-primario-hover); }
     .cuenta-contenido { padding: 48px 16px; }
     .cuenta-tarjeta { padding: 32px 24px; }
     .formulario { padding: 20px; }
+    .graficas-grid { grid-template-columns: 1fr; }
+    .perfil-avatar-fila { flex-direction: column; text-align: center; }
 }

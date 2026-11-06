@@ -31,4 +31,7 @@ public class UsuariosApiServicio : IUsuariosApiServicio
 
     public async Task<ResultadoOperacion<UsuarioDto>> CambiarRolAsync(int usuarioId, int rolId) =>
         await _api.PutJsonAsync<UsuarioDto>($"api/usuarios/{usuarioId}/rol", new CambiarRolDto { RolId = rolId });
+
+    public async Task<ResultadoOperacion<UsuarioDto>> ActualizarPerfilAsync(ActualizarPerfilDto dto) =>
+        await _api.PutJsonAsync<UsuarioDto>("api/cuenta/perfil", dto);
 }

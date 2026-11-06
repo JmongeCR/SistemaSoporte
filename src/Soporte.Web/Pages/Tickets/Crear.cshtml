@@ -2,20 +2,25 @@
 @model Soporte.Web.Pages.Tickets.CrearModel
 @{
     ViewData["Title"] = "Crear ticket";
+    var esModal = Request.Query.ContainsKey("modal");
+    if (esModal) { Layout = null; }
 }
 
-<nav class="migas" aria-label="Ruta">
-    <a asp-page="./Index">Tickets</a>
-    <span aria-hidden="true">/</span>
-    <span class="migas-actual">Crear ticket</span>
-</nav>
+@if (!esModal)
+{
+    <nav class="migas" aria-label="Ruta">
+        <a asp-page="./Index">Tickets</a>
+        <span aria-hidden="true">/</span>
+        <span class="migas-actual">Crear ticket</span>
+    </nav>
 
-<header class="encabezado-pagina">
-    <div>
-        <h1>Crear ticket</h1>
-        <p>Registrá una nueva solicitud de soporte</p>
-    </div>
-</header>
+    <header class="encabezado-pagina">
+        <div>
+            <h1>Crear ticket</h1>
+            <p>Registrá una nueva solicitud de soporte</p>
+        </div>
+    </header>
+}
 
 @if (Model.MensajeError is not null)
 {
@@ -98,7 +103,14 @@
         </div>
 
         <div class="acciones-formulario">
-            <a asp-page="./Index" class="boton-secundario">Cancelar</a>
+            @if (esModal)
+            {
+                <button type="button" class="boton-secundario" data-cerrar-modal-crear>Cancelar</button>
+            }
+            else
+            {
+                <a asp-page="./Index" class="boton-secundario">Cancelar</a>
+            }
             <button type="submit" class="boton-primario">Crear ticket</button>
         </div>
     </form>

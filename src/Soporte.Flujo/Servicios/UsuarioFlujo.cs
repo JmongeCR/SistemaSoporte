@@ -13,12 +13,14 @@ public class UsuarioFlujo : IUsuarioFlujo
     private readonly IUsuarioRepository _usuarios;
     private readonly ICatalogoRepository _catalogos;
     private readonly IUsuarioReglas _reglas;
+    private readonly ISeguridadContrasenas _seguridad;
 
-    public UsuarioFlujo(IUsuarioRepository usuarios, ICatalogoRepository catalogos, IUsuarioReglas reglas)
+    public UsuarioFlujo(IUsuarioRepository usuarios, ICatalogoRepository catalogos, IUsuarioReglas reglas, ISeguridadContrasenas seguridad)
     {
         _usuarios = usuarios;
         _catalogos = catalogos;
         _reglas = reglas;
+        _seguridad = seguridad;
     }
 
     public async Task<ResultadoOperacion<IReadOnlyList<UsuarioDto>>> ListarAsync(FiltroUsuariosDto filtro, UsuarioContextoDto usuario)
@@ -73,5 +75,44 @@ public class UsuarioFlujo : IUsuarioFlujo
             Rol = rol.Nombre,
             Activo = objetivo.Activo
         }, "Rol actualizado correctamente.");
+    }
+
+    public async Task<ResultadoOperacion<UsuarioDto>> ActualizarPerfilAsync(int usuarioId, ActualizarPerfilDto dto, UsuarioContextoDto usuarioActual)
+    {
+        if (usuarioActual.UsuarioId != usuarioId)
+            return ResultadoOperacion<UsuarioDto>.SinPermiso("Solo podés editar tu propio perfil.");
+
+        var usuario = await _usuarios.ObtenerPorIdAsync(usuarioId);
+        if (usuario is null)
+            return ResultadoOperacion<UsuarioDto>.NoEncontrado($"No existe el usuario #{usuarioId}.");
+
+        if (!string.IsNullOrWhiteSpace(dto.NuevaContrasena))
+        {
+            if (string.IsNullOrWhiteSpace(dto.ContrasenaActual))
+                return ResultadoOperacion<UsuarioDto>.Fallo("Ingresá tu contraseña actual para poder cambiarla.");
+
+            if (!_seguridad.Verificar(dto.ContrasenaActual, usuario.PasswordHash))
+                return ResultadoOperacion<UsuarioDto>.Fallo("La contraseña actual es incorrecta.");
+
+            await _usuarios.ActualizarPasswordAsync(usuarioId, _seguridad.GenerarHash(dto.NuevaContrasena));
+        }
+
+        var nombreTrimmed = dto.Nombre.Trim();
+        if (usuario.Nombre != nombreTrimmed)
+            await _usuarios.ActualizarNombreAsync(usuarioId, nombreTrimmed);
+
+        var actualizado = await _usuarios.ObtenerPorIdAsync(usuarioId);
+        var roles = await _catalogos.ListarRolesAsync();
+        var rol = roles.SingleOrDefault(r => r.Id == actualizado!.RolId);
+
+        return ResultadoOperacion<UsuarioDto>.Ok(new UsuarioDto
+        {
+            Id = actualizado!.Id,
+            Nombre = actualizado.Nombre,
+            Correo = actualizado.Correo,
+            RolId = actualizado.RolId,
+            Rol = rol?.Nombre ?? string.Empty,
+            Activo = actualizado.Activo
+        }, "Perfil actualizado correctamente.");
     }
 }

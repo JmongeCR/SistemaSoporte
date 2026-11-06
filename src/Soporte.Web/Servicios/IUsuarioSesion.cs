@@ -8,5 +8,6 @@ public interface IUsuarioSesion
     bool EstaAutenticado { get; }
     int UsuarioId { get; }
     string Nombre { get; }
+    string Correo { get; }
     RolTipo Rol { get; }
 }

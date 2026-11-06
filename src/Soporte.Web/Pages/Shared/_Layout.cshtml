@@ -9,7 +9,7 @@
     string Activo(string prefijo) => paginaActual.StartsWith(prefijo) ? "activo" : string.Empty;
 }
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" id="html-raiz">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,13 +19,22 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script>
+        (function () {
+            var t = localStorage.getItem("tema");
+            if (t === "oscuro") document.documentElement.setAttribute("data-tema", "oscuro");
+        })();
+    </script>
 </head>
 <body>
     <div class="app">
         <aside class="app-sidebar">
             <div class="app-marca-fila">
                 <a class="app-marca" asp-page="/Dashboard/Index"><span aria-hidden="true">🎫</span> Soporte</a>
-                <vc:campana />
+                <div class="app-marca-acciones">
+                    <button type="button" class="app-btn-tema" id="btn-tema" aria-label="Cambiar tema" title="Cambiar tema"></button>
+                    <vc:campana />
+                </div>
             </div>
 
             <nav aria-label="Navegación principal">
@@ -40,13 +49,13 @@
                 </ul>
             </nav>
 
-            <div class="app-usuario">
+            <a asp-page="/Cuenta/Perfil" class="app-usuario app-usuario-enlace">
                 <span class="avatar avatar-grande avatar-oscuro">@Formato.Iniciales(Sesion.Nombre)</span>
                 <div>
                     <div class="app-usuario-nombre">@Sesion.Nombre</div>
                     <div class="app-usuario-rol">@Sesion.Rol</div>
                 </div>
-            </div>
+            </a>
             <form method="post" asp-page="/Cuenta/Salir" class="app-salir">
                 <button type="submit" class="app-salir-boton">Cerrar sesión</button>
             </form>
@@ -57,8 +66,19 @@
         </main>
     </div>
 
+    <dialog id="modal-crear-ticket" class="modal-dialog">
+        <div class="modal-cabecera">
+            <h2 class="modal-titulo">Nuevo ticket</h2>
+            <button type="button" class="modal-cerrar" data-cerrar-modal-crear aria-label="Cerrar">✕</button>
+        </div>
+        <div id="modal-crear-contenido" class="modal-cuerpo">
+            <div class="modal-cargando">Cargando formulario…</div>
+        </div>
+    </dialog>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

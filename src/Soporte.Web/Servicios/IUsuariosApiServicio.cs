@@ -15,4 +15,7 @@ public interface IUsuariosApiServicio
 
     /// <summary>HU-15: cambia el rol (el API protege al último Administrador).</summary>
     Task<ResultadoOperacion<UsuarioDto>> CambiarRolAsync(int usuarioId, int rolId);
+
+    /// <summary>Actualiza nombre y/o contraseña del usuario autenticado.</summary>
+    Task<ResultadoOperacion<UsuarioDto>> ActualizarPerfilAsync(ActualizarPerfilDto dto);
 }

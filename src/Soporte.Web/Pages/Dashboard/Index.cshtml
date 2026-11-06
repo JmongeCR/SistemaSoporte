@@ -17,7 +17,7 @@
             <p>@(Model.EsAdministrador ? "Resumen general de soporte técnico" : "Tu ámbito: tickets asignados a vos y sin asignar")</p>
         }
     </div>
-    <a asp-page="/Tickets/Crear" class="boton-primario">+ Nuevo Ticket</a>
+    <button type="button" class="boton-primario" data-abrir-modal-crear>+ Nuevo Ticket</button>
 </header>
 
 @if (Model.NotificacionesNoLeidas > 0)
@@ -74,6 +74,40 @@ else
         <partial name="_ListaTicketsDashboard" model='(Model.Recientes, Model.EsCliente ? "Todavía no reportaste ningún problema." : "Todavía no hay actividad.", Model.EsCliente)' />
     </section>
 </div>
+
+@if (!Model.EsCliente && Model.Metricas?.Datos is { } metricasGraf)
+{
+    <section class="graficas-seccion">
+        <div class="graficas-grid">
+            <div class="tarjeta grafica-tarjeta">
+                <h2 class="titulo-seccion" style="margin:0 0 16px">Estado de tickets</h2>
+                <div class="grafica-contenedor-dona">
+                    <canvas id="grafica-estados" aria-label="Distribución de tickets por estado"></canvas>
+                </div>
+            </div>
+            @if (Model.CargaAgentes is { Exito: true } cargaGraf && cargaGraf.Datos!.Count > 0)
+            {
+                <div class="tarjeta grafica-tarjeta">
+                    <h2 class="titulo-seccion" style="margin:0 0 16px">Carga por agente</h2>
+                    <div class="grafica-contenedor-barras">
+                        <canvas id="grafica-agentes" aria-label="Tickets activos por agente"></canvas>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+    <script id="datos-graficas" type="application/json">
+    {
+        "estados": {
+            "abiertos": @metricasGraf.Abiertos,
+            "enProgreso": @metricasGraf.EnProgreso,
+            "resueltos": @metricasGraf.ResueltosHoy,
+            "slaVencido": @metricasGraf.SlaVencido
+        },
+        "agentes": @(Model.CargaAgentes is { Exito: true } ca ? System.Text.Json.JsonSerializer.Serialize(ca.Datos!.Select(a => new { a.Agente, a.Abiertos, a.EnProgreso })) : "[]")
+    }
+    </script>
+}
 
 @if (Model.CargaAgentes is { } carga)
 {

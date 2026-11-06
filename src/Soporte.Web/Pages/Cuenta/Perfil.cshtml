@@ -1,0 +1,77 @@
+@page
+@model Soporte.Web.Pages.Cuenta.PerfilModel
+@{
+    ViewData["Title"] = "Mi perfil";
+}
+
+<nav class="migas" aria-label="Ruta">
+    <a asp-page="/Dashboard/Index">Dashboard</a>
+    <span aria-hidden="true">/</span>
+    <span class="migas-actual">Mi perfil</span>
+</nav>
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Mi perfil</h1>
+        <p>Editá tu nombre y contraseña</p>
+    </div>
+</header>
+
+@if (Model.MensajeExito is not null)
+{
+    <div class="alerta-exito" role="status" data-autocerrar>@Model.MensajeExito</div>
+}
+
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">@Model.MensajeError</div>
+}
+
+<div class="perfil-layout">
+    <div class="tarjeta formulario">
+        <div class="perfil-avatar-fila">
+            <span class="avatar avatar-xl avatar-oscuro">@Formato.Iniciales(Model.NombreActual)</span>
+            <div>
+                <div class="perfil-nombre">@Model.NombreActual</div>
+                <div class="perfil-correo">@Model.CorreoActual</div>
+                <span class="pill-rol">@Model.RolActual</span>
+            </div>
+        </div>
+
+        <form method="post" data-envio-unico>
+            <h2 class="titulo-seccion" style="margin-top:0">Información personal</h2>
+
+            <div class="grupo-campo">
+                <label asp-for="Perfil.Nombre" class="etiqueta">Nombre completo <span class="requerido">*</span></label>
+                <input asp-for="Perfil.Nombre" class="campo campo-completo" />
+                <span asp-validation-for="Perfil.Nombre"></span>
+            </div>
+
+            <h2 class="titulo-seccion">Cambiar contraseña</h2>
+            <p class="texto-secundario" style="margin:-8px 0 16px;font-size:13px">Dejá los campos en blanco si no querés cambiarla.</p>
+
+            <div class="grupo-campo campo-contrasena">
+                <label asp-for="Perfil.ContrasenaActual" class="etiqueta">Contraseña actual</label>
+                <input asp-for="Perfil.ContrasenaActual" type="password" class="campo campo-completo" autocomplete="current-password" />
+                <button type="button" class="boton-ver" data-mostrar-contrasena="#Perfil_ContrasenaActual" aria-pressed="false" aria-label="Mostrar contraseña">👁</button>
+                <span asp-validation-for="Perfil.ContrasenaActual"></span>
+            </div>
+
+            <div class="grupo-campo campo-contrasena">
+                <label asp-for="Perfil.NuevaContrasena" class="etiqueta">Nueva contraseña</label>
+                <input asp-for="Perfil.NuevaContrasena" type="password" class="campo campo-completo" autocomplete="new-password" />
+                <button type="button" class="boton-ver" data-mostrar-contrasena="#Perfil_NuevaContrasena" aria-pressed="false" aria-label="Mostrar contraseña">👁</button>
+                <span asp-validation-for="Perfil.NuevaContrasena"></span>
+            </div>
+
+            <div class="acciones-formulario">
+                <a asp-page="/Dashboard/Index" class="boton-secundario">Cancelar</a>
+                <button type="submit" class="boton-primario">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -11,4 +11,5 @@ public interface IUsuarioRepository
     Task<int> ContarPorRolAsync(int rolId);
     Task ActualizarRolAsync(int usuarioId, int rolId);
     Task ActualizarPasswordAsync(int usuarioId, string passwordHash);
+    Task ActualizarNombreAsync(int usuarioId, string nombre);
 }

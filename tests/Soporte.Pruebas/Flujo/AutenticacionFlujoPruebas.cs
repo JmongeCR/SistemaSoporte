@@ -44,6 +44,7 @@ public class AutenticacionFlujoPruebas
         public Task<IReadOnlyList<UsuarioDto>> ListarAsync(FiltroUsuariosDto filtro) => throw new NotSupportedException();
         public Task<int> ContarPorRolAsync(int rolId) => throw new NotSupportedException();
         public Task ActualizarRolAsync(int usuarioId, int rolId) => throw new NotSupportedException();
+        public Task ActualizarNombreAsync(int usuarioId, string nombre) => throw new NotSupportedException();
     }
 
     private sealed class TokensEnMemoria : ITokenRecuperacionRepository
