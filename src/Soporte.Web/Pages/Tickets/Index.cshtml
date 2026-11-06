@@ -57,36 +57,47 @@ else if (Model.Tickets is not null)
         }
         else
         {
-            <table class="tabla">
+            <table class="tabla tabla-tickets">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Título</th>
-                        <th>Cliente</th>
-                        <th>Prioridad</th>
-                        <th>Estado</th>
-                        <th>Agente</th>
+                        <th class="col-id">ID</th>
+                        <th class="col-titulo">Título</th>
+                        @if (!Model.EsCliente) { <th class="col-cliente">Cliente</th> }
+                        <th class="col-categoria">Categoría</th>
+                        <th class="col-prioridad">Prioridad</th>
+                        <th class="col-estado">Estado</th>
+                        <th class="col-agente">Agente</th>
+                        <th class="col-fecha">Creado</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var ticket in Model.Tickets.Elementos)
                     {
-                        <tr>
-                            <td class="ticket-id"><a asp-page="./Detalle" asp-route-id="@ticket.Id">#@ticket.Id</a></td>
-                            <td>
-                                <a asp-page="./Detalle" asp-route-id="@ticket.Id" class="enlace-fila">@ticket.Asunto</a>
+                        <tr class="fila-ticket" data-href="/Tickets/Detalle/@ticket.Id">
+                            <td class="col-id">
+                                <a asp-page="./Detalle" asp-route-id="@ticket.Id" class="chip-id">#@ticket.Id</a>
+                            </td>
+                            <td class="col-titulo">
+                                <a asp-page="./Detalle" asp-route-id="@ticket.Id" class="enlace-titulo">@ticket.Asunto</a>
                                 @if (ticket.EsperaRespuestaCliente)
                                 {
-                                    <span class="pill pill-alerta ms-1">@(Model.EsCliente ? "Espera tu respuesta" : "Espera respuesta del cliente")</span>
+                                    <span class="pill pill-alerta etiqueta-mini-fila">@(Model.EsCliente ? "Te esperan" : "Esperando cliente")</span>
                                 }
                                 @if (ticket.SlaVencido && !Model.EsCliente)
                                 {
-                                    <span class="pill pill-alerta ms-1" title="Superó el tiempo de atención de su prioridad">SLA vencido</span>
+                                    <span class="pill pill-alerta etiqueta-mini-fila">SLA vencido</span>
                                 }
                             </td>
-                            <td class="texto-secundario">@ticket.Cliente</td>
-                            <td><span class="prioridad @Formato.ClasePrioridad(ticket.PrioridadId)">@ticket.Prioridad</span></td>
-                            <td>
+                            @if (!Model.EsCliente)
+                            {
+                                <td class="col-cliente celda-secundaria">@ticket.Cliente</td>
+                            }
+                            <td class="col-categoria celda-secundaria">@ticket.Categoria</td>
+                            <td class="col-prioridad">
+                                <span class="prioridad-dot @Formato.ClasePrioridad(ticket.PrioridadId)" title="@ticket.Prioridad"></span>
+                                <span class="celda-secundaria">@ticket.Prioridad</span>
+                            </td>
+                            <td class="col-estado">
                                 <span class="pill @Formato.ClaseEstado(ticket.EstadoId)">@ticket.Estado</span>
                                 @if (!Model.EsCliente)
                                 {
@@ -97,16 +108,17 @@ else if (Model.Tickets is not null)
                                             data-estado-id="@ticket.EstadoId">✎</button>
                                 }
                             </td>
-                            <td>
+                            <td class="col-agente">
                                 @if (ticket.AgenteAsignado is null)
                                 {
-                                    <span class="texto-tenue">Sin asignar</span>
+                                    <span class="celda-tenue">—</span>
                                 }
                                 else
                                 {
-                                    <span class="avatar" title="@ticket.AgenteAsignado">@Formato.Iniciales(ticket.AgenteAsignado)</span>
+                                    <span class="avatar avatar-sm" title="@ticket.AgenteAsignado">@Formato.Iniciales(ticket.AgenteAsignado)</span>
                                 }
                             </td>
+                            <td class="col-fecha celda-secundaria">@Formato.Hace(ticket.FechaCreacion)</td>
                         </tr>
                     }
                 </tbody>

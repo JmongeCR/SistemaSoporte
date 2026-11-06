@@ -254,6 +254,31 @@ select.campo { padding-right: 32px; }
 .tabla td { padding: 16px 18px; border-top: 1px solid var(--color-borde); vertical-align: middle; }
 .tabla tbody tr:hover { background: #FAFBFC; }
 
+/* ---- Tabla compacta de tickets (estilo Jira) ---- */
+.tabla-tickets td { padding: 9px 14px; font-size: 13px; }
+.tabla-tickets th { padding: 9px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.tabla-tickets .col-id { width: 72px; white-space: nowrap; }
+.tabla-tickets .col-titulo { min-width: 220px; }
+.tabla-tickets .col-cliente, .tabla-tickets .col-categoria { width: 120px; }
+.tabla-tickets .col-prioridad { width: 110px; white-space: nowrap; }
+.tabla-tickets .col-estado { width: 120px; white-space: nowrap; }
+.tabla-tickets .col-agente { width: 60px; text-align: center; }
+.tabla-tickets .col-fecha { width: 90px; white-space: nowrap; }
+.fila-ticket { cursor: pointer; }
+.chip-id { display: inline-block; font-size: 12px; font-weight: 600; color: var(--color-primario); background: #EEF3FF; border-radius: 4px; padding: 2px 7px; text-decoration: none; white-space: nowrap; }
+.chip-id:hover { background: #D9E5FF; color: var(--color-primario); }
+.enlace-titulo { color: var(--color-texto); text-decoration: none; font-size: 13px; font-weight: 500; }
+.enlace-titulo:hover { color: var(--color-primario); text-decoration: underline; }
+.etiqueta-mini-fila { font-size: 11px; margin-left: 6px; vertical-align: middle; }
+.celda-secundaria { font-size: 12px; color: var(--color-texto-secundario); }
+.celda-tenue { color: var(--color-texto-tenue); font-size: 13px; }
+.prioridad-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; flex-shrink: 0; }
+.avatar-sm { width: 22px; height: 22px; font-size: 10px; }
+[data-tema="oscuro"] .chip-id { background: #1D2B4A; color: #7DA6FF; }
+[data-tema="oscuro"] .chip-id:hover { background: #243560; }
+[data-tema="oscuro"] .enlace-titulo { color: #E2E8F0; }
+[data-tema="oscuro"] .fila-ticket:hover td { background: #1A1F2E; }
+
 .texto-secundario { color: var(--color-texto-secundario); }
 .texto-tenue { color: var(--color-texto-tenue); }
 .ticket-id { color: var(--color-primario); font-weight: 600; white-space: nowrap; }

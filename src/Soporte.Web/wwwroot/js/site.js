@@ -345,3 +345,12 @@ document.querySelectorAll("[data-autocerrar]").forEach((aviso) => {
     document.addEventListener("click", (e) => { if (!contenedor.contains(e.target)) cerrar(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrar(); });
 })();
+
+// Fila de ticket completa clickeable (excepto si el click es sobre un enlace, botón o form)
+document.addEventListener("click", (e) => {
+    const fila = e.target.closest(".fila-ticket");
+    if (!fila) return;
+    if (e.target.closest("a, button, form")) return;
+    const href = fila.dataset.href;
+    if (href) window.location.href = href;
+});
