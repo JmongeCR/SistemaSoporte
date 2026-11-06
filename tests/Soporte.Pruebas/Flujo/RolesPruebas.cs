@@ -37,6 +37,8 @@ public class RolesPruebas
         public Task<Usuario?> ObtenerPorCorreoAsync(string correo) => throw new NotSupportedException();
         public Task ActualizarPasswordAsync(int usuarioId, string passwordHash) => throw new NotSupportedException();
         public Task ActualizarNombreAsync(int usuarioId, string nombre) => throw new NotSupportedException();
+        public Task<IReadOnlyList<UsuarioPermiso>> ObtenerPermisosAsync(int usuarioId) => Task.FromResult<IReadOnlyList<UsuarioPermiso>>(Array.Empty<UsuarioPermiso>());
+        public Task GuardarPermisosAsync(int usuarioId, IReadOnlyList<UsuarioPermiso> overrides) => Task.CompletedTask;
     }
 
     private sealed class CatalogoConRoles : ICatalogoRepository

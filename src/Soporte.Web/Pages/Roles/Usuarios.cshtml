@@ -58,7 +58,7 @@ else if (Model.Usuarios is not null)
         <div class="lista-usuarios-panel tarjeta">
             @foreach (var usuario in Model.Usuarios)
             {
-                <button type="button" class="usuario-fila-btn" data-usuario-fila
+                <button type="button" class="usuario-fila-btn @(usuario.Id == Model.UsuarioId ? "activo" : "")" data-usuario-fila
                         data-usuario-id="@usuario.Id" data-nombre="@usuario.Nombre" data-correo="@usuario.Correo"
                         data-rol-id="@usuario.RolId" data-rol="@usuario.Rol" data-clase-rol="@DescripcionRoles.ClaseRol(usuario.RolId)">
                     <span class="avatar avatar-grande @DescripcionRoles.ClaseRol(usuario.RolId)">@Formato.Iniciales(usuario.Nombre)</span>
@@ -76,25 +76,78 @@ else if (Model.Usuarios is not null)
 
         @* Panel derecho: detalle y permisos del usuario seleccionado *@
         <div>
-            <div id="panel-placeholder" class="tarjeta panel-placeholder">
-                <p class="texto-tenue">← Seleccioná un usuario para ver sus permisos.</p>
-            </div>
-            <div id="panel-usuario" class="tarjeta panel-detalle-usuario" hidden>
-                <div class="panel-usuario-cab">
-                    <span class="avatar avatar-xl" id="pu-iniciales"></span>
-                    <div class="panel-usuario-data">
-                        <strong class="panel-usuario-nombre" id="pu-nombre"></strong>
-                        <span class="panel-usuario-correo" id="pu-correo"></span>
-                    </div>
-                    <span class="pill-rol" id="pu-rol"></span>
-                    <button type="button" class="boton-contorno" id="pu-cambiar-rol" data-cambiar-rol
-                            data-usuario-id="" data-nombre="" data-correo="" data-rol-id="" data-rol="" data-clase-rol="">
-                        Cambiar rol
-                    </button>
+            @if (Model.UsuarioSeleccionado is null)
+            {
+                <div class="tarjeta panel-placeholder">
+                    <p class="texto-tenue">← Seleccioná un usuario para ver y editar sus permisos.</p>
                 </div>
-                <h3 class="panel-usuario-seccion-titulo">Permisos de este rol</h3>
-                <div id="pu-permisos"></div>
-            </div>
+            }
+            else
+            {
+                var u = Model.UsuarioSeleccionado;
+                var claseRol = DescripcionRoles.ClaseRol(u.RolId);
+                <div class="tarjeta panel-detalle-usuario">
+                    <div class="panel-usuario-cab">
+                        <span class="avatar avatar-xl @claseRol">@Formato.Iniciales(u.Nombre)</span>
+                        <div class="panel-usuario-data">
+                            <strong class="panel-usuario-nombre">
+                                @u.Nombre
+                                @if (u.Id == Model.UsuarioActualId) { <span class="etiqueta-mini">(vos)</span> }
+                            </strong>
+                            <span class="panel-usuario-correo">@u.Correo</span>
+                        </div>
+                        <span class="pill-rol @claseRol">@u.Rol</span>
+                        <button type="button" class="boton-contorno" data-cambiar-rol
+                                data-usuario-id="@u.Id" data-nombre="@u.Nombre" data-correo="@u.Correo"
+                                data-rol-id="@u.RolId" data-rol="@u.Rol" data-clase-rol="@claseRol">
+                            Cambiar rol
+                        </button>
+                    </div>
+
+                    <h3 class="panel-usuario-seccion-titulo">Permisos personalizados</h3>
+                    <p class="texto-tenue panel-permisos-hint">Los permisos marcados con <span class="etiqueta-mini etiqueta-override">personalizado</span> difieren del default del rol.</p>
+
+                    @if (Model.PermisosUsuario is null)
+                    {
+                        <p class="alerta-error">No se pudieron cargar los permisos.</p>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="GuardarPermisos" data-envio-unico>
+                            <input type="hidden" name="usuarioId" value="@u.Id" />
+                            <input type="hidden" name="Filtro.Texto" value="@Model.Filtro.Texto" />
+                            <input type="hidden" name="Filtro.RolId" value="@Model.Filtro.RolId" />
+
+                            @foreach (var grupo in Model.PermisosUsuario.Grupos)
+                            {
+                                <div class="permiso-grupo">
+                                    <div class="permiso-grupo-titulo">@grupo.Grupo</div>
+                                    @foreach (var p in grupo.Permisos)
+                                    {
+                                        <label class="permiso-fila">
+                                            <input type="checkbox" class="permiso-check" name="permisosHabilitados" value="@p.Id" @(p.Concedido ? "checked" : "") />
+                                            <span class="permiso-desc @(p.Concedido ? "" : "sin-permiso")">
+                                                @p.Descripcion
+                                                @if (p.EsOverride) { <span class="etiqueta-mini etiqueta-override">personalizado</span> }
+                                            </span>
+                                        </label>
+                                    }
+                                </div>
+                            }
+
+                            <div class="panel-permisos-acciones">
+                                <button type="submit" form="form-restablecer" class="boton-secundario">Restaurar defaults del rol</button>
+                                <button type="submit" class="boton-primario">Guardar permisos</button>
+                            </div>
+                        </form>
+                        <form id="form-restablecer" method="post" asp-page-handler="RestablecerPermisos" hidden>
+                            <input type="hidden" name="usuarioId" value="@u.Id" />
+                            <input type="hidden" name="Filtro.Texto" value="@Model.Filtro.Texto" />
+                            <input type="hidden" name="Filtro.RolId" value="@Model.Filtro.RolId" />
+                        </form>
+                    }
+                </div>
+            }
         </div>
     </div>
 

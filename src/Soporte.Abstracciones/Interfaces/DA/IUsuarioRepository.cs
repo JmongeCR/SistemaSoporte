@@ -12,4 +12,7 @@ public interface IUsuarioRepository
     Task ActualizarRolAsync(int usuarioId, int rolId);
     Task ActualizarPasswordAsync(int usuarioId, string passwordHash);
     Task ActualizarNombreAsync(int usuarioId, string nombre);
+    Task<IReadOnlyList<UsuarioPermiso>> ObtenerPermisosAsync(int usuarioId);
+    /// <summary>Reemplaza todos los overrides del usuario con la lista provista (vacía = usar solo defaults del rol).</summary>
+    Task GuardarPermisosAsync(int usuarioId, IReadOnlyList<UsuarioPermiso> overrides);
 }

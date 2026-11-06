@@ -24,7 +24,7 @@ for _ in $(seq 1 40); do
 done
 [[ "$estado" == "healthy" ]] || { echo "SQL Server no respondió a tiempo." >&2; exit 1; }
 
-for script in 01_esquema.sql 02_catalogos.sql 03_procedimientos.sql 04_seed_pruebas.sql 05_seguimiento_notificaciones.sql 06_contrasena_version.sql; do
+for script in 01_esquema.sql 02_catalogos.sql 03_procedimientos.sql 04_seed_pruebas.sql 05_seguimiento_notificaciones.sql 06_contrasena_version.sql 07_permisos_usuario.sql; do
   echo "→ $script"
   docker exec "$CONTENEDOR" /opt/mssql-tools18/bin/sqlcmd \
     -S localhost -U sa -P "$SQLSERVER_SA_PASSWORD" -C -b -i "/scripts/$script" > /dev/null

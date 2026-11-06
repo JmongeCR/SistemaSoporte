@@ -7,7 +7,7 @@ CONTENEDOR="sc701-soporte-sqlserver"
 cd "$(dirname "$0")/.."
 set -a; source .env; set +a
 
-for script in database/05_*.sql; do
+for script in database/0[5-9]_*.sql; do
   echo "→ $(basename "$script")"
   docker exec "$CONTENEDOR" /opt/mssql-tools18/bin/sqlcmd \
     -S localhost -U sa -P "$SQLSERVER_SA_PASSWORD" -C -b -i "/scripts/$(basename "$script")" > /dev/null

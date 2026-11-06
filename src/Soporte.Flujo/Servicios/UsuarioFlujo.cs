@@ -3,6 +3,7 @@ using Soporte.Abstracciones.Enumeraciones;
 using Soporte.Abstracciones.Interfaces.DA;
 using Soporte.Abstracciones.Interfaces.Flujo;
 using Soporte.Abstracciones.Interfaces.Reglas;
+using Soporte.Abstracciones.Modelos;
 
 namespace Soporte.Flujo.Servicios;
 
@@ -64,6 +65,7 @@ public class UsuarioFlujo : IUsuarioFlujo
             return ResultadoOperacion<UsuarioDto>.Desde(validacion);
 
         await _usuarios.ActualizarRolAsync(usuarioId, dto.RolId);
+        await _usuarios.GuardarPermisosAsync(usuarioId, Array.Empty<UsuarioPermiso>());
 
         var rol = (await _catalogos.ListarRolesAsync()).Single(r => r.Id == dto.RolId);
         return ResultadoOperacion<UsuarioDto>.Ok(new UsuarioDto
@@ -114,5 +116,83 @@ public class UsuarioFlujo : IUsuarioFlujo
             Rol = rol?.Nombre ?? string.Empty,
             Activo = actualizado.Activo
         }, "Perfil actualizado correctamente.");
+    }
+
+    public async Task<ResultadoOperacion<MatrizPermisosDto>> ObtenerPermisosEfectivosAsync(int usuarioId, UsuarioContextoDto usuarioActual)
+    {
+        if (!_reglas.PuedeAdministrarUsuarios(usuarioActual))
+            return ResultadoOperacion<MatrizPermisosDto>.SinPermiso(SinPermisoUsuarios);
+
+        var usuario = await _usuarios.ObtenerPorIdAsync(usuarioId);
+        if (usuario is null)
+            return ResultadoOperacion<MatrizPermisosDto>.NoEncontrado($"No existe el usuario #{usuarioId}.");
+
+        var roles = await _catalogos.ListarRolesAsync();
+        var rol = roles.SingleOrDefault(r => r.Id == usuario.RolId);
+        if (rol is null)
+            return ResultadoOperacion<MatrizPermisosDto>.NoEncontrado($"No existe el rol #{usuario.RolId}.");
+
+        var todosPermisos = await _catalogos.ListarPermisosConRolesAsync();
+        var overrides = await _usuarios.ObtenerPermisosAsync(usuarioId);
+        var overridesDict = overrides.ToDictionary(o => o.PermisoId, o => o.Concedido);
+
+        var grupos = todosPermisos
+            .GroupBy(p => p.Grupo)
+            .OrderBy(g => g.Min(p => p.Id))
+            .Select(g => new GrupoPermisosDto
+            {
+                Grupo = g.Key,
+                Permisos = g.OrderBy(p => p.Id)
+                    .Select(p => new PermisoDto
+                    {
+                        Id = p.Id,
+                        Codigo = p.Codigo,
+                        Descripcion = p.Descripcion,
+                        Concedido = overridesDict.TryGetValue(p.Id, out var ov) ? ov : p.Roles.Any(r => r.RolId == usuario.RolId),
+                        EsOverride = overridesDict.ContainsKey(p.Id)
+                    })
+                    .ToList()
+            })
+            .ToList();
+
+        return ResultadoOperacion<MatrizPermisosDto>.Ok(new MatrizPermisosDto { RolId = rol.Id, Rol = rol.Nombre, Grupos = grupos });
+    }
+
+    public async Task<ResultadoOperacion> ActualizarPermisosAsync(int usuarioId, ActualizarPermisosUsuarioDto dto, UsuarioContextoDto usuarioActual)
+    {
+        if (!_reglas.PuedeAdministrarUsuarios(usuarioActual))
+            return ResultadoOperacion.SinPermiso(SinPermisoUsuarios);
+
+        var usuario = await _usuarios.ObtenerPorIdAsync(usuarioId);
+        if (usuario is null)
+            return ResultadoOperacion.NoEncontrado($"No existe el usuario #{usuarioId}.");
+
+        var todosPermisos = await _catalogos.ListarPermisosConRolesAsync();
+        var overrides = todosPermisos
+            .Select(p => new
+            {
+                p.Id,
+                DefaultConcedido = p.Roles.Any(r => r.RolId == usuario.RolId),
+                NuevoConcedido = dto.PermisosHabilitados.Contains(p.Id)
+            })
+            .Where(x => x.NuevoConcedido != x.DefaultConcedido)
+            .Select(x => new UsuarioPermiso { UsuarioId = usuarioId, PermisoId = x.Id, Concedido = x.NuevoConcedido })
+            .ToList();
+
+        await _usuarios.GuardarPermisosAsync(usuarioId, overrides);
+        return ResultadoOperacion.Ok("Permisos actualizados correctamente.");
+    }
+
+    public async Task<ResultadoOperacion> RestablecerPermisosAsync(int usuarioId, UsuarioContextoDto usuarioActual)
+    {
+        if (!_reglas.PuedeAdministrarUsuarios(usuarioActual))
+            return ResultadoOperacion.SinPermiso(SinPermisoUsuarios);
+
+        var usuario = await _usuarios.ObtenerPorIdAsync(usuarioId);
+        if (usuario is null)
+            return ResultadoOperacion.NoEncontrado($"No existe el usuario #{usuarioId}.");
+
+        await _usuarios.GuardarPermisosAsync(usuarioId, Array.Empty<UsuarioPermiso>());
+        return ResultadoOperacion.Ok("Permisos restablecidos al default del rol.");
     }
 }

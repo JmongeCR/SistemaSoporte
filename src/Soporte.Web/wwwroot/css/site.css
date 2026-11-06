@@ -806,3 +806,9 @@ a.aviso-info:hover { color: var(--color-primario-hover); }
 
 /* Modal cambiar estado */
 .modal-ticket-asunto { font-size: 13.5px; color: var(--color-texto-secundario); margin: 0 0 16px; }
+
+/* Per-user permissions panel */
+.permiso-check { cursor: pointer; }
+.etiqueta-override { background: var(--color-primario); color: #fff; margin-left: 4px; }
+.panel-permisos-hint { font-size: 12px; color: var(--color-texto-tenue); margin: -8px 0 14px; }
+.panel-permisos-acciones { display: flex; gap: 8px; justify-content: flex-end; padding-top: 16px; border-top: 1px solid var(--color-borde); margin-top: 16px; flex-wrap: wrap; }

@@ -80,4 +80,24 @@ public class UsuarioRepository : IUsuarioRepository
             .Where(u => u.Id == usuarioId)
             .ExecuteUpdateAsync(s => s.SetProperty(u => u.Nombre, nombre));
     }
+
+    public async Task<IReadOnlyList<UsuarioPermiso>> ObtenerPermisosAsync(int usuarioId)
+    {
+        return await _contexto.UsuariosPermisos
+            .AsNoTracking()
+            .Where(x => x.UsuarioId == usuarioId)
+            .ToListAsync();
+    }
+
+    public async Task GuardarPermisosAsync(int usuarioId, IReadOnlyList<UsuarioPermiso> overrides)
+    {
+        await _contexto.UsuariosPermisos
+            .Where(x => x.UsuarioId == usuarioId)
+            .ExecuteDeleteAsync();
+
+        if (overrides.Count > 0)
+            await _contexto.UsuariosPermisos.AddRangeAsync(overrides);
+
+        await _contexto.SaveChangesAsync();
+    }
 }

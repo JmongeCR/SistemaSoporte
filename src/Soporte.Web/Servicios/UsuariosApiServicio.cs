@@ -34,4 +34,13 @@ public class UsuariosApiServicio : IUsuariosApiServicio
 
     public async Task<ResultadoOperacion<UsuarioDto>> ActualizarPerfilAsync(ActualizarPerfilDto dto) =>
         await _api.PutJsonAsync<UsuarioDto>("api/cuenta/perfil", dto);
+
+    public async Task<ResultadoOperacion<MatrizPermisosDto>> ObtenerPermisosAsync(int usuarioId) =>
+        await _api.GetAsync<MatrizPermisosDto>($"api/usuarios/{usuarioId}/permisos");
+
+    public Task<ResultadoOperacion> ActualizarPermisosAsync(int usuarioId, ActualizarPermisosUsuarioDto dto) =>
+        _api.PutJsonAsync($"api/usuarios/{usuarioId}/permisos", dto);
+
+    public Task<ResultadoOperacion> RestablecerPermisosAsync(int usuarioId) =>
+        _api.DeleteAsync($"api/usuarios/{usuarioId}/permisos");
 }

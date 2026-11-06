@@ -16,7 +16,10 @@ public class GrupoPermisosDto
 
 public class PermisoDto
 {
+    public int Id { get; init; }
     public string Codigo { get; init; } = string.Empty;
     public string Descripcion { get; init; } = string.Empty;
     public bool Concedido { get; init; }
+    /// <summary>true si este permiso tiene un override explícito de usuario (difiere del default del rol).</summary>
+    public bool EsOverride { get; init; }
 }

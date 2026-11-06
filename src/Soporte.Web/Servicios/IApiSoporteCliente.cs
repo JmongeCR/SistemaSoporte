@@ -13,6 +13,12 @@ public interface IApiSoporteCliente
     /// <summary>POST sin cuerpo para acciones cuya respuesta no trae datos (ej. 204).</summary>
     Task<ResultadoOperacion> PostSinCuerpoAsync(string ruta);
 
+    /// <summary>PUT con cuerpo JSON cuando la respuesta no trae datos (ej. 204).</summary>
+    Task<ResultadoOperacion> PutJsonAsync(string ruta, object cuerpo);
+
+    /// <summary>DELETE cuando la respuesta no trae datos (ej. 204).</summary>
+    Task<ResultadoOperacion> DeleteAsync(string ruta);
+
     /// <summary>Descarga un archivo (la autorización la decide el API con el token del usuario).</summary>
     Task<ResultadoOperacion<ArchivoDescargaDto>> DescargarAsync(string ruta);
 }

@@ -47,6 +47,12 @@ public class ApiSoporteCliente : IApiSoporteCliente
     public async Task<ResultadoOperacion> PostSinCuerpoAsync(string ruta) =>
         await EnviarAsync(ruta, cliente => cliente.PostAsync(ruta, content: null), _ => Task.FromResult<MensajeDto?>(new MensajeDto()));
 
+    public async Task<ResultadoOperacion> PutJsonAsync(string ruta, object cuerpo) =>
+        await EnviarAsync(ruta, cliente => cliente.PutAsJsonAsync(ruta, cuerpo), _ => Task.FromResult<MensajeDto?>(new MensajeDto()));
+
+    public async Task<ResultadoOperacion> DeleteAsync(string ruta) =>
+        await EnviarAsync(ruta, cliente => cliente.DeleteAsync(ruta), _ => Task.FromResult<MensajeDto?>(new MensajeDto()));
+
     public Task<ResultadoOperacion<ArchivoDescargaDto>> DescargarAsync(string ruta) =>
         EnviarAsync(ruta, cliente => cliente.GetAsync(ruta), async respuesta =>
         {

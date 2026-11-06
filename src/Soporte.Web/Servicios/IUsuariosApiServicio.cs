@@ -18,4 +18,13 @@ public interface IUsuariosApiServicio
 
     /// <summary>Actualiza nombre y/o contraseña del usuario autenticado.</summary>
     Task<ResultadoOperacion<UsuarioDto>> ActualizarPerfilAsync(ActualizarPerfilDto dto);
+
+    /// <summary>Permisos efectivos del usuario (defaults del rol + overrides). Solo Administrador.</summary>
+    Task<ResultadoOperacion<MatrizPermisosDto>> ObtenerPermisosAsync(int usuarioId);
+
+    /// <summary>Guarda los permisos explícitos del usuario. Solo Administrador.</summary>
+    Task<ResultadoOperacion> ActualizarPermisosAsync(int usuarioId, ActualizarPermisosUsuarioDto dto);
+
+    /// <summary>Elimina los overrides y deja al usuario con los defaults del rol. Solo Administrador.</summary>
+    Task<ResultadoOperacion> RestablecerPermisosAsync(int usuarioId);
 }

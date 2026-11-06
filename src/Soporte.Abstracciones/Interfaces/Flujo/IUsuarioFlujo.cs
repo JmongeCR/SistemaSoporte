@@ -15,4 +15,13 @@ public interface IUsuarioFlujo
 
     /// <summary>Actualiza el nombre y, opcionalmente, la contraseña del usuario autenticado.</summary>
     Task<ResultadoOperacion<UsuarioDto>> ActualizarPerfilAsync(int usuarioId, ActualizarPerfilDto dto, UsuarioContextoDto usuarioActual);
+
+    /// <summary>Permisos efectivos de un usuario (defaults del rol + overrides explícitos). Solo Administrador.</summary>
+    Task<ResultadoOperacion<MatrizPermisosDto>> ObtenerPermisosEfectivosAsync(int usuarioId, UsuarioContextoDto usuarioActual);
+
+    /// <summary>Guarda los permisos explícitos del usuario. Solo Administrador.</summary>
+    Task<ResultadoOperacion> ActualizarPermisosAsync(int usuarioId, ActualizarPermisosUsuarioDto dto, UsuarioContextoDto usuarioActual);
+
+    /// <summary>Elimina todos los overrides de un usuario, dejándolo con los defaults del rol. Solo Administrador.</summary>
+    Task<ResultadoOperacion> RestablecerPermisosAsync(int usuarioId, UsuarioContextoDto usuarioActual);
 }

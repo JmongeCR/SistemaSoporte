@@ -29,10 +29,15 @@ public class UsuariosModel : PageModel
     [BindProperty(SupportsGet = true)]
     public FiltroUsuariosDto Filtro { get; set; } = new();
 
+    [BindProperty(SupportsGet = true)]
+    public int? UsuarioId { get; set; }
+
     public IReadOnlyList<UsuarioDto>? Usuarios { get; private set; }
     public IReadOnlyList<CatalogoDto> Roles { get; private set; } = Array.Empty<CatalogoDto>();
     public string? MensajeError { get; private set; }
     public int UsuarioActualId => _sesion.UsuarioId;
+    public UsuarioDto? UsuarioSeleccionado { get; private set; }
+    public MatrizPermisosDto? PermisosUsuario { get; private set; }
 
     /// <summary>Texto de ayuda del modal según el rol elegido.</summary>
     public string AvisosPorRolJson => JsonSerializer.Serialize(Roles.ToDictionary(r => r.Id.ToString(), r => DescripcionRoles.De(r.Id).AvisoAlAsignar));
@@ -65,6 +70,52 @@ public class UsuariosModel : PageModel
                 .Where(r => r.Exito && r.Datos is not null)
                 .ToDictionary(r => r.Datos!.RolId, r => r.Datos!);
         }
+
+        if (UsuarioId.HasValue && Usuarios is not null)
+        {
+            UsuarioSeleccionado = Usuarios.SingleOrDefault(u => u.Id == UsuarioId);
+            if (UsuarioSeleccionado is not null)
+            {
+                var perms = await _usuariosApi.ObtenerPermisosAsync(UsuarioId.Value);
+                if (perms.Exito)
+                    PermisosUsuario = perms.Datos;
+            }
+        }
+    }
+
+    public async Task<IActionResult> OnPostGuardarPermisosAsync(int usuarioId, [FromForm(Name = "permisosHabilitados")] List<int>? permisosHabilitados)
+    {
+        var dto = new ActualizarPermisosUsuarioDto { PermisosHabilitados = permisosHabilitados ?? new List<int>() };
+        var resultado = await _usuariosApi.ActualizarPermisosAsync(usuarioId, dto);
+        if (resultado.Exito)
+            TempData["Aviso"] = "Permisos actualizados correctamente.";
+        else
+        {
+            TempData["ErrorTitulo"] = "No se pudieron guardar los permisos.";
+            TempData["ErrorDetalle"] = resultado.Mensaje;
+        }
+
+        return RedirectToPage(new RouteValueDictionary
+        {
+            [nameof(UsuarioId)] = usuarioId,
+            [$"{nameof(Filtro)}.{nameof(FiltroUsuariosDto.Texto)}"] = Filtro.Texto,
+            [$"{nameof(Filtro)}.{nameof(FiltroUsuariosDto.RolId)}"] = Filtro.RolId
+        });
+    }
+
+    public async Task<IActionResult> OnPostRestablecerPermisosAsync(int usuarioId)
+    {
+        var resultado = await _usuariosApi.RestablecerPermisosAsync(usuarioId);
+        TempData["Aviso"] = resultado.Exito
+            ? "Permisos restablecidos al default del rol."
+            : resultado.Mensaje ?? "No se pudo restablecer los permisos.";
+
+        return RedirectToPage(new RouteValueDictionary
+        {
+            [nameof(UsuarioId)] = usuarioId,
+            [$"{nameof(Filtro)}.{nameof(FiltroUsuariosDto.Texto)}"] = Filtro.Texto,
+            [$"{nameof(Filtro)}.{nameof(FiltroUsuariosDto.RolId)}"] = Filtro.RolId
+        });
     }
 
     /// <param name="usuarioId">Usuario al que se le cambia el rol.</param>

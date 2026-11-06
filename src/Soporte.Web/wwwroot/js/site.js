@@ -245,66 +245,16 @@ document.querySelectorAll("[data-autocerrar]").forEach((aviso) => {
     boton.addEventListener("click", toggleTema);
 })();
 
-// Panel split usuarios (Roles/Usuarios): seleccionar usuario → ver permisos de su rol.
+// Panel split usuarios (Roles/Usuarios): clic en usuario → navega a la misma página con UsuarioId en la URL.
 (() => {
-    const datosSrc = document.getElementById("datos-permisos-roles");
-    if (!datosSrc) return;
+    const filas = document.querySelectorAll("[data-usuario-fila]");
+    if (!filas.length) return;
 
-    let permisosPorRol;
-    try { permisosPorRol = JSON.parse(datosSrc.textContent); } catch { return; }
-
-    const panelUsuario = document.getElementById("panel-usuario");
-    const panelPlaceholder = document.getElementById("panel-placeholder");
-    if (!panelUsuario || !panelPlaceholder) return;
-
-    const cam = (id) => document.getElementById(id);
-    let filaActiva = null;
-
-    const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-
-    document.querySelectorAll("[data-usuario-fila]").forEach((fila) => {
+    filas.forEach((fila) => {
         fila.addEventListener("click", () => {
-            if (filaActiva) filaActiva.classList.remove("activo");
-            fila.classList.add("activo");
-            filaActiva = fila;
-
-            const { usuarioId, nombre, correo, rolId, rol, claseRol } = fila.dataset;
-            const iniciales = nombre.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase();
-
-            cam("pu-iniciales").textContent = iniciales;
-            cam("pu-iniciales").className = `avatar avatar-xl ${claseRol}`;
-            cam("pu-nombre").textContent = nombre;
-            cam("pu-correo").textContent = correo;
-
-            const rolEl = cam("pu-rol");
-            rolEl.textContent = rol;
-            rolEl.className = `pill-rol ${claseRol}`;
-
-            const btnRol = cam("pu-cambiar-rol");
-            if (btnRol) {
-                Object.assign(btnRol.dataset, { usuarioId, nombre, correo, rolId, rol, claseRol });
-            }
-
-            const permisosDiv = cam("pu-permisos");
-            const matriz = permisosPorRol[rolId];
-            if (!matriz || !Array.isArray(matriz.Grupos)) {
-                permisosDiv.innerHTML = '<p class="texto-tenue">No hay información de permisos.</p>';
-            } else {
-                permisosDiv.innerHTML = matriz.Grupos.map((grupo) => `
-                    <div class="permiso-grupo">
-                        <div class="permiso-grupo-titulo">${esc(grupo.Grupo)}</div>
-                        ${grupo.Permisos.map((p) => `
-                            <label class="permiso-fila">
-                                <input type="checkbox" class="permiso-check" ${p.Concedido ? "checked" : ""} disabled>
-                                <span class="permiso-desc${p.Concedido ? "" : " sin-permiso"}">${esc(p.Descripcion)}</span>
-                            </label>
-                        `).join("")}
-                    </div>
-                `).join("");
-            }
-
-            panelUsuario.hidden = false;
-            panelPlaceholder.hidden = true;
+            const url = new URL(window.location.href);
+            url.searchParams.set("UsuarioId", fila.dataset.usuarioId);
+            window.location.href = url.toString();
         });
     });
 })();

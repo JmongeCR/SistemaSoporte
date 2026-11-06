@@ -48,6 +48,49 @@ public class UsuariosController : SoporteControllerBase
         return resultado.Exito ? Ok(resultado.Datos) : RespuestaError(resultado);
     }
 
+    /// <summary>Permisos efectivos del usuario (defaults del rol + overrides). Solo Administrador.</summary>
+    [HttpGet("{id:int}/permisos")]
+    [ProducesResponseType(typeof(MatrizPermisosDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<MatrizPermisosDto>> ObtenerPermisosAsync(int id)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null)
+            return NoAutenticado();
+
+        var resultado = await _usuarioFlujo.ObtenerPermisosEfectivosAsync(id, usuario);
+        return resultado.Exito ? Ok(resultado.Datos) : RespuestaError(resultado);
+    }
+
+    /// <summary>Guarda los permisos explícitos del usuario. Solo Administrador.</summary>
+    [HttpPut("{id:int}/permisos")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ActualizarPermisosAsync(int id, [FromBody] ActualizarPermisosUsuarioDto dto)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null)
+            return NoAutenticado();
+
+        var resultado = await _usuarioFlujo.ActualizarPermisosAsync(id, dto, usuario);
+        return resultado.Exito ? NoContent() : RespuestaError(resultado);
+    }
+
+    /// <summary>Elimina los overrides y deja al usuario con los defaults del rol. Solo Administrador.</summary>
+    [HttpDelete("{id:int}/permisos")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RestablecerPermisosAsync(int id)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null)
+            return NoAutenticado();
+
+        var resultado = await _usuarioFlujo.RestablecerPermisosAsync(id, usuario);
+        return resultado.Exito ? NoContent() : RespuestaError(resultado);
+    }
+
     /// <summary>Cambia el rol de un usuario (HU-15). Solo Administrador.</summary>
     /// <remarks>No permite quitar el rol Administrador al único administrador del sistema.</remarks>
     [HttpPut("{id:int}/rol")]
