@@ -43,7 +43,6 @@
                     {
                         <li><a class="app-nav-enlace @Activo("/Admin/Usuarios")" asp-page="/Admin/Usuarios/Index">Usuarios</a></li>
                         <li><a class="app-nav-enlace @Activo("/Admin/Plantillas")" asp-page="/Admin/Plantillas/Index">Plantillas</a></li>
-                        <li><a class="app-nav-enlace @Activo("/Admin/Configuracion")" asp-page="/Admin/Configuracion/Sla">Configuración</a></li>
                     }
                     <li><a class="app-nav-enlace @Activo("/Ayuda")" asp-page="/Ayuda/Index">Ayuda</a></li>
                 </ul>
@@ -85,6 +84,15 @@
         <main class="app-contenido" role="main">
             @RenderBody()
         </main>
+
+        <footer class="app-footer">
+            <div class="app-footer-inner">
+                <span class="app-footer-marca">
+                    <span aria-hidden="true">🎫</span> Soporte
+                </span>
+                <span class="app-footer-copy">© @DateTime.Now.Year — Sistema de Soporte</span>
+            </div>
+        </footer>
     </div>
 
     <dialog id="modal-crear-ticket" class="app-dialog">

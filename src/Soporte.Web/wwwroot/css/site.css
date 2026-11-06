@@ -64,12 +64,12 @@ body {
     display: flex;
     align-items: stretch;
     background: var(--color-sidebar);
-    padding: 0 24px;
+    padding: 0 28px;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
-    min-height: 52px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+    min-height: 62px;
 }
 
 .app-header-izq { display: flex; align-items: center; margin-right: 20px; }
@@ -77,12 +77,13 @@ body {
 .app-marca {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     color: #FFFFFF;
-    font-size: 15px;
+    font-size: 19px;
     font-weight: 700;
     text-decoration: none;
     white-space: nowrap;
+    letter-spacing: -0.3px;
 }
 .app-marca:hover { color: rgba(255,255,255,0.85); }
 
@@ -178,6 +179,33 @@ body {
 
 .app-marca-acciones { display: none; }
 .app-contenido { flex: 1; min-width: 0; padding: 28px 36px; background: #F4F6F9; }
+
+/* ---------- Footer de la app ---------- */
+.app-footer {
+    background: var(--color-sidebar);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 0 28px;
+}
+.app-footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 44px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.app-footer-marca {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.75);
+    font-size: 13px;
+    font-weight: 600;
+}
+.app-footer-copy {
+    color: rgba(255,255,255,0.40);
+    font-size: 12px;
+}
 
 /* ---------- Encabezado de página ---------- */
 .encabezado-pagina { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
