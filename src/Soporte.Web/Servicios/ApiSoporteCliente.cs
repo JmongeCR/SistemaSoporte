@@ -44,6 +44,9 @@ public class ApiSoporteCliente : IApiSoporteCliente
     public Task<ResultadoOperacion<T>> PutJsonAsync<T>(string ruta, object cuerpo) =>
         EnviarAsync<T>(ruta, cliente => cliente.PutAsJsonAsync(ruta, cuerpo));
 
+    public Task<ResultadoOperacion<T>> PatchJsonAsync<T>(string ruta, object cuerpo) =>
+        EnviarAsync<T>(ruta, cliente => cliente.PatchAsJsonAsync(ruta, cuerpo));
+
     public async Task<ResultadoOperacion> PostSinCuerpoAsync(string ruta) =>
         await EnviarAsync(ruta, cliente => cliente.PostAsync(ruta, content: null), _ => Task.FromResult<MensajeDto?>(new MensajeDto()));
 

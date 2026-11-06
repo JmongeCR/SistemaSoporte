@@ -9,6 +9,7 @@ public interface IApiSoporteCliente
     Task<ResultadoOperacion<T>> PostMultipartAsync<T>(string ruta, MultipartFormDataContent contenido);
     Task<ResultadoOperacion<T>> PostJsonAsync<T>(string ruta, object cuerpo);
     Task<ResultadoOperacion<T>> PutJsonAsync<T>(string ruta, object cuerpo);
+    Task<ResultadoOperacion<T>> PatchJsonAsync<T>(string ruta, object cuerpo);
 
     /// <summary>POST sin cuerpo para acciones cuya respuesta no trae datos (ej. 204).</summary>
     Task<ResultadoOperacion> PostSinCuerpoAsync(string ruta);

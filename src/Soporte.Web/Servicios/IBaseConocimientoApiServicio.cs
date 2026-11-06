@@ -10,4 +10,5 @@ public interface IBaseConocimientoApiServicio
     Task<ResultadoOperacion> VincularAsync(int ticketId, int articuloId);
     Task<ResultadoOperacion> DesvincularAsync(int ticketId, int articuloId);
     Task<ResultadoOperacion<ArticuloKbDto>> CrearAsync(CrearArticuloKbDto dto);
+    Task<ResultadoOperacion<ArticuloKbDto>> CambiarPublicadoAsync(int id, bool publicado);
 }

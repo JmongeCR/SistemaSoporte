@@ -15,7 +15,13 @@ else
     <header class="encabezado-pagina">
         <div>
             <a asp-page="/Ayuda/Index" class="enlace-volver">← Ayuda</a>
-            <h1>@Model.Articulo.Titulo</h1>
+            <h1>
+                @Model.Articulo.Titulo
+                @if (!Model.Articulo.Publicado)
+                {
+                    <span class="pill pill-warn" style="font-size:13px;vertical-align:middle;margin-left:8px">Borrador</span>
+                }
+            </h1>
             <p>
                 <span class="pill pill-info">@Model.Articulo.CategoriaNombre</span>
                 <span class="texto-secundario" style="font-size:13px;margin-left:8px">
@@ -23,10 +29,25 @@ else
                 </span>
             </p>
         </div>
+        @if (Model.PuedeGestionar)
+        {
+            <form method="post" asp-page-handler="CambiarPublicado">
+                <input type="hidden" name="id" value="@Model.Articulo.Id" />
+                <input type="hidden" name="publicado" value="@(!Model.Articulo.Publicado ? "true" : "false")" />
+                <input type="hidden" name="slug" value="@Model.Articulo.Slug" />
+                @if (Model.Articulo.Publicado)
+                {
+                    <button type="submit" class="boton-secundario">Despublicar</button>
+                }
+                else
+                {
+                    <button type="submit" class="boton-primario">Publicar</button>
+                }
+            </form>
+        }
     </header>
 
     <div class="tarjeta kb-contenido">
         @Html.Raw(Model.ContenidoHtml)
     </div>
-
 }

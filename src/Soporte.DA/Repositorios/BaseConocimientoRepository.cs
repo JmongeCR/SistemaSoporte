@@ -15,16 +15,17 @@ public class BaseConocimientoRepository : IBaseConocimientoRepository
         _contexto = contexto;
     }
 
-    public async Task<IReadOnlyList<ArticuloKbResumenDto>> ListarAsync(int? categoriaId = null)
+    public async Task<IReadOnlyList<ArticuloKbResumenDto>> ListarAsync(int? categoriaId = null, bool incluyeNoBublicados = false)
     {
         var query = _contexto.ArticulosKb.AsNoTracking()
-            .Where(a => a.Publicado);
+            .Where(a => incluyeNoBublicados || a.Publicado);
 
         if (categoriaId.HasValue)
             query = query.Where(a => a.CategoriaId == categoriaId.Value);
 
         return await query
-            .OrderByDescending(a => a.Vistas)
+            .OrderBy(a => a.Categoria.Nombre)
+            .ThenByDescending(a => a.Vistas)
             .ThenBy(a => a.Titulo)
             .Select(a => new ArticuloKbResumenDto
             {
@@ -32,15 +33,16 @@ public class BaseConocimientoRepository : IBaseConocimientoRepository
                 Titulo          = a.Titulo,
                 Slug            = a.Slug,
                 CategoriaNombre = a.Categoria.Nombre,
-                Vistas          = a.Vistas
+                Vistas          = a.Vistas,
+                Publicado       = a.Publicado
             })
             .ToListAsync();
     }
 
-    public async Task<ArticuloKbDto?> ObtenerPorSlugAsync(string slug)
+    public async Task<ArticuloKbDto?> ObtenerPorSlugAsync(string slug, bool incluyeNoBublicados = false)
     {
         return await _contexto.ArticulosKb.AsNoTracking()
-            .Where(a => a.Slug == slug && a.Publicado)
+            .Where(a => a.Slug == slug && (incluyeNoBublicados || a.Publicado))
             .Select(a => new ArticuloKbDto
             {
                 Id                = a.Id,
@@ -57,10 +59,10 @@ public class BaseConocimientoRepository : IBaseConocimientoRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<ArticuloKbDto?> ObtenerPorIdAsync(int id)
+    public async Task<ArticuloKbDto?> ObtenerPorIdAsync(int id, bool incluyeNoBublicados = false)
     {
         return await _contexto.ArticulosKb.AsNoTracking()
-            .Where(a => a.Id == id && a.Publicado)
+            .Where(a => a.Id == id && (incluyeNoBublicados || a.Publicado))
             .Select(a => new ArticuloKbDto
             {
                 Id                = a.Id,
@@ -154,4 +156,11 @@ public class BaseConocimientoRepository : IBaseConocimientoRepository
 
     public async Task<bool> ExisteSlugAsync(string slug) =>
         await _contexto.ArticulosKb.AnyAsync(a => a.Slug == slug);
+
+    public async Task ActualizarPublicadoAsync(int id, bool publicado) =>
+        await _contexto.ArticulosKb
+            .Where(a => a.Id == id)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(a => a.Publicado, publicado)
+                .SetProperty(a => a.FechaActualizacion, DateTime.UtcNow));
 }

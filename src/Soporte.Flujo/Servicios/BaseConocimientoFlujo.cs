@@ -17,12 +17,12 @@ public class BaseConocimientoFlujo : IBaseConocimientoFlujo
         _repo = repo;
     }
 
-    public Task<IReadOnlyList<ArticuloKbResumenDto>> ListarAsync(int? categoriaId = null) =>
-        _repo.ListarAsync(categoriaId);
+    public Task<IReadOnlyList<ArticuloKbResumenDto>> ListarAsync(int? categoriaId = null, bool incluyeNoBublicados = false) =>
+        _repo.ListarAsync(categoriaId, incluyeNoBublicados);
 
-    public async Task<ResultadoOperacion<ArticuloKbDto>> ObtenerPorSlugAsync(string slug)
+    public async Task<ResultadoOperacion<ArticuloKbDto>> ObtenerPorSlugAsync(string slug, bool incluyeNoBublicados = false)
     {
-        var articulo = await _repo.ObtenerPorSlugAsync(slug);
+        var articulo = await _repo.ObtenerPorSlugAsync(slug, incluyeNoBublicados);
         if (articulo is null)
             return ResultadoOperacion<ArticuloKbDto>.NoEncontrado("Artículo no encontrado.");
 
@@ -43,6 +43,25 @@ public class BaseConocimientoFlujo : IBaseConocimientoFlujo
     {
         await _repo.DesvincularAsync(ticketId, articuloId);
         return ResultadoOperacion.Ok();
+    }
+
+    public async Task<ResultadoOperacion<ArticuloKbDto>> CambiarPublicadoAsync(int id, bool publicado, UsuarioContextoDto usuario)
+    {
+        if (usuario.Rol != Soporte.Abstracciones.Enumeraciones.RolTipo.Administrador &&
+            usuario.Rol != Soporte.Abstracciones.Enumeraciones.RolTipo.Agente)
+            return ResultadoOperacion<ArticuloKbDto>.SinPermiso("Solo agentes y administradores pueden publicar artículos.");
+
+        await _repo.ActualizarPublicadoAsync(id, publicado);
+        var articulo = await _repo.ObtenerPorSlugAsync(await SlugPorIdAsync(id), incluyeNoBublicados: true);
+        return articulo is not null
+            ? ResultadoOperacion<ArticuloKbDto>.Ok(articulo)
+            : ResultadoOperacion<ArticuloKbDto>.NoEncontrado("Artículo no encontrado.");
+    }
+
+    private async Task<string> SlugPorIdAsync(int id)
+    {
+        var a = await _repo.ObtenerPorIdAsync(id, incluyeNoBublicados: true);
+        return a?.Slug ?? string.Empty;
     }
 
     public async Task<ResultadoOperacion<ArticuloKbDto>> CrearAsync(CrearArticuloKbDto dto, UsuarioContextoDto usuario)

@@ -927,7 +927,13 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
 .enlace-volver { font-size: 13px; color: var(--color-texto-secundario); text-decoration: none; display: inline-block; margin-bottom: 6px; }
 .enlace-volver:hover { color: var(--color-primario); }
 .pill-info { background: #EEF3FF; color: #2655C6; }
+.pill-warn { background: #FFF3CD; color: #856404; }
 [data-tema="oscuro"] .pill-info { background: #1D2B4A; color: #7DA6FF; }
+[data-tema="oscuro"] .pill-warn { background: #3A2E00; color: #FFD700; }
+.kb-seccion { margin-bottom: 32px; }
+.kb-seccion-titulo { font-size: 16px; font-weight: 700; color: var(--color-texto-secundario); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 14px; }
+.kb-card-borrador { opacity: .75; border-style: dashed; }
+.kb-badge-borrador { align-self: flex-start; }
 [data-tema="oscuro"] .kb-card { background: #1A1F2D; border-color: #2D3344; }
 [data-tema="oscuro"] .kb-card:hover { border-color: var(--color-primario); }
 [data-tema="oscuro"] .kb-titulo { color: #E2E8F0; }

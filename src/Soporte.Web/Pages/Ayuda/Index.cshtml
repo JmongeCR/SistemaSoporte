@@ -6,6 +6,10 @@
 @{
     ViewData["Title"] = "Ayuda";
     var puedeCrear = Sesion.EstaAutenticado && Sesion.Rol != RolTipo.Cliente;
+    var secciones = Model.Articulos
+        .GroupBy(a => a.CategoriaNombre)
+        .OrderBy(g => g.Key)
+        .ToList();
 }
 
 <header class="encabezado-pagina">
@@ -19,7 +23,7 @@
     }
 </header>
 
-@if (!Model.Articulos.Any())
+@if (!secciones.Any())
 {
     <div class="estado-vacio">
         <p>No hay artículos disponibles.</p>
@@ -27,14 +31,23 @@
 }
 else
 {
-    <div class="kb-grid">
-        @foreach (var art in Model.Articulos)
-        {
-            <a class="kb-card" asp-page="/Ayuda/Articulo" asp-route-slug="@art.Slug">
-                <span class="pill pill-info kb-categoria">@art.CategoriaNombre</span>
-                <h3 class="kb-titulo">@art.Titulo</h3>
-                <span class="kb-vistas">@art.Vistas vista@(art.Vistas == 1 ? "" : "s")</span>
-            </a>
-        }
-    </div>
+    @foreach (var seccion in secciones)
+    {
+        <section class="kb-seccion">
+            <h2 class="kb-seccion-titulo">@seccion.Key</h2>
+            <div class="kb-grid">
+                @foreach (var art in seccion)
+                {
+                    <a class="kb-card@(!art.Publicado ? " kb-card-borrador" : "")" asp-page="/Ayuda/Articulo" asp-route-slug="@art.Slug">
+                        @if (!art.Publicado)
+                        {
+                            <span class="pill pill-warn kb-badge-borrador">Borrador</span>
+                        }
+                        <h3 class="kb-titulo">@art.Titulo</h3>
+                        <span class="kb-vistas">@art.Vistas vista@(art.Vistas == 1 ? "" : "s")</span>
+                    </a>
+                }
+            </div>
+        </section>
+    }
 }

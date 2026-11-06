@@ -7,4 +7,5 @@ public class ArticuloKbResumenDto
     public string Slug            { get; set; } = string.Empty;
     public string CategoriaNombre { get; set; } = string.Empty;
     public int    Vistas          { get; set; }
+    public bool   Publicado       { get; set; }
 }
