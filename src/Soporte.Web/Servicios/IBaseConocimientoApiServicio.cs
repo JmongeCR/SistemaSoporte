@@ -9,4 +9,5 @@ public interface IBaseConocimientoApiServicio
     Task<ResultadoOperacion<IReadOnlyList<ArticuloKbResumenDto>>> ListarPorTicketAsync(int ticketId);
     Task<ResultadoOperacion> VincularAsync(int ticketId, int articuloId);
     Task<ResultadoOperacion> DesvincularAsync(int ticketId, int articuloId);
+    Task<ResultadoOperacion<ArticuloKbDto>> CrearAsync(CrearArticuloKbDto dto);
 }

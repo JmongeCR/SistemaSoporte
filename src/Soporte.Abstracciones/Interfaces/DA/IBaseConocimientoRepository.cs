@@ -1,4 +1,5 @@
 using Soporte.Abstracciones.DTOs;
+using Soporte.Abstracciones.Modelos;
 
 namespace Soporte.Abstracciones.Interfaces.DA;
 
@@ -11,4 +12,6 @@ public interface IBaseConocimientoRepository
     Task VincularAsync(int ticketId, int articuloId, int usuarioId);
     Task DesvincularAsync(int ticketId, int articuloId);
     Task IncrementarVistasAsync(int id);
+    Task<ArticuloKbDto> CrearAsync(ArticuloKb articulo);
+    Task<bool> ExisteSlugAsync(string slug);
 }

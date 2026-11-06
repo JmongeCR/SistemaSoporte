@@ -128,4 +128,30 @@ public class BaseConocimientoRepository : IBaseConocimientoRepository
             .Where(a => a.Id == id)
             .ExecuteUpdateAsync(s => s.SetProperty(a => a.Vistas, a => a.Vistas + 1));
     }
+
+    public async Task<ArticuloKbDto> CrearAsync(ArticuloKb articulo)
+    {
+        _contexto.ArticulosKb.Add(articulo);
+        await _contexto.SaveChangesAsync();
+
+        await _contexto.Entry(articulo).Reference(a => a.Categoria).LoadAsync();
+        await _contexto.Entry(articulo).Reference(a => a.CreadoPor).LoadAsync();
+
+        return new ArticuloKbDto
+        {
+            Id               = articulo.Id,
+            Titulo           = articulo.Titulo,
+            Contenido        = articulo.Contenido,
+            Slug             = articulo.Slug,
+            CategoriaId      = articulo.CategoriaId,
+            CategoriaNombre  = articulo.Categoria.Nombre,
+            CreadoPorNombre  = articulo.CreadoPor.Nombre,
+            FechaCreacion    = articulo.FechaCreacion,
+            Publicado        = articulo.Publicado,
+            Vistas           = 0
+        };
+    }
+
+    public async Task<bool> ExisteSlugAsync(string slug) =>
+        await _contexto.ArticulosKb.AnyAsync(a => a.Slug == slug);
 }

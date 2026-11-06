@@ -1,7 +1,11 @@
 @page
 @model Soporte.Web.Pages.Ayuda.IndexModel
+@using Soporte.Abstracciones.Enumeraciones
+@using Soporte.Web.Servicios
+@inject IUsuarioSesion Sesion
 @{
     ViewData["Title"] = "Ayuda";
+    var puedeCrear = Sesion.EstaAutenticado && Sesion.Rol != RolTipo.Cliente;
 }
 
 <header class="encabezado-pagina">
@@ -9,6 +13,10 @@
         <h1>Base de conocimiento</h1>
         <p>Artículos, procedimientos y preguntas frecuentes</p>
     </div>
+    @if (puedeCrear)
+    {
+        <a asp-page="/Ayuda/Nuevo" class="boton-primario">+ Nuevo artículo</a>
+    }
 </header>
 
 @if (!Model.Articulos.Any())

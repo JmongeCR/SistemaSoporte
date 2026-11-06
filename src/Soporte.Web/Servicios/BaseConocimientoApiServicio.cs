@@ -30,4 +30,7 @@ public class BaseConocimientoApiServicio : IBaseConocimientoApiServicio
 
     public Task<ResultadoOperacion> DesvincularAsync(int ticketId, int articuloId) =>
         _api.DeleteAsync($"api/kb/ticket/{ticketId}/{articuloId}");
+
+    public Task<ResultadoOperacion<ArticuloKbDto>> CrearAsync(CrearArticuloKbDto dto) =>
+        _api.PostJsonAsync<ArticuloKbDto>("api/kb", dto);
 }

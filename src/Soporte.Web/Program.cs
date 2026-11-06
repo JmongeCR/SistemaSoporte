@@ -14,6 +14,7 @@ builder.Services.AddRazorPages(opciones =>
     // HU-14 a HU-16: la sección de roles se protege en el servidor, no solo ocultando el menú.
     opciones.Conventions.AuthorizeFolder("/Admin", PoliticaSoloAdministrador);
     opciones.Conventions.AllowAnonymousToFolder("/Cuenta");
+    opciones.Conventions.AllowAnonymousToFolder("/Ayuda");
     opciones.Conventions.AllowAnonymousToPage("/Error");
 });
 

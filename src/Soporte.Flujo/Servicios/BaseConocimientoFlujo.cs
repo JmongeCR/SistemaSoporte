@@ -1,6 +1,10 @@
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
 using Soporte.Abstracciones.DTOs;
 using Soporte.Abstracciones.Interfaces.DA;
 using Soporte.Abstracciones.Interfaces.Flujo;
+using Soporte.Abstracciones.Modelos;
 
 namespace Soporte.Flujo.Servicios;
 
@@ -39,5 +43,50 @@ public class BaseConocimientoFlujo : IBaseConocimientoFlujo
     {
         await _repo.DesvincularAsync(ticketId, articuloId);
         return ResultadoOperacion.Ok();
+    }
+
+    public async Task<ResultadoOperacion<ArticuloKbDto>> CrearAsync(CrearArticuloKbDto dto, UsuarioContextoDto usuario)
+    {
+        var slug = await GenerarSlugUnicoAsync(dto.Titulo);
+
+        var articulo = new ArticuloKb
+        {
+            Titulo        = dto.Titulo.Trim(),
+            Contenido     = dto.Contenido.Trim(),
+            Slug          = slug,
+            CategoriaId   = dto.CategoriaId,
+            CreadoPorId   = usuario.UsuarioId,
+            FechaCreacion = DateTime.UtcNow,
+            Publicado     = dto.Publicado
+        };
+
+        var resultado = await _repo.CrearAsync(articulo);
+        return ResultadoOperacion<ArticuloKbDto>.Ok(resultado);
+    }
+
+    private async Task<string> GenerarSlugUnicoAsync(string titulo)
+    {
+        var base64 = Slugificar(titulo);
+        var slug = base64;
+        var i = 1;
+        while (await _repo.ExisteSlugAsync(slug))
+            slug = $"{base64}-{i++}";
+        return slug;
+    }
+
+    private static string Slugificar(string texto)
+    {
+        var normalizado = texto.Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder();
+        foreach (var c in normalizado)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                sb.Append(c);
+        }
+        var sinAcentos = sb.ToString().Normalize(NormalizationForm.FormC).ToLowerInvariant();
+        var slug = Regex.Replace(sinAcentos, @"[^a-z0-9\s-]", "");
+        slug = Regex.Replace(slug, @"\s+", "-");
+        slug = Regex.Replace(slug, @"-+", "-").Trim('-');
+        return slug.Length > 200 ? slug[..200] : slug;
     }
 }

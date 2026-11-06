@@ -96,6 +96,8 @@ public class CatalogoRepositoryFalso : ICatalogoRepository
     public Task<IReadOnlyList<CatalogoDto>> ListarEstadosAsync() => throw new NotSupportedException();
     public Task<IReadOnlyList<CatalogoDto>> ListarRolesAsync() => throw new NotSupportedException();
     public Task<IReadOnlyList<Permiso>> ListarPermisosConRolesAsync() => throw new NotSupportedException();
+    public Task<IReadOnlyList<PrioridadSlaDto>> ListarPrioridadesConSlaAsync() => throw new NotSupportedException();
+    public Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, int horasSla) => throw new NotSupportedException();
 }
 
 public class ComentarioRepositoryFalso : IComentarioRepository

@@ -3,8 +3,9 @@
 @inject IUsuarioSesion Sesion
 @{
     var paginaActual = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
-    var esCliente = Sesion.Rol == RolTipo.Cliente;
-    var esAdministrador = Sesion.Rol == RolTipo.Administrador;
+    var autenticado = Sesion.EstaAutenticado;
+    var esCliente = autenticado && Sesion.Rol == RolTipo.Cliente;
+    var esAdministrador = autenticado && Sesion.Rol == RolTipo.Administrador;
 
     string Activo(string prefijo) => paginaActual.StartsWith(prefijo) ? "activo" : string.Empty;
 }
@@ -48,26 +49,33 @@
             </nav>
 
             <div class="app-header-der">
-                <vc:campana />
-                <div class="menu-usuario" id="menu-usuario">
-                    <button type="button" class="menu-usuario-toggle" id="menu-usuario-toggle"
-                            aria-haspopup="true" aria-expanded="false">
-                        <span class="avatar avatar-sm">@Formato.Iniciales(Sesion.Nombre)</span>
-                        <span class="menu-usuario-nombre">@Sesion.Nombre</span>
-                        <span class="menu-usuario-flecha" aria-hidden="true">▾</span>
-                    </button>
-                    <div class="menu-usuario-dropdown" id="menu-usuario-dropdown" role="menu">
-                        <a asp-page="/Cuenta/Perfil" class="menu-usuario-item" role="menuitem">Configuración</a>
-                        @if (esAdministrador)
-                        {
-                            <a asp-page="/Admin/Usuarios/Index" class="menu-usuario-item" role="menuitem">Gestión de usuarios</a>
-                        }
-                        <div class="menu-usuario-sep" role="separator"></div>
-                        <form method="post" asp-page="/Cuenta/Salir">
-                            <button type="submit" class="menu-usuario-item salir" role="menuitem">Salir</button>
-                        </form>
+                @if (autenticado)
+                {
+                    <vc:campana />
+                    <div class="menu-usuario" id="menu-usuario">
+                        <button type="button" class="menu-usuario-toggle" id="menu-usuario-toggle"
+                                aria-haspopup="true" aria-expanded="false">
+                            <span class="avatar avatar-sm">@Formato.Iniciales(Sesion.Nombre)</span>
+                            <span class="menu-usuario-nombre">@Sesion.Nombre</span>
+                            <span class="menu-usuario-flecha" aria-hidden="true">▾</span>
+                        </button>
+                        <div class="menu-usuario-dropdown" id="menu-usuario-dropdown" role="menu">
+                            <a asp-page="/Cuenta/Perfil" class="menu-usuario-item" role="menuitem">Configuración</a>
+                            @if (esAdministrador)
+                            {
+                                <a asp-page="/Admin/Usuarios/Index" class="menu-usuario-item" role="menuitem">Gestión de usuarios</a>
+                            }
+                            <div class="menu-usuario-sep" role="separator"></div>
+                            <form method="post" asp-page="/Cuenta/Salir">
+                                <button type="submit" class="menu-usuario-item salir" role="menuitem">Salir</button>
+                            </form>
+                        </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <a asp-page="/Cuenta/Login" class="btn-iniciar-sesion">Iniciar sesión</a>
+                }
                 <button type="button" class="app-btn-tema" id="btn-tema" aria-label="Cambiar tema" title="Cambiar tema"></button>
             </div>
         </header>

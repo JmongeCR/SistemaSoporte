@@ -1,0 +1,54 @@
+@page
+@model Soporte.Web.Pages.Ayuda.NuevoModel
+@{
+    ViewData["Title"] = "Nuevo artículo";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Nuevo artículo</h1>
+        <p>Redactá el artículo en Markdown. Se publicará en la base de conocimiento.</p>
+    </div>
+</header>
+
+<div class="contenedor-formulario">
+    <form method="post" class="formulario-kb">
+        <div asp-validation-summary="ModelOnly" class="alerta alerta-error"></div>
+
+        <div class="grupo-campo">
+            <label asp-for="Input.Titulo" class="etiqueta">Título</label>
+            <input asp-for="Input.Titulo" class="campo campo-completo"
+                   placeholder="Ej. Cómo restablecer la contraseña del ERP" autofocus />
+            <span asp-validation-for="Input.Titulo" class="campo-validacion"></span>
+        </div>
+
+        <div class="grupo-campo">
+            <label asp-for="Input.CategoriaId" class="etiqueta">Categoría</label>
+            <select asp-for="Input.CategoriaId" asp-items="Model.Categorias" class="campo campo-completo">
+                <option value="">— Seleccioná una categoría —</option>
+            </select>
+            <span asp-validation-for="Input.CategoriaId" class="campo-validacion"></span>
+        </div>
+
+        <div class="grupo-campo">
+            <label asp-for="Input.Contenido" class="etiqueta">Contenido (Markdown)</label>
+            <textarea asp-for="Input.Contenido" class="campo campo-completo campo-kb-contenido" rows="18"
+                      placeholder="## Pasos&#10;&#10;1. Paso uno&#10;2. Paso dos"></textarea>
+            <span asp-validation-for="Input.Contenido" class="campo-validacion"></span>
+        </div>
+
+        <div class="grupo-campo grupo-campo-inline">
+            <input asp-for="Input.Publicado" type="checkbox" id="publicado" />
+            <label for="publicado" class="etiqueta etiqueta-inline">Publicar de inmediato</label>
+        </div>
+
+        <div class="barra-acciones-form">
+            <a asp-page="/Ayuda/Index" class="boton-secundario">Cancelar</a>
+            <button type="submit" class="boton-primario">Guardar artículo</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

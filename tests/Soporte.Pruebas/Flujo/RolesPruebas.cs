@@ -56,6 +56,8 @@ public class RolesPruebas
         public Task<IReadOnlyList<CatalogoDto>> ListarPrioridadesAsync() => throw new NotSupportedException();
         public Task<IReadOnlyList<CatalogoDto>> ListarEstadosAsync() => throw new NotSupportedException();
         public Task<bool> ExisteCategoriaActivaAsync(int categoriaId) => throw new NotSupportedException();
+        public Task<IReadOnlyList<PrioridadSlaDto>> ListarPrioridadesConSlaAsync() => throw new NotSupportedException();
+        public Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, int horasSla) => throw new NotSupportedException();
     }
 
     private readonly UsuariosEnMemoria _usuarios = new();

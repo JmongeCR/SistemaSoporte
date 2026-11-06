@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Soporte.Abstracciones.DTOs;
 using Soporte.Abstracciones.Interfaces.Flujo;
@@ -19,11 +20,13 @@ public class BaseConocimientoController : SoporteControllerBase
         _usuarioActual = usuarioActual;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<ArticuloKbResumenDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<ArticuloKbResumenDto>>> ListarAsync([FromQuery] int? categoriaId = null) =>
         Ok(await _flujo.ListarAsync(categoriaId));
 
+    [AllowAnonymous]
     [HttpGet("{slug}")]
     [ProducesResponseType(typeof(ArticuloKbDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -33,10 +36,20 @@ public class BaseConocimientoController : SoporteControllerBase
         return resultado.Exito ? Ok(resultado.Datos) : NotFound();
     }
 
+    [AllowAnonymous]
     [HttpGet("ticket/{ticketId:int}")]
     [ProducesResponseType(typeof(IReadOnlyList<ArticuloKbResumenDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<ArticuloKbResumenDto>>> ListarPorTicketAsync(int ticketId) =>
         Ok(await _flujo.ListarPorTicketAsync(ticketId));
+
+    [HttpPost]
+    [ProducesResponseType(typeof(ArticuloKbDto), StatusCodes.Status201Created)]
+    public async Task<ActionResult<ArticuloKbDto>> CrearAsync([FromBody] CrearArticuloKbDto dto)
+    {
+        var usuario = _usuarioActual.Obtener();
+        var resultado = await _flujo.CrearAsync(dto, usuario);
+        return CreatedAtAction(nameof(ObtenerAsync), new { slug = resultado.Datos!.Slug }, resultado.Datos);
+    }
 
     [HttpPost("ticket/{ticketId:int}/{articuloId:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
