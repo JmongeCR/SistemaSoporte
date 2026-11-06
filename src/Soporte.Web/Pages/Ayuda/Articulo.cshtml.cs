@@ -53,4 +53,11 @@ public class ArticuloModel : PageModel
         await _kb.VotarAsync(articuloId, esUtil);
         return RedirectToPage(new { slug });
     }
+
+    public async Task<IActionResult> OnPostEliminarAsync(int id, string slug)
+    {
+        if (_sesion.Rol != RolTipo.Administrador) return Forbid();
+        await _kb.EliminarAsync(id);
+        return RedirectToPage("/Ayuda/Index");
+    }
 }

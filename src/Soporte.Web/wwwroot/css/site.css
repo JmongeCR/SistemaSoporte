@@ -426,6 +426,22 @@ textarea.campo { height: auto; min-height: 120px; padding: 12px; resize: vertica
 }
 .boton-secundario:hover { border-color: #CFD3DA; color: var(--color-texto); }
 
+.boton-peligro {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 20px;
+    border: 1px solid #F5C2BF;
+    border-radius: var(--radio);
+    background: var(--rojo-fondo);
+    color: #BF2E24;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+.boton-peligro:hover { background: #FFD6D3; border-color: #E89490; }
+
+.boton-xs { padding: 5px 12px; font-size: 12px; }
+
 /* Selector segmentado (radio buttons) */
 .segmentado { display: flex; gap: 4px; padding: 4px; border-radius: var(--radio); background: var(--color-segmentado); }
 .segmentado-opcion { position: absolute; opacity: 0; pointer-events: none; }

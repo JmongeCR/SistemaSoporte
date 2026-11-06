@@ -73,6 +73,28 @@ public class BaseConocimientoFlujo : IBaseConocimientoFlujo
         return a?.Slug ?? string.Empty;
     }
 
+    public async Task<ResultadoOperacion<ArticuloKbDto>> ActualizarAsync(int id, ActualizarArticuloKbDto dto, UsuarioContextoDto usuario)
+    {
+        if (usuario.Rol != Soporte.Abstracciones.Enumeraciones.RolTipo.Administrador &&
+            usuario.Rol != Soporte.Abstracciones.Enumeraciones.RolTipo.Agente)
+            return ResultadoOperacion<ArticuloKbDto>.SinPermiso("Solo agentes y administradores pueden editar artículos.");
+
+        await _repo.ActualizarAsync(id, dto);
+        var articulo = await _repo.ObtenerPorIdAsync(id, incluyeNoBublicados: true);
+        return articulo is not null
+            ? ResultadoOperacion<ArticuloKbDto>.Ok(articulo)
+            : ResultadoOperacion<ArticuloKbDto>.NoEncontrado("Artículo no encontrado.");
+    }
+
+    public async Task<ResultadoOperacion> EliminarAsync(int id, UsuarioContextoDto usuario)
+    {
+        if (usuario.Rol != Soporte.Abstracciones.Enumeraciones.RolTipo.Administrador)
+            return ResultadoOperacion.SinPermiso("Solo administradores pueden eliminar artículos.");
+
+        await _repo.EliminarAsync(id);
+        return ResultadoOperacion.Ok();
+    }
+
     public async Task<ResultadoOperacion<ArticuloKbDto>> CrearAsync(CrearArticuloKbDto dto, UsuarioContextoDto usuario)
     {
         var slug = await GenerarSlugUnicoAsync(dto.Titulo);

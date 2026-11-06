@@ -70,6 +70,45 @@ public class CatalogosController : SoporteControllerBase
         return resultado.Exito ? Ok(resultado.Datos) : RespuestaError(resultado);
     }
 
+    /// <summary>Crea una categoría. Solo Administrador.</summary>
+    [HttpPost("categorias")]
+    [ProducesResponseType(typeof(CatalogoDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<CatalogoDto>> CrearCategoriaAsync([FromBody] string nombre)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
+        var resultado = await _catalogoFlujo.CrearCategoriaAsync(nombre, usuario);
+        if (!resultado.Exito) return RespuestaError(resultado);
+        return CreatedAtAction(nameof(CrearCategoriaAsync), resultado.Datos);
+    }
+
+    /// <summary>Renombra una categoría. Solo Administrador.</summary>
+    [HttpPut("categorias/{id:int}")]
+    [ProducesResponseType(typeof(CatalogoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CatalogoDto>> ActualizarCategoriaAsync(int id, [FromBody] string nombre)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
+        var resultado = await _catalogoFlujo.ActualizarCategoriaAsync(id, nombre, usuario);
+        return resultado.Exito ? Ok(resultado.Datos) : RespuestaError(resultado);
+    }
+
+    /// <summary>Elimina una categoría sin uso. Solo Administrador.</summary>
+    [HttpDelete("categorias/{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> EliminarCategoriaAsync(int id)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
+        var resultado = await _catalogoFlujo.EliminarCategoriaAsync(id, usuario);
+        return resultado.Exito ? NoContent() : RespuestaError(resultado);
+    }
+
     /// <summary>Permisos del rol agrupados, de solo lectura (HU-16). Solo Administrador.</summary>
     [HttpGet("roles/{rolId:int}/permisos")]
     [ProducesResponseType(typeof(MatrizPermisosDto), StatusCodes.Status200OK)]

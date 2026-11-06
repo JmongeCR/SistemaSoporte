@@ -27,6 +27,28 @@ public class CatalogoFlujo : ICatalogoFlujo
         return await _catalogos.ActualizarSlaAsync(id, dto.HorasSla);
     }
 
+    public async Task<ResultadoOperacion<CatalogoDto>> CrearCategoriaAsync(string nombre, UsuarioContextoDto usuario)
+    {
+        if (usuario.Rol != RolTipo.Administrador)
+            return ResultadoOperacion<CatalogoDto>.SinPermiso("Solo administradores pueden crear categorías.");
+        var cat = await _catalogos.CrearCategoriaAsync(nombre);
+        return ResultadoOperacion<CatalogoDto>.Ok(cat);
+    }
+
+    public async Task<ResultadoOperacion<CatalogoDto>> ActualizarCategoriaAsync(int id, string nombre, UsuarioContextoDto usuario)
+    {
+        if (usuario.Rol != RolTipo.Administrador)
+            return ResultadoOperacion<CatalogoDto>.SinPermiso("Solo administradores pueden editar categorías.");
+        return await _catalogos.ActualizarCategoriaAsync(id, nombre);
+    }
+
+    public async Task<ResultadoOperacion> EliminarCategoriaAsync(int id, UsuarioContextoDto usuario)
+    {
+        if (usuario.Rol != RolTipo.Administrador)
+            return ResultadoOperacion.SinPermiso("Solo administradores pueden eliminar categorías.");
+        return await _catalogos.EliminarCategoriaAsync(id);
+    }
+
     public async Task<ResultadoOperacion<MatrizPermisosDto>> ObtenerMatrizPermisosAsync(int rolId, UsuarioContextoDto usuario)
     {
         if (usuario.Rol != RolTipo.Administrador)

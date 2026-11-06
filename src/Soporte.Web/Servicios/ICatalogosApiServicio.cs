@@ -14,4 +14,8 @@ public interface ICatalogosApiServicio
 
     Task<ResultadoOperacion<IReadOnlyList<PrioridadSlaDto>>> ListarPrioridadesConSlaAsync();
     Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, ActualizarSlaDto dto);
+
+    Task<ResultadoOperacion<CatalogoDto>> CrearCategoriaAsync(string nombre);
+    Task<ResultadoOperacion<CatalogoDto>> ActualizarCategoriaAsync(int id, string nombre);
+    Task<ResultadoOperacion> EliminarCategoriaAsync(int id);
 }

@@ -53,6 +53,38 @@ public class CatalogoRepository : ICatalogoRepository
         return await _contexto.Categorias.AnyAsync(c => c.Id == categoriaId && c.Activa);
     }
 
+    public async Task<CatalogoDto> CrearCategoriaAsync(string nombre)
+    {
+        var cat = new Categoria { Nombre = nombre.Trim(), Activa = true };
+        _contexto.Categorias.Add(cat);
+        await _contexto.SaveChangesAsync();
+        return new CatalogoDto { Id = cat.Id, Nombre = cat.Nombre };
+    }
+
+    public async Task<ResultadoOperacion<CatalogoDto>> ActualizarCategoriaAsync(int id, string nombre)
+    {
+        var cat = await _contexto.Categorias.FindAsync(id);
+        if (cat is null)
+            return ResultadoOperacion<CatalogoDto>.NoEncontrado($"No existe la categoría #{id}.");
+        cat.Nombre = nombre.Trim();
+        await _contexto.SaveChangesAsync();
+        return ResultadoOperacion<CatalogoDto>.Ok(new CatalogoDto { Id = cat.Id, Nombre = cat.Nombre });
+    }
+
+    public async Task<ResultadoOperacion> EliminarCategoriaAsync(int id)
+    {
+        var cat = await _contexto.Categorias.FindAsync(id);
+        if (cat is null)
+            return ResultadoOperacion.NoEncontrado($"No existe la categoría #{id}.");
+        var enUso = await _contexto.Tickets.AnyAsync(t => t.CategoriaId == id)
+                 || await _contexto.ArticulosKb.AnyAsync(a => a.CategoriaId == id);
+        if (enUso)
+            return ResultadoOperacion.Fallo("No se puede eliminar una categoría en uso por tickets o artículos.");
+        _contexto.Categorias.Remove(cat);
+        await _contexto.SaveChangesAsync();
+        return ResultadoOperacion.Ok();
+    }
+
     public async Task<IReadOnlyList<Permiso>> ListarPermisosConRolesAsync()
     {
         return await _contexto.Permisos.AsNoTracking()

@@ -14,4 +14,8 @@ public interface ICatalogoFlujo
 
     Task<IReadOnlyList<PrioridadSlaDto>> ListarPrioridadesConSlaAsync();
     Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, ActualizarSlaDto dto, UsuarioContextoDto usuario);
+
+    Task<ResultadoOperacion<CatalogoDto>> CrearCategoriaAsync(string nombre, UsuarioContextoDto usuario);
+    Task<ResultadoOperacion<CatalogoDto>> ActualizarCategoriaAsync(int id, string nombre, UsuarioContextoDto usuario);
+    Task<ResultadoOperacion> EliminarCategoriaAsync(int id, UsuarioContextoDto usuario);
 }

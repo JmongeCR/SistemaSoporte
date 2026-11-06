@@ -67,6 +67,38 @@ public class BaseConocimientoController : SoporteControllerBase
     public async Task<ActionResult<IReadOnlyList<ArticuloKbResumenDto>>> ListarPorTicketAsync(int ticketId) =>
         Ok(await _flujo.ListarPorTicketAsync(ticketId));
 
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(typeof(ArticuloKbDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<ArticuloKbDto>> ActualizarAsync(int id, [FromBody] ActualizarArticuloKbDto dto)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
+        var resultado = await _flujo.ActualizarAsync(id, dto, usuario);
+        return resultado.TipoError switch
+        {
+            TipoError.SinPermiso  => Forbid(),
+            TipoError.NoEncontrado => NotFound(),
+            _ => Ok(resultado.Datos)
+        };
+    }
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> EliminarAsync(int id)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
+        var resultado = await _flujo.EliminarAsync(id, usuario);
+        return resultado.TipoError switch
+        {
+            TipoError.SinPermiso   => Forbid(),
+            TipoError.NoEncontrado => NotFound(),
+            _ => NoContent()
+        };
+    }
+
     [HttpPost]
     [ProducesResponseType(typeof(ArticuloKbDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<ArticuloKbDto>> CrearAsync([FromBody] CrearArticuloKbDto dto)

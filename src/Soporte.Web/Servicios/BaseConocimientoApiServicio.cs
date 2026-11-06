@@ -34,6 +34,12 @@ public class BaseConocimientoApiServicio : IBaseConocimientoApiServicio
     public Task<ResultadoOperacion<ArticuloKbDto>> CrearAsync(CrearArticuloKbDto dto) =>
         _api.PostJsonAsync<ArticuloKbDto>("api/kb", dto);
 
+    public Task<ResultadoOperacion<ArticuloKbDto>> ActualizarAsync(int id, ActualizarArticuloKbDto dto) =>
+        _api.PutJsonAsync<ArticuloKbDto>($"api/kb/{id}", dto);
+
+    public Task<ResultadoOperacion> EliminarAsync(int id) =>
+        _api.DeleteAsync($"api/kb/{id}");
+
     public Task<ResultadoOperacion<ArticuloKbDto>> CambiarPublicadoAsync(int id, bool publicado) =>
         _api.PatchJsonAsync<ArticuloKbDto>($"api/kb/{id}/publicado", publicado);
 

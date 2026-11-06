@@ -1,0 +1,119 @@
+@page
+@model Soporte.Web.Pages.Admin.Categorias.IndexModel
+@{
+    ViewData["Title"] = "Categorías";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Categorías</h1>
+        <p>Categorías para tickets y artículos de la base de conocimiento</p>
+    </div>
+</header>
+
+@if (Model.MensajeExito is not null)
+{
+    <div class="alerta alerta-exito" role="status">@Model.MensajeExito</div>
+}
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta alerta-error" role="alert">@Model.MensajeError</div>
+}
+
+<div class="layout-dos-columnas" style="gap:24px;align-items:flex-start">
+
+    <!-- Tabla de categorías -->
+    <div class="tarjeta" style="flex:1;min-width:0">
+        <h2 class="tarjeta-titulo" style="margin:0 0 16px">Categorías activas</h2>
+
+        @if (!Model.Categorias.Any())
+        {
+            <div class="estado-vacio"><p>No hay categorías.</p></div>
+        }
+        else
+        {
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th style="width:200px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cat in Model.Categorias)
+                    {
+                        <tr>
+                            <td class="texto-secundario">@cat.Id</td>
+                            <td><strong>@cat.Nombre</strong></td>
+                            <td>
+                                <div style="display:flex;gap:8px;justify-content:flex-end">
+                                    <button type="button" class="boton-secundario boton-xs"
+                                            onclick="abrirEditar(@cat.Id, '@Html.Raw(Html.Encode(cat.Nombre))')">
+                                        Editar
+                                    </button>
+                                    <form method="post" asp-page-handler="Eliminar"
+                                          onsubmit="return confirm('¿Eliminar «@cat.Nombre»? Solo es posible si no está en uso.')">
+                                        <input type="hidden" name="id" value="@cat.Id" />
+                                        <button type="submit" class="boton-peligro boton-xs">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <!-- Panel lateral: crear + editar -->
+    <div style="width:320px;flex-shrink:0;display:flex;flex-direction:column;gap:16px">
+
+        <!-- Crear -->
+        <div class="tarjeta">
+            <h2 class="tarjeta-titulo" style="margin:0 0 16px">Nueva categoría</h2>
+            <form method="post" asp-page-handler="Crear">
+                <div asp-validation-summary="ModelOnly" class="alerta alerta-error"></div>
+                <div class="grupo-campo">
+                    <label asp-for="NuevaNombre" class="etiqueta">Nombre</label>
+                    <input asp-for="NuevaNombre" class="campo campo-completo" placeholder="Ej. Redes y conectividad" />
+                    <span asp-validation-for="NuevaNombre" class="campo-validacion"></span>
+                </div>
+                <button type="submit" class="boton-primario boton-bloque">Crear categoría</button>
+            </form>
+        </div>
+
+        <!-- Editar (oculto por defecto) -->
+        <div class="tarjeta" id="panel-editar" style="display:none">
+            <h2 class="tarjeta-titulo" style="margin:0 0 16px">Editar categoría</h2>
+            <form method="post" asp-page-handler="Editar">
+                <input type="hidden" asp-for="EditarId" id="editar-id" />
+                <div class="grupo-campo">
+                    <label asp-for="EditarNombre" class="etiqueta">Nombre</label>
+                    <input asp-for="EditarNombre" id="editar-nombre" class="campo campo-completo" />
+                    <span asp-validation-for="EditarNombre" class="campo-validacion"></span>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button type="button" class="boton-secundario" onclick="cerrarEditar()">Cancelar</button>
+                    <button type="submit" class="boton-primario" style="flex:1">Guardar</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+    function abrirEditar(id, nombre) {
+        document.getElementById("editar-id").value = id;
+        document.getElementById("editar-nombre").value = nombre;
+        document.getElementById("panel-editar").style.display = "";
+        document.getElementById("editar-nombre").focus();
+    }
+    function cerrarEditar() {
+        document.getElementById("panel-editar").style.display = "none";
+    }
+    </script>
+}

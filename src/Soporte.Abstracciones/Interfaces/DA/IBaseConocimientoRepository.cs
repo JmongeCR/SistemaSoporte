@@ -14,6 +14,8 @@ public interface IBaseConocimientoRepository
     Task DesvincularAsync(int ticketId, int articuloId);
     Task IncrementarVistasAsync(int id);
     Task<ArticuloKbDto> CrearAsync(ArticuloKb articulo);
+    Task ActualizarAsync(int id, ActualizarArticuloKbDto dto);
+    Task EliminarAsync(int id);
     Task<bool> ExisteSlugAsync(string slug);
     Task<VotoKbResultadoDto> VotarAsync(int articuloId, int usuarioId, bool esUtil);
     Task<VotoKbResultadoDto> ObtenerVotosAsync(int articuloId, int? usuarioId);

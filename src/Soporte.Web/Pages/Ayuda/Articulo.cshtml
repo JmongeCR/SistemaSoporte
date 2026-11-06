@@ -86,19 +86,31 @@ else
         </div>
         @if (Model.PuedeGestionar)
         {
-            <form method="post" asp-page-handler="CambiarPublicado">
-                <input type="hidden" name="id" value="@Model.Articulo.Id" />
-                <input type="hidden" name="publicado" value="@(!Model.Articulo.Publicado ? "true" : "false")" />
-                <input type="hidden" name="slug" value="@Model.Articulo.Slug" />
-                @if (Model.Articulo.Publicado)
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <a asp-page="/Ayuda/Editar" asp-route-slug="@Model.Articulo.Slug" class="boton-secundario">✏️ Editar</a>
+                <form method="post" asp-page-handler="CambiarPublicado">
+                    <input type="hidden" name="id" value="@Model.Articulo.Id" />
+                    <input type="hidden" name="publicado" value="@(!Model.Articulo.Publicado ? "true" : "false")" />
+                    <input type="hidden" name="slug" value="@Model.Articulo.Slug" />
+                    @if (Model.Articulo.Publicado)
+                    {
+                        <button type="submit" class="boton-secundario">Despublicar</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="boton-primario">Publicar</button>
+                    }
+                </form>
+                @if (Sesion.Rol == Soporte.Abstracciones.Enumeraciones.RolTipo.Administrador)
                 {
-                    <button type="submit" class="boton-secundario">Despublicar</button>
+                    <form method="post" asp-page-handler="Eliminar"
+                          onsubmit="return confirm('¿Eliminar este artículo? No se puede deshacer.')">
+                        <input type="hidden" name="id" value="@Model.Articulo.Id" />
+                        <input type="hidden" name="slug" value="@Model.Articulo.Slug" />
+                        <button type="submit" class="boton-peligro">Eliminar</button>
+                    </form>
                 }
-                else
-                {
-                    <button type="submit" class="boton-primario">Publicar</button>
-                }
-            </form>
+            </div>
         }
     </header>
 

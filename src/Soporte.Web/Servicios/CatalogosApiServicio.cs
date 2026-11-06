@@ -31,4 +31,13 @@ public class CatalogosApiServicio : ICatalogosApiServicio
 
     public async Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, ActualizarSlaDto dto) =>
         await _api.PutJsonAsync<PrioridadSlaDto>($"api/catalogos/prioridades/{id}/sla", dto);
+
+    public Task<ResultadoOperacion<CatalogoDto>> CrearCategoriaAsync(string nombre) =>
+        _api.PostJsonAsync<CatalogoDto>("api/catalogos/categorias", nombre);
+
+    public Task<ResultadoOperacion<CatalogoDto>> ActualizarCategoriaAsync(int id, string nombre) =>
+        _api.PutJsonAsync<CatalogoDto>($"api/catalogos/categorias/{id}", nombre);
+
+    public Task<ResultadoOperacion> EliminarCategoriaAsync(int id) =>
+        _api.DeleteAsync($"api/catalogos/categorias/{id}");
 }

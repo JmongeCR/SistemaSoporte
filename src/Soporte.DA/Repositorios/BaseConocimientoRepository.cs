@@ -180,6 +180,26 @@ public class BaseConocimientoRepository : IBaseConocimientoRepository
         return await ObtenerVotosAsync(articuloId, usuarioId);
     }
 
+    public async Task ActualizarAsync(int id, ActualizarArticuloKbDto dto)
+    {
+        var articulo = await _contexto.ArticulosKb.FindAsync(id);
+        if (articulo is null) return;
+
+        articulo.Titulo     = dto.Titulo.Trim();
+        articulo.Contenido  = dto.Contenido.Trim();
+        articulo.CategoriaId = dto.CategoriaId;
+        articulo.Publicado  = dto.Publicado;
+        await _contexto.SaveChangesAsync();
+    }
+
+    public async Task EliminarAsync(int id)
+    {
+        var articulo = await _contexto.ArticulosKb.FindAsync(id);
+        if (articulo is null) return;
+        _contexto.ArticulosKb.Remove(articulo);
+        await _contexto.SaveChangesAsync();
+    }
+
     public async Task<VotoKbResultadoDto> ObtenerVotosAsync(int articuloId, int? usuarioId)
     {
         var votos = await _contexto.VotosKb

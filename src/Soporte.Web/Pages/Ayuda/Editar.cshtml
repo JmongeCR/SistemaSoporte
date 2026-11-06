@@ -1,0 +1,53 @@
+@page "{slug}"
+@model Soporte.Web.Pages.Ayuda.EditarModel
+@{
+    ViewData["Title"] = "Editar artículo";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <a asp-page="/Ayuda/Articulo" asp-route-slug="@Model.Slug" class="enlace-volver">← Volver al artículo</a>
+        <h1>Editar artículo</h1>
+    </div>
+</header>
+
+<div class="contenedor-formulario">
+    <form method="post">
+        <input type="hidden" name="articuloId" value="@Model.ArticuloId" />
+        <div asp-validation-summary="ModelOnly" class="alerta alerta-error"></div>
+
+        <div class="grupo-campo">
+            <label asp-for="Input.Titulo" class="etiqueta">Título</label>
+            <input asp-for="Input.Titulo" class="campo campo-completo" autofocus />
+            <span asp-validation-for="Input.Titulo" class="campo-validacion"></span>
+        </div>
+
+        <div class="grupo-campo">
+            <label asp-for="Input.CategoriaId" class="etiqueta">Categoría</label>
+            <select asp-for="Input.CategoriaId" asp-items="Model.Categorias" class="campo campo-completo">
+                <option value="">— Seleccioná una categoría —</option>
+            </select>
+            <span asp-validation-for="Input.CategoriaId" class="campo-validacion"></span>
+        </div>
+
+        <div class="grupo-campo">
+            <label asp-for="Input.Contenido" class="etiqueta">Contenido (Markdown)</label>
+            <textarea asp-for="Input.Contenido" class="campo campo-completo campo-kb-contenido" rows="18"></textarea>
+            <span asp-validation-for="Input.Contenido" class="campo-validacion"></span>
+        </div>
+
+        <div class="grupo-campo grupo-campo-inline">
+            <input asp-for="Input.Publicado" type="checkbox" id="publicado" />
+            <label for="publicado" class="etiqueta etiqueta-inline">Publicado</label>
+        </div>
+
+        <div class="barra-acciones-form">
+            <a asp-page="/Ayuda/Articulo" asp-route-slug="@Model.Slug" class="boton-secundario">Cancelar</a>
+            <button type="submit" class="boton-primario">Guardar cambios</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
