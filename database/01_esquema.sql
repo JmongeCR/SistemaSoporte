@@ -21,15 +21,18 @@ SET QUOTED_IDENTIFIER ON;
 GO
 
 /* ---------- Limpieza (orden inverso a las dependencias) ---------- */
-DROP TABLE IF EXISTS dbo.Notificacion;   -- creada en 05_seguimiento_notificaciones.sql
+DROP TABLE IF EXISTS dbo.TicketArticuloKb;  -- creada en 08_base_conocimiento.sql
+DROP TABLE IF EXISTS dbo.ArticuloKb;        -- creada en 08_base_conocimiento.sql
+DROP TABLE IF EXISTS dbo.UsuarioPermiso;    -- creada en 07_permisos_usuario.sql
+DROP TABLE IF EXISTS dbo.RolPermiso;
+DROP TABLE IF EXISTS dbo.Permiso;
+DROP TABLE IF EXISTS dbo.Notificacion;      -- creada en 05_seguimiento_notificaciones.sql
 DROP TABLE IF EXISTS dbo.LecturaComentario;
 DROP TABLE IF EXISTS dbo.Adjunto;
 DROP TABLE IF EXISTS dbo.Comentario;
 DROP TABLE IF EXISTS dbo.HistorialTicket;
 DROP TABLE IF EXISTS dbo.Ticket;
 DROP TABLE IF EXISTS dbo.TokenRecuperacion;
-DROP TABLE IF EXISTS dbo.RolPermiso;
-DROP TABLE IF EXISTS dbo.Permiso;
 DROP TABLE IF EXISTS dbo.Usuario;
 DROP TABLE IF EXISTS dbo.Categoria;
 DROP TABLE IF EXISTS dbo.Prioridad;
