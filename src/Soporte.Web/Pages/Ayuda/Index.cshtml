@@ -5,49 +5,113 @@
 @inject IUsuarioSesion Sesion
 @{
     ViewData["Title"] = "Ayuda";
+    Layout = "_LayoutAyuda";
     var puedeCrear = Sesion.EstaAutenticado && Sesion.Rol != RolTipo.Cliente;
+    var autenticado = Sesion.EstaAutenticado;
     var secciones = Model.Articulos
         .GroupBy(a => a.CategoriaNombre)
         .OrderBy(g => g.Key)
         .ToList();
 }
 
-<header class="encabezado-pagina">
-    <div>
-        <h1>Base de conocimiento</h1>
-        <p>Artículos, procedimientos y preguntas frecuentes</p>
-    </div>
-    @if (puedeCrear)
-    {
-        <a asp-page="/Ayuda/Nuevo" class="boton-primario">+ Nuevo artículo</a>
-    }
-</header>
-
-@if (!secciones.Any())
+@if (!autenticado)
 {
-    <div class="estado-vacio">
-        <p>No hay artículos disponibles.</p>
+    <section class="kb-hero">
+        <div class="kb-hero-inner">
+            <h1 class="kb-hero-titulo">¿En qué podemos ayudarte?</h1>
+            <p class="kb-hero-subtitulo">Artículos, procedimientos y preguntas frecuentes</p>
+            <div class="kb-hero-busqueda">
+                <input type="search" id="kb-buscar" class="kb-input-busqueda" placeholder="Buscar en la base de conocimiento…" autocomplete="off" />
+                <svg class="kb-busqueda-icono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+    <div class="kb-portal-contenido">
+        @if (!secciones.Any())
+        {
+            <p class="kb-vacio-portal">No hay artículos disponibles aún.</p>
+        }
+        else
+        {
+            @foreach (var seccion in secciones)
+            {
+                <section class="kb-seccion-portal">
+                    <h2 class="kb-seccion-portal-titulo">@seccion.Key</h2>
+                    <div class="kb-grid-portal">
+                        @foreach (var art in seccion.Where(a => a.Publicado))
+                        {
+                            <a class="kb-card-portal" asp-page="/Ayuda/Articulo" asp-route-slug="@art.Slug">
+                                <span class="kb-card-portal-titulo">@art.Titulo</span>
+                                <span class="kb-card-portal-vistas">@art.Vistas vista@(art.Vistas == 1 ? "" : "s")</span>
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+        }
     </div>
 }
 else
 {
-    @foreach (var seccion in secciones)
+    <header class="encabezado-pagina">
+        <div>
+            <h1>Base de conocimiento</h1>
+            <p>Artículos, procedimientos y preguntas frecuentes</p>
+        </div>
+        @if (puedeCrear)
+        {
+            <a asp-page="/Ayuda/Nuevo" class="boton-primario">+ Nuevo artículo</a>
+        }
+    </header>
+
+    @if (!secciones.Any())
     {
-        <section class="kb-seccion">
-            <h2 class="kb-seccion-titulo">@seccion.Key</h2>
-            <div class="kb-grid">
-                @foreach (var art in seccion)
-                {
-                    <a class="kb-card@(!art.Publicado ? " kb-card-borrador" : "")" asp-page="/Ayuda/Articulo" asp-route-slug="@art.Slug">
-                        @if (!art.Publicado)
-                        {
-                            <span class="pill pill-warn kb-badge-borrador">Borrador</span>
-                        }
-                        <h3 class="kb-titulo">@art.Titulo</h3>
-                        <span class="kb-vistas">@art.Vistas vista@(art.Vistas == 1 ? "" : "s")</span>
-                    </a>
-                }
-            </div>
-        </section>
+        <div class="estado-vacio">
+            <p>No hay artículos disponibles.</p>
+        </div>
     }
+    else
+    {
+        @foreach (var seccion in secciones)
+        {
+            <section class="kb-seccion">
+                <h2 class="kb-seccion-titulo">@seccion.Key</h2>
+                <div class="kb-grid">
+                    @foreach (var art in seccion)
+                    {
+                        <a class="kb-card@(!art.Publicado ? " kb-card-borrador" : "")" asp-page="/Ayuda/Articulo" asp-route-slug="@art.Slug">
+                            @if (!art.Publicado)
+                            {
+                                <span class="pill pill-warn kb-badge-borrador">Borrador</span>
+                            }
+                            <h3 class="kb-titulo">@art.Titulo</h3>
+                            <span class="kb-vistas">@art.Vistas vista@(art.Vistas == 1 ? "" : "s")</span>
+                        </a>
+                    }
+                </div>
+            </section>
+        }
+    }
+}
+
+@section Scripts {
+<script>
+(function () {
+    var inp = document.getElementById("kb-buscar");
+    if (!inp) return;
+    inp.addEventListener("input", function () {
+        var q = this.value.trim().toLowerCase();
+        document.querySelectorAll(".kb-card-portal").forEach(function (card) {
+            var texto = card.querySelector(".kb-card-portal-titulo").textContent.toLowerCase();
+            card.style.display = texto.includes(q) ? "" : "none";
+        });
+        document.querySelectorAll(".kb-seccion-portal").forEach(function (sec) {
+            var visible = Array.from(sec.querySelectorAll(".kb-card-portal")).some(c => c.style.display !== "none");
+            sec.style.display = visible ? "" : "none";
+        });
+    });
+})();
+</script>
 }

@@ -1032,3 +1032,205 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
 .votos-count { font-size: 13px; font-weight: 600; }
 .kb-votos-anonimo { flex-wrap: wrap; }
 .kb-votos-anonimo .kb-votos-pregunta { font-size: 13px; color: var(--color-texto-secundario); }
+
+/* ================================================================
+   Portal KB público (anónimos)
+   ================================================================ */
+
+.ayuda-portal-body {
+    background: var(--color-fondo-suave, #F7F7FA);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header minimal */
+.ayuda-portal-header {
+    background: #fff;
+    border-bottom: 1px solid var(--color-borde);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.ayuda-portal-header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.ayuda-portal-marca {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-primario);
+    text-decoration: none;
+    letter-spacing: -.01em;
+}
+.ayuda-portal-btn-login {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-primario);
+    text-decoration: none;
+    padding: 6px 14px;
+    border: 1px solid var(--color-primario);
+    border-radius: 20px;
+    transition: background .15s, color .15s;
+}
+.ayuda-portal-btn-login:hover {
+    background: var(--color-primario);
+    color: #fff;
+}
+
+/* Hero */
+.kb-hero {
+    background: linear-gradient(135deg, #1E3A8A 0%, var(--color-primario) 100%);
+    color: #fff;
+    padding: 56px 20px 48px;
+    text-align: center;
+}
+.kb-hero-inner { max-width: 600px; margin: 0 auto; }
+.kb-hero-titulo {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -.02em;
+}
+.kb-hero-subtitulo {
+    font-size: 15px;
+    opacity: .85;
+    margin: 0 0 24px;
+}
+
+/* Buscador en el hero */
+.kb-hero-busqueda {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+}
+.kb-input-busqueda {
+    width: 100%;
+    padding: 13px 16px 13px 44px;
+    font-size: 15px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,.97);
+    color: var(--color-texto);
+    box-shadow: 0 4px 20px rgba(0,0,0,.18);
+    outline: none;
+    box-sizing: border-box;
+}
+.kb-input-busqueda:focus { box-shadow: 0 4px 24px rgba(0,0,0,.28); }
+.kb-busqueda-icono {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-texto-tenue);
+    pointer-events: none;
+}
+
+/* Contenido portal */
+.kb-portal-contenido {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 36px 20px 48px;
+    flex: 1;
+}
+.kb-vacio-portal {
+    text-align: center;
+    color: var(--color-texto-tenue);
+    margin-top: 32px;
+}
+
+/* Secciones portal */
+.kb-seccion-portal { margin-bottom: 36px; }
+.kb-seccion-portal-titulo {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--color-texto-tenue);
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+/* Grid de cards en portal */
+.kb-grid-portal {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+}
+.kb-card-portal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid var(--color-borde);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--color-texto);
+    transition: border-color .15s, box-shadow .15s, transform .1s;
+}
+.kb-card-portal:hover {
+    border-color: var(--color-primario);
+    box-shadow: 0 2px 12px rgba(41,107,237,.12);
+    transform: translateY(-1px);
+}
+.kb-card-portal-titulo {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    flex: 1;
+}
+.kb-card-portal-vistas {
+    font-size: 11px;
+    color: var(--color-texto-tenue);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Artículo en vista portal (sin app-shell) */
+.ayuda-portal-body .kb-contenido {
+    max-width: 760px;
+    margin: 0 auto;
+}
+.ayuda-portal-body .encabezado-pagina {
+    max-width: 760px;
+    margin: 24px auto 0;
+    padding: 0 20px;
+}
+.ayuda-portal-body .kb-votos-bloque {
+    max-width: 760px;
+    margin: 20px auto;
+}
+.ayuda-portal-body main {
+    padding: 0 20px 48px;
+}
+
+/* Footer portal */
+.ayuda-portal-footer {
+    background: #fff;
+    border-top: 1px solid var(--color-borde);
+    text-align: center;
+    padding: 28px 20px;
+    margin-top: auto;
+}
+.ayuda-portal-footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.ayuda-portal-footer p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-texto-secundario);
+}

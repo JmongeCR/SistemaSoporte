@@ -1,0 +1,120 @@
+@using Soporte.Abstracciones.Enumeraciones
+@using Soporte.Web.Servicios
+@inject IUsuarioSesion Sesion
+@{
+    var paginaActual = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+    var autenticado  = Sesion.EstaAutenticado;
+    var esCliente    = autenticado && Sesion.Rol == RolTipo.Cliente;
+    var esAdmin      = autenticado && Sesion.Rol == RolTipo.Administrador;
+    string Activo(string p) => paginaActual.StartsWith(p) ? "activo" : string.Empty;
+}
+<!DOCTYPE html>
+<html lang="es" id="html-raiz">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Centro de Ayuda</title>
+    <link rel="icon" type="image/svg+xml" href="~/img/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script>
+        (function () {
+            var t = localStorage.getItem("tema");
+            if (t === "oscuro") document.documentElement.setAttribute("data-tema", "oscuro");
+        })();
+    </script>
+</head>
+
+@if (autenticado)
+{
+<body>
+    <div class="app">
+        <header class="app-header">
+            <div class="app-header-izq">
+                <a class="app-marca" asp-page="/Dashboard/Index"><span aria-hidden="true">🎫</span> Soporte</a>
+            </div>
+            <nav class="app-nav-wrap" aria-label="Navegación principal">
+                <ul class="app-nav">
+                    <li><a class="app-nav-enlace @Activo("/Dashboard")" asp-page="/Dashboard/Index">Dashboard</a></li>
+                    <li><a class="app-nav-enlace @Activo("/Tickets")" asp-page="/Tickets/Index">@(esCliente ? "Mis tickets" : "Tickets")</a></li>
+                    @if (esAdmin)
+                    {
+                        <li><a class="app-nav-enlace @Activo("/Admin/Usuarios")" asp-page="/Admin/Usuarios/Index">Usuarios</a></li>
+                        <li><a class="app-nav-enlace @Activo("/Admin/Plantillas")" asp-page="/Admin/Plantillas/Index">Plantillas</a></li>
+                        <li><a class="app-nav-enlace @Activo("/Admin/Configuracion")" asp-page="/Admin/Configuracion/Sla">Configuración</a></li>
+                    }
+                    <li><a class="app-nav-enlace @Activo("/Ayuda")" asp-page="/Ayuda/Index">Ayuda</a></li>
+                </ul>
+            </nav>
+            <div class="app-header-der">
+                <vc:campana />
+                <div class="menu-usuario" id="menu-usuario">
+                    <button type="button" class="menu-usuario-toggle" id="menu-usuario-toggle"
+                            aria-haspopup="true" aria-expanded="false">
+                        <span class="avatar avatar-sm">@Formato.Iniciales(Sesion.Nombre)</span>
+                        <span class="menu-usuario-nombre">@Sesion.Nombre</span>
+                        <span class="menu-usuario-flecha" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="menu-usuario-dropdown" id="menu-usuario-dropdown" role="menu">
+                        <a asp-page="/Cuenta/Perfil" class="menu-usuario-item" role="menuitem">Configuración</a>
+                        @if (esAdmin)
+                        {
+                            <a asp-page="/Admin/Usuarios/Index" class="menu-usuario-item" role="menuitem">Gestión de usuarios</a>
+                            <a asp-page="/Admin/Configuracion/Sla" class="menu-usuario-item" role="menuitem">Configuración SLA</a>
+                        }
+                        <div class="menu-usuario-sep" role="separator"></div>
+                        <form method="post" asp-page="/Cuenta/Salir">
+                            <button type="submit" class="menu-usuario-item salir" role="menuitem">Salir</button>
+                        </form>
+                    </div>
+                </div>
+                <button type="button" class="app-btn-tema" id="btn-tema" aria-label="Cambiar tema" title="Cambiar tema"></button>
+            </div>
+        </header>
+        <main class="app-contenido" role="main">
+            @RenderBody()
+        </main>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+}
+else
+{
+<body class="ayuda-portal-body">
+    <header class="ayuda-portal-header">
+        <div class="ayuda-portal-header-inner">
+            <a asp-page="/Ayuda/Index" class="ayuda-portal-marca">
+                <svg width="26" height="22" viewBox="0 0 38 32" aria-hidden="true" fill="currentColor">
+                    <path d="M7 2h24a5 5 0 0 1 5 5v13a5 5 0 0 1-5 5H15l-8 6v-6a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z"/>
+                </svg>
+                Centro de Ayuda
+            </a>
+            <a asp-page="/Cuenta/Login" class="ayuda-portal-btn-login">Iniciar sesión</a>
+        </div>
+    </header>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="ayuda-portal-footer">
+        <div class="ayuda-portal-footer-inner">
+            <p>¿No encontrás lo que buscás?</p>
+            <a asp-page="/Cuenta/Login" class="boton-primario">Abrí un ticket →</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+}
+</html>

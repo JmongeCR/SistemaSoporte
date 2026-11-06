@@ -1,7 +1,11 @@
 @page "{slug}"
 @model Soporte.Web.Pages.Ayuda.ArticuloModel
+@using Soporte.Web.Servicios
+@inject IUsuarioSesion Sesion
 @{
     ViewData["Title"] = Model.Articulo?.Titulo ?? "Artículo";
+    Layout = "_LayoutAyuda";
+    var autenticado = Sesion.EstaAutenticado;
 }
 
 @if (Model.Articulo is null)
