@@ -11,71 +11,73 @@ document.querySelectorAll("[data-mostrar-contrasena]").forEach((boton) => {
 });
 
 // Zona de archivos reutilizable (HU-04 esc. 3, HU-11).
-// Marcado: <div class="zona-archivos" data-zona-archivos data-extensiones=".pdf,.png" data-max-mb="10"
-//               data-max-archivos="5" data-lista="#id-ul" data-error="#id-p"> <input type="file" multiple> ...
-// Acumula archivos entre selecciones, permite quitarlos y avisa formato/tamaño antes de enviar.
-// Es solo ayuda visual: el API vuelve a validar todo (formato, tamaño y contenido real).
-document.querySelectorAll("[data-zona-archivos]").forEach((zona) => {
-    const entrada = zona.querySelector("input[type=file]");
-    const lista = document.querySelector(zona.dataset.lista);
-    const error = document.querySelector(zona.dataset.error);
-    const extensiones = zona.dataset.extensiones.split(",");
-    const maxBytes = Number(zona.dataset.maxMb) * 1024 * 1024;
-    const maxArchivos = Number(zona.dataset.maxArchivos);
-    let seleccionados = [];
+// Extrae en función para poder re-inicializar en contenido inyectado dinámicamente.
+function initZonaArchivos(raiz) {
+    raiz.querySelectorAll("[data-zona-archivos]:not([data-za-init])").forEach((zona) => {
+        zona.dataset.zaInit = "1";
+        const entrada = zona.querySelector("input[type=file]");
+        const lista = raiz.querySelector(zona.dataset.lista) ?? document.querySelector(zona.dataset.lista);
+        const error = raiz.querySelector(zona.dataset.error) ?? document.querySelector(zona.dataset.error);
+        const extensiones = zona.dataset.extensiones.split(",");
+        const maxBytes = Number(zona.dataset.maxMb) * 1024 * 1024;
+        const maxArchivos = Number(zona.dataset.maxArchivos);
+        let seleccionados = [];
 
-    const tamano = (bytes) => bytes < 1024 * 1024 ? `${Math.ceil(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+        const tamano = (bytes) => bytes < 1024 * 1024 ? `${Math.ceil(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 
-    const sincronizar = () => {
-        const transferencia = new DataTransfer();
-        seleccionados.forEach((archivo) => transferencia.items.add(archivo));
-        entrada.files = transferencia.files;
+        const sincronizar = () => {
+            const transferencia = new DataTransfer();
+            seleccionados.forEach((archivo) => transferencia.items.add(archivo));
+            entrada.files = transferencia.files;
 
-        lista.replaceChildren(...seleccionados.map((archivo, indice) => {
-            const item = document.createElement("li");
-            item.innerHTML = `<div><span class="archivo-nombre"></span><span class="archivo-tamano">${tamano(archivo.size)}</span></div>
-                              <button type="button" class="boton-quitar">✕ Quitar</button>`;
-            item.querySelector(".archivo-nombre").textContent = archivo.name;
-            item.querySelector("button").addEventListener("click", () => { seleccionados.splice(indice, 1); sincronizar(); });
-            return item;
-        }));
-    };
+            lista.replaceChildren(...seleccionados.map((archivo, indice) => {
+                const item = document.createElement("li");
+                item.innerHTML = `<div><span class="archivo-nombre"></span><span class="archivo-tamano">${tamano(archivo.size)}</span></div>
+                                  <button type="button" class="boton-quitar">✕ Quitar</button>`;
+                item.querySelector(".archivo-nombre").textContent = archivo.name;
+                item.querySelector("button").addEventListener("click", () => { seleccionados.splice(indice, 1); sincronizar(); });
+                return item;
+            }));
+        };
 
-    entrada.addEventListener("change", () => {
-        const errores = [];
-        for (const archivo of entrada.files) {
-            const extension = archivo.name.slice(archivo.name.lastIndexOf(".")).toLowerCase();
-            if (!extensiones.includes(extension)) errores.push(`"${archivo.name}" no es un formato permitido (válidos: PDF, PNG o JPG).`);
-            else if (archivo.size > maxBytes) errores.push(`"${archivo.name}" supera el límite de ${zona.dataset.maxMb} MB.`);
-            else if (seleccionados.length >= maxArchivos) errores.push(`Puede adjuntar hasta ${maxArchivos} archivos.`);
-            else seleccionados.push(archivo);
-        }
-        error.textContent = [...new Set(errores)].join(" ");
-        sincronizar();
+        entrada.addEventListener("change", () => {
+            const errores = [];
+            for (const archivo of entrada.files) {
+                const extension = archivo.name.slice(archivo.name.lastIndexOf(".")).toLowerCase();
+                if (!extensiones.includes(extension)) errores.push(`"${archivo.name}" no es un formato permitido (válidos: PDF, PNG o JPG).`);
+                else if (archivo.size > maxBytes) errores.push(`"${archivo.name}" supera el límite de ${zona.dataset.maxMb} MB.`);
+                else if (seleccionados.length >= maxArchivos) errores.push(`Puede adjuntar hasta ${maxArchivos} archivos.`);
+                else seleccionados.push(archivo);
+            }
+            error.textContent = [...new Set(errores)].join(" ");
+            sincronizar();
+        });
+
+        ["dragenter", "dragover"].forEach((evento) => zona.addEventListener(evento, () => zona.classList.add("arrastrando")));
+        ["dragleave", "drop"].forEach((evento) => zona.addEventListener(evento, () => zona.classList.remove("arrastrando")));
     });
-
-    ["dragenter", "dragover"].forEach((evento) => zona.addEventListener(evento, () => zona.classList.add("arrastrando")));
-    ["dragleave", "drop"].forEach((evento) => zona.addEventListener(evento, () => zona.classList.remove("arrastrando")));
-});
+}
+initZonaArchivos(document);
 
 // Formularios que no deben enviarse dos veces (doble clic): <form data-envio-unico>.
-document.querySelectorAll("form[data-envio-unico]").forEach((formulario) => {
-    formulario.addEventListener("submit", (evento) => {
-        if (formulario.dataset.enviando) {
-            evento.preventDefault();
-            return;
-        }
-        // Si la validación del navegador (jQuery Validate) encuentra errores, no se bloquea el botón.
-        if (window.jQuery && jQuery(formulario).data("validator") && !jQuery(formulario).valid()) return;
-
-        formulario.dataset.enviando = "1";
-        formulario.querySelectorAll("button[type=submit]").forEach((boton) => {
-            boton.disabled = true;
-            boton.dataset.textoOriginal = boton.textContent;
-            boton.textContent = "Enviando…";
+function initEnvioUnico(raiz) {
+    raiz.querySelectorAll("form[data-envio-unico]:not([data-eu-init])").forEach((formulario) => {
+        formulario.dataset.euInit = "1";
+        formulario.addEventListener("submit", (evento) => {
+            if (formulario.dataset.enviando) { evento.preventDefault(); return; }
+            // Si la validación del navegador (jQuery Validate) encuentra errores, no se bloquea el botón.
+            if (window.jQuery && jQuery(formulario).data("validator") && !jQuery(formulario).valid()) return;
+            formulario.dataset.enviando = "1";
+            formulario.querySelectorAll("button[type=submit]").forEach((boton) => {
+                boton.disabled = true;
+                boton.dataset.textoOriginal = boton.textContent;
+                boton.textContent = "Enviando…";
+            });
         });
     });
-});
+}
+initEnvioUnico(document);
+
 // Al volver con el botón "atrás" (caché del navegador), los botones quedan habilitados otra vez.
 window.addEventListener("pageshow", () => {
     document.querySelectorAll("form[data-envio-unico]").forEach((formulario) => {
@@ -200,27 +202,26 @@ document.querySelectorAll("[data-autocerrar]").forEach((aviso) => {
             if (!respuesta.ok || respuesta.redirected) throw new Error();
             const html = await respuesta.text();
             const doc = new DOMParser().parseFromString(html, "text/html");
-            const formulario = doc.querySelector(".diseno-formulario");
-            if (!formulario) throw new Error("formulario no encontrado");
+            const bloque = doc.querySelector(".diseno-formulario");
+            if (!bloque) throw new Error("formulario no encontrado");
             contenido.innerHTML = "";
-            contenido.appendChild(document.importNode(formulario, true));
-            // Re-ejecutar comportamientos de zona de archivos dentro del modal
-            contenido.querySelectorAll("[data-zona-archivos]").forEach((zona) => zona.dispatchEvent(new Event("zona-init")));
+            contenido.appendChild(document.importNode(bloque, true));
+            // Re-inicializar comportamientos en el contenido inyectado.
+            initZonaArchivos(contenido);
+            initEnvioUnico(contenido);
             cargado = true;
         } catch {
             contenido.innerHTML = '<div class="modal-cargando">No se pudo cargar el formulario. <a class="enlace" href="/Tickets/Crear">Ir a la página</a></div>';
         }
     };
 
-    const cerrar = () => { modal.close(); };
+    const cerrar = () => modal.close();
 
     document.querySelectorAll("[data-abrir-modal-crear]").forEach((btn) => btn.addEventListener("click", abrir));
-    document.querySelectorAll("[data-cerrar-modal-crear]").forEach((btn) => btn.addEventListener("click", cerrar));
-    modal.addEventListener("click", (e) => { if (e.target === modal) cerrar(); });
-
-    // Cuando el formulario redirige tras crear el ticket, el modal se cierra automáticamente.
-    modal.addEventListener("close", () => {
-        // Si viene un TempData de éxito, el navegador refresca la página destino; aquí es un noop.
+    // Usar delegación de eventos para el botón "Cancelar" inyectado dinámicamente.
+    modal.addEventListener("click", (e) => {
+        if (e.target.closest("[data-cerrar-modal-crear]")) { cerrar(); return; }
+        if (e.target === modal) cerrar();
     });
 })();
 
@@ -242,6 +243,90 @@ document.querySelectorAll("[data-autocerrar]").forEach((aviso) => {
     };
 
     boton.addEventListener("click", toggleTema);
+})();
+
+// Panel split usuarios (Roles/Usuarios): seleccionar usuario → ver permisos de su rol.
+(() => {
+    const datosSrc = document.getElementById("datos-permisos-roles");
+    if (!datosSrc) return;
+
+    let permisosPorRol;
+    try { permisosPorRol = JSON.parse(datosSrc.textContent); } catch { return; }
+
+    const panelUsuario = document.getElementById("panel-usuario");
+    const panelPlaceholder = document.getElementById("panel-placeholder");
+    if (!panelUsuario || !panelPlaceholder) return;
+
+    const cam = (id) => document.getElementById(id);
+    let filaActiva = null;
+
+    const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    document.querySelectorAll("[data-usuario-fila]").forEach((fila) => {
+        fila.addEventListener("click", () => {
+            if (filaActiva) filaActiva.classList.remove("activo");
+            fila.classList.add("activo");
+            filaActiva = fila;
+
+            const { usuarioId, nombre, correo, rolId, rol, claseRol } = fila.dataset;
+            const iniciales = nombre.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+
+            cam("pu-iniciales").textContent = iniciales;
+            cam("pu-iniciales").className = `avatar avatar-xl ${claseRol}`;
+            cam("pu-nombre").textContent = nombre;
+            cam("pu-correo").textContent = correo;
+
+            const rolEl = cam("pu-rol");
+            rolEl.textContent = rol;
+            rolEl.className = `pill-rol ${claseRol}`;
+
+            const btnRol = cam("pu-cambiar-rol");
+            if (btnRol) {
+                Object.assign(btnRol.dataset, { usuarioId, nombre, correo, rolId, rol, claseRol });
+            }
+
+            const permisosDiv = cam("pu-permisos");
+            const matriz = permisosPorRol[rolId];
+            if (!matriz || !Array.isArray(matriz.Grupos)) {
+                permisosDiv.innerHTML = '<p class="texto-tenue">No hay información de permisos.</p>';
+            } else {
+                permisosDiv.innerHTML = matriz.Grupos.map((grupo) => `
+                    <div class="permiso-grupo">
+                        <div class="permiso-grupo-titulo">${esc(grupo.Grupo)}</div>
+                        ${grupo.Permisos.map((p) => `
+                            <label class="permiso-fila">
+                                <input type="checkbox" class="permiso-check" ${p.Concedido ? "checked" : ""} disabled>
+                                <span class="permiso-desc${p.Concedido ? "" : " sin-permiso"}">${esc(p.Descripcion)}</span>
+                            </label>
+                        `).join("")}
+                    </div>
+                `).join("");
+            }
+
+            panelUsuario.hidden = false;
+            panelPlaceholder.hidden = true;
+        });
+    });
+})();
+
+// Modal "Cambiar estado" (lista de tickets).
+(() => {
+    const modal = document.getElementById("modal-cambiar-estado");
+    if (!modal) return;
+
+    const campo = (n) => modal.querySelector(`[data-campo-estado="${n}"]`);
+
+    document.querySelectorAll("[data-cambiar-estado]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            campo("ticket-id").value = btn.dataset.ticketId;
+            campo("asunto").textContent = `#${btn.dataset.ticketId} — ${btn.dataset.asunto}`;
+            modal.querySelector("select[name='nuevoEstadoId']").value = btn.dataset.estadoId;
+            modal.showModal();
+        });
+    });
+
+    modal.querySelectorAll("[data-cerrar-modal]").forEach((btn) => btn.addEventListener("click", () => modal.close()));
+    modal.addEventListener("click", (e) => { if (e.target === modal) modal.close(); });
 })();
 
 // Gráficas Chart.js del dashboard (si existen los canvas y los datos).

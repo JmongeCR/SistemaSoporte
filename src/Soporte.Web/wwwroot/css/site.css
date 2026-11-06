@@ -757,4 +757,52 @@ a.aviso-info:hover { color: var(--color-primario-hover); }
     .formulario { padding: 20px; }
     .graficas-grid { grid-template-columns: 1fr; }
     .perfil-avatar-fila { flex-direction: column; text-align: center; }
+    .split-usuarios { grid-template-columns: 1fr; }
 }
+
+/* ── Split panel usuarios (Roles/Usuarios) ───────────────────────────────── */
+.split-usuarios { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: start; }
+
+.lista-usuarios-panel { overflow: hidden; padding: 0; }
+
+.usuario-fila-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; width: 100%; background: none; border: none;
+    border-bottom: 1px solid var(--color-borde); cursor: pointer; text-align: left; color: var(--color-texto);
+}
+.usuario-fila-btn:last-child { border-bottom: none; }
+.usuario-fila-btn:hover { background: var(--color-fondo-suave); }
+.usuario-fila-btn.activo { background: var(--color-fondo-suave); border-left: 3px solid var(--color-primario); padding-left: 13px; }
+
+.usuario-fila-info { flex: 1; min-width: 0; }
+.usuario-fila-nombre { font-size: 13.5px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+.usuario-fila-correo { font-size: 12px; color: var(--color-texto-tenue); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin-top: 1px; }
+.usuario-fila-rol { flex-shrink: 0; font-size: 11px; }
+
+/* Right panel */
+.panel-detalle-usuario { padding: 20px; }
+.panel-placeholder { padding: 40px 20px; text-align: center; }
+.panel-usuario-cab { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--color-borde); margin-bottom: 16px; flex-wrap: wrap; }
+.panel-usuario-data { flex: 1; min-width: 0; }
+.panel-usuario-nombre { font-size: 15px; font-weight: 600; display: block; }
+.panel-usuario-correo { font-size: 13px; color: var(--color-texto-tenue); display: block; margin-top: 2px; }
+.panel-usuario-seccion-titulo { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--color-texto-secundario); margin: 0 0 12px; }
+
+.permiso-grupo { margin-bottom: 18px; }
+.permiso-grupo-titulo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--color-texto-secundario); margin-bottom: 6px; }
+.permiso-fila { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: default; }
+.permiso-check { width: 15px; height: 15px; accent-color: var(--color-primario); cursor: default; flex-shrink: 0; }
+.permiso-desc { font-size: 13.5px; }
+.permiso-desc.sin-permiso { color: var(--color-texto-tenue); }
+
+/* Quick status change button in ticket list */
+.boton-estado-quick {
+    background: none; border: none; cursor: pointer;
+    color: var(--color-texto-tenue); padding: 2px 5px; margin-left: 4px;
+    border-radius: 4px; font-size: 12px; line-height: 1; vertical-align: middle;
+    transition: background .1s;
+}
+.boton-estado-quick:hover { background: var(--color-fondo-suave); color: var(--color-texto); }
+
+/* Modal cambiar estado */
+.modal-ticket-asunto { font-size: 13.5px; color: var(--color-texto-secundario); margin: 0 0 16px; }

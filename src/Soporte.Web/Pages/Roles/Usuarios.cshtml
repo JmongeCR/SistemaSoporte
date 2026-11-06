@@ -53,34 +53,52 @@ else if (Model.Usuarios is { Count: 0 })
 }
 else if (Model.Usuarios is not null)
 {
-    <div class="tarjeta">
-        <table class="tabla">
-            <thead>
-                <tr><th>Usuario</th><th>Correo electrónico</th><th>Rol actual</th><th><span class="visually-hidden">Acciones</span></th></tr>
-            </thead>
-            <tbody>
-                @foreach (var usuario in Model.Usuarios)
-                {
-                    <tr>
-                        <td>
-                            <span class="avatar avatar-grande @DescripcionRoles.ClaseRol(usuario.RolId) me-2">@Formato.Iniciales(usuario.Nombre)</span>
+    <div class="split-usuarios">
+        @* Panel izquierdo: lista de usuarios *@
+        <div class="lista-usuarios-panel tarjeta">
+            @foreach (var usuario in Model.Usuarios)
+            {
+                <button type="button" class="usuario-fila-btn" data-usuario-fila
+                        data-usuario-id="@usuario.Id" data-nombre="@usuario.Nombre" data-correo="@usuario.Correo"
+                        data-rol-id="@usuario.RolId" data-rol="@usuario.Rol" data-clase-rol="@DescripcionRoles.ClaseRol(usuario.RolId)">
+                    <span class="avatar avatar-grande @DescripcionRoles.ClaseRol(usuario.RolId)">@Formato.Iniciales(usuario.Nombre)</span>
+                    <span class="usuario-fila-info">
+                        <span class="usuario-fila-nombre">
                             @usuario.Nombre
                             @if (usuario.Id == Model.UsuarioActualId) { <span class="etiqueta-mini">(vos)</span> }
-                        </td>
-                        <td class="texto-secundario">@usuario.Correo</td>
-                        <td><span class="pill-rol @DescripcionRoles.ClaseRol(usuario.RolId)">@usuario.Rol</span></td>
-                        <td class="text-end">
-                            <button type="button" class="boton-contorno" data-cambiar-rol
-                                    data-usuario-id="@usuario.Id" data-nombre="@usuario.Nombre" data-correo="@usuario.Correo"
-                                    data-rol-id="@usuario.RolId" data-rol="@usuario.Rol" data-clase-rol="@DescripcionRoles.ClaseRol(usuario.RolId)">
-                                Cambiar rol
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        </span>
+                        <span class="usuario-fila-correo">@usuario.Correo</span>
+                    </span>
+                    <span class="pill-rol @DescripcionRoles.ClaseRol(usuario.RolId) usuario-fila-rol">@usuario.Rol</span>
+                </button>
+            }
+        </div>
+
+        @* Panel derecho: detalle y permisos del usuario seleccionado *@
+        <div>
+            <div id="panel-placeholder" class="tarjeta panel-placeholder">
+                <p class="texto-tenue">← Seleccioná un usuario para ver sus permisos.</p>
+            </div>
+            <div id="panel-usuario" class="tarjeta panel-detalle-usuario" hidden>
+                <div class="panel-usuario-cab">
+                    <span class="avatar avatar-xl" id="pu-iniciales"></span>
+                    <div class="panel-usuario-data">
+                        <strong class="panel-usuario-nombre" id="pu-nombre"></strong>
+                        <span class="panel-usuario-correo" id="pu-correo"></span>
+                    </div>
+                    <span class="pill-rol" id="pu-rol"></span>
+                    <button type="button" class="boton-contorno" id="pu-cambiar-rol" data-cambiar-rol
+                            data-usuario-id="" data-nombre="" data-correo="" data-rol-id="" data-rol="" data-clase-rol="">
+                        Cambiar rol
+                    </button>
+                </div>
+                <h3 class="panel-usuario-seccion-titulo">Permisos de este rol</h3>
+                <div id="pu-permisos"></div>
+            </div>
+        </div>
     </div>
+
+    <script type="application/json" id="datos-permisos-roles">@Html.Raw(Model.PermisosRolesJson)</script>
 }
 
 @* Modal "Cambiar rol" (diseño 06c). Cancelar o ✕ cierra sin aplicar cambios (HU-15 esc. 3). *@

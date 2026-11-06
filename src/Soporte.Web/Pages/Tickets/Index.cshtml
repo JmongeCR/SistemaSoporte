@@ -23,7 +23,11 @@
 
 @if (TempData["MensajeExito"] is string mensajeExito)
 {
-    <div class="alerta-exito" role="status">@mensajeExito</div>
+    <div class="alerta-exito" role="status" data-autocerrar>@mensajeExito</div>
+}
+@if (TempData["MensajeError"] is string mensajeErrorIndex)
+{
+    <div class="alerta-error" role="alert">@mensajeErrorIndex</div>
 }
 
 <form method="get" class="barra-filtros" role="search">
@@ -82,7 +86,17 @@ else if (Model.Tickets is not null)
                             </td>
                             <td class="texto-secundario">@ticket.Cliente</td>
                             <td><span class="prioridad @Formato.ClasePrioridad(ticket.PrioridadId)">@ticket.Prioridad</span></td>
-                            <td><span class="pill @Formato.ClaseEstado(ticket.EstadoId)">@ticket.Estado</span></td>
+                            <td>
+                                <span class="pill @Formato.ClaseEstado(ticket.EstadoId)">@ticket.Estado</span>
+                                @if (!Model.EsCliente)
+                                {
+                                    <button type="button" class="boton-estado-quick" aria-label="Cambiar estado"
+                                            data-cambiar-estado
+                                            data-ticket-id="@ticket.Id"
+                                            data-asunto="@ticket.Asunto"
+                                            data-estado-id="@ticket.EstadoId">✎</button>
+                                }
+                            </td>
                             <td>
                                 @if (ticket.AgenteAsignado is null)
                                 {
@@ -110,4 +124,29 @@ else if (Model.Tickets is not null)
             }
         }
     </div>
+}
+
+@if (!Model.EsCliente)
+{
+    <dialog id="modal-cambiar-estado" class="dialogo" aria-labelledby="titulo-modal-estado">
+        <form method="post" asp-page-handler="CambiarEstado" data-envio-unico>
+            <header class="modal-encabezado">
+                <h2 id="titulo-modal-estado">Cambiar estado</h2>
+                <button type="button" class="modal-cerrar" data-cerrar-modal aria-label="Cerrar">✕</button>
+            </header>
+            <input type="hidden" name="ticketId" data-campo-estado="ticket-id" />
+            <p class="modal-ticket-asunto" data-campo-estado="asunto"></p>
+            <label class="etiqueta" for="nuevo-estado-sel">Nuevo estado</label>
+            <select id="nuevo-estado-sel" name="nuevoEstadoId" class="campo campo-completo">
+                @foreach (var estado in Model.Estados)
+                {
+                    <option value="@estado.Id">@estado.Nombre</option>
+                }
+            </select>
+            <div class="modal-acciones">
+                <button type="button" class="boton-secundario" data-cerrar-modal>Cancelar</button>
+                <button type="submit" class="boton-primario">Guardar</button>
+            </div>
+        </form>
+    </dialog>
 }

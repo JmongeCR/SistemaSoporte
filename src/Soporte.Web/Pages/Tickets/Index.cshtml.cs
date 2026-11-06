@@ -64,6 +64,34 @@ public class IndexModel : PageModel
             .ToList();
     }
 
+    public async Task<IActionResult> OnPostCambiarEstadoAsync(int ticketId, int nuevoEstadoId)
+    {
+        var detalle = await _ticketsApi.ObtenerAsync(ticketId);
+        if (!detalle.Exito)
+        {
+            TempData["MensajeError"] = "No se pudo obtener el ticket.";
+            return RedirectToPage();
+        }
+
+        var t = detalle.Datos!;
+        var cambios = new ActualizarTicketDto
+        {
+            EstadoId = nuevoEstadoId,
+            PrioridadId = t.PrioridadId,
+            CategoriaId = t.CategoriaId,
+            AgenteAsignadoId = t.AgenteAsignadoId,
+            RowVersion = t.RowVersion
+        };
+
+        var resultado = await _ticketsApi.ActualizarAsync(ticketId, cambios);
+        if (resultado.Exito)
+            TempData["MensajeExito"] = "Estado actualizado.";
+        else
+            TempData["MensajeError"] = resultado.Mensaje ?? "No se pudo actualizar el estado.";
+
+        return RedirectToPage();
+    }
+
     /// <summary>Parámetros de ruta para los enlaces de paginación, conservando los filtros actuales.</summary>
     public Dictionary<string, string> RutaPagina(int pagina)
     {

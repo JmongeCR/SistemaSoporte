@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
@@ -36,6 +37,9 @@ public class UsuariosModel : PageModel
     /// <summary>Texto de ayuda del modal según el rol elegido.</summary>
     public string AvisosPorRolJson => JsonSerializer.Serialize(Roles.ToDictionary(r => r.Id.ToString(), r => DescripcionRoles.De(r.Id).AvisoAlAsignar));
 
+    public IReadOnlyDictionary<int, MatrizPermisosDto> PermisosRoles { get; private set; } = new Dictionary<int, MatrizPermisosDto>();
+    public string PermisosRolesJson => JsonSerializer.Serialize(PermisosRoles, new JsonSerializerOptions { PropertyNamingPolicy = null });
+
     public async Task OnGetAsync()
     {
         if (!ModelState.IsValid)
@@ -53,6 +57,14 @@ public class UsuariosModel : PageModel
             Usuarios = usuarios.Result.Datos;
         else
             MensajeError = usuarios.Result.Mensaje;
+
+        if (Roles.Count > 0)
+        {
+            var tareasPermisos = await Task.WhenAll(Roles.Select(r => _catalogosApi.ObtenerMatrizPermisosAsync(r.Id)));
+            PermisosRoles = tareasPermisos
+                .Where(r => r.Exito && r.Datos is not null)
+                .ToDictionary(r => r.Datos!.RolId, r => r.Datos!);
+        }
     }
 
     /// <param name="usuarioId">Usuario al que se le cambia el rol.</param>
