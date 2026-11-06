@@ -184,7 +184,7 @@
             </div>
         </div>
 
-        <div class="tarjeta" id="kb">
+        <div class="tarjeta kb-lateral" id="kb">
             <h2 class="etiqueta-seccion"><span class="punto-azul" aria-hidden="true"></span>Artículos relacionados</h2>
 
             @if (Model.ArticulosVinculados.Any())
@@ -193,10 +193,13 @@
                     @foreach (var art in Model.ArticulosVinculados)
                     {
                         <li class="kb-vinculado-item">
-                            <a asp-page="/Ayuda/Articulo" asp-route-slug="@art.Slug" class="kb-vinculado-enlace" target="_blank">@art.Titulo</a>
+                            <div class="kb-vinculado-info">
+                                <a asp-page="/Ayuda/Articulo" asp-route-slug="@art.Slug" class="kb-vinculado-enlace" target="_blank">@art.Titulo</a>
+                                <span class="kb-vinculado-cat">@art.CategoriaNombre</span>
+                            </div>
                             @if (Model.PuedeGestionar)
                             {
-                                <form method="post" asp-page-handler="DesvincularKb" asp-route-id="@t.Id" style="display:inline">
+                                <form method="post" asp-page-handler="DesvincularKb" asp-route-id="@t.Id">
                                     <input type="hidden" name="articuloId" value="@art.Id" />
                                     <button type="submit" class="btn-desvincular" title="Quitar artículo">×</button>
                                 </form>
@@ -207,20 +210,27 @@
             }
             else
             {
-                <p class="texto-tenue kb-vacio">Sin artículos vinculados.</p>
+                <p class="kb-vacio">Sin artículos vinculados.</p>
             }
 
             @if (Model.PuedeGestionar && Model.ArticulosDisponibles.Any())
             {
                 <form method="post" asp-page-handler="VincularKb" asp-route-id="@t.Id" class="kb-vincular-form">
-                    <select name="articuloId" class="campo campo-completo">
-                        <option value="">— Vincular artículo —</option>
-                        @foreach (var art in Model.ArticulosDisponibles)
-                        {
-                            <option value="@art.Id">@art.Titulo</option>
-                        }
-                    </select>
-                    <button type="submit" class="boton-secundario boton-bloque">Vincular</button>
+                    <div class="kb-vincular-fila">
+                        <select name="articuloId" class="campo kb-vincular-select">
+                            <option value="">— Seleccionar —</option>
+                            @foreach (var grp in Model.ArticulosDisponibles.GroupBy(a => a.CategoriaNombre).OrderBy(g => g.Key))
+                            {
+                                <optgroup label="@grp.Key">
+                                    @foreach (var art in grp)
+                                    {
+                                        <option value="@art.Id">@art.Titulo</option>
+                                    }
+                                </optgroup>
+                            }
+                        </select>
+                        <button type="submit" class="boton-secundario kb-vincular-btn">+</button>
+                    </div>
                 </form>
             }
         </div>
