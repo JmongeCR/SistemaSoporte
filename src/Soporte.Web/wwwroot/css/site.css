@@ -54,6 +54,7 @@ body {
     color: var(--color-texto);
     background: #FFFFFF;
     -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
 }
 
 /* ---------- App shell: top nav + contenido ---------- */
@@ -451,8 +452,11 @@ textarea.campo { height: auto; min-height: 120px; padding: 12px; resize: vertica
 .campo-alto { height: 44px; background: var(--color-zona); }
 .campo-contrasena { position: relative; }
 .campo-contrasena .campo { padding-right: 44px; }
-.boton-ver { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 4px 6px; border: 0; background: none; font-size: 14px; cursor: pointer; opacity: 0.7; }
-.boton-ver[aria-pressed="true"] { opacity: 1; }
+.boton-ver { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 4px 6px; border: 0; background: none; cursor: pointer; color: var(--color-texto-secundario); display: flex; align-items: center; }
+.boton-ver:hover { color: var(--color-texto); }
+.icono-ojo-ocultar { display: none; }
+.boton-ver[aria-pressed="true"] .icono-ojo-ver { display: none; }
+.boton-ver[aria-pressed="true"] .icono-ojo-ocultar { display: block; }
 .boton-bloque { width: 100%; justify-content: center; margin-top: 4px; }
 .enlace { color: var(--color-primario); font-size: 13px; text-decoration: none; }
 .enlace:hover { text-decoration: underline; }
@@ -729,6 +733,9 @@ a.aviso-info:hover { color: var(--color-primario-hover); }
 [data-tema="oscuro"] .segmentado-opcion:checked + label { background: #2D3344; }
 
 
+/* Bloquea el scroll del fondo mientras cualquier dialog esté abierto */
+body:has(dialog[open]) { overflow: hidden; }
+
 /* ---------- Modal crear ticket ---------- */
 .app-dialog {
     width: min(820px, calc(100vw - 32px));
@@ -874,6 +881,57 @@ a.aviso-info:hover { color: var(--color-primario-hover); }
 
 [data-tema="oscuro"] .ticket-info-grid { background: #161B2A; border-color: #2D3344; }
 [data-tema="oscuro"] .ticket-info-fila { border-color: #2D3344; }
+
+/* ---------- Configuración SLA ---------- */
+.tabla-sla { width: 100%; border-collapse: collapse; }
+.tabla-sla th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--color-texto-secundario); padding: 0 12px 10px; text-align: left; }
+.tabla-sla td { padding: 10px 12px; border-top: 1px solid var(--color-borde); vertical-align: middle; }
+.sla-horas-actual { font-weight: 600; color: var(--color-texto); font-size: 15px; }
+.fila-sla-form { display: flex; align-items: center; gap: 8px; }
+.sla-input { width: 80px; text-align: center; }
+.sla-unidad { font-size: 13px; color: var(--color-texto-secundario); }
+[data-tema="oscuro"] .tabla-sla td { border-color: #2D3344; }
+
+/* ---------- Página de Ayuda ---------- */
+.ayuda-contenedor { display: flex; flex-direction: column; gap: 24px; }
+.ayuda-seccion { padding: 24px 28px; }
+.ayuda-titulo-seccion { font-size: 15px; font-weight: 700; margin: 0 0 16px; color: var(--color-texto); }
+.ayuda-item { border-bottom: 1px solid var(--color-borde); }
+.ayuda-item:last-child { border-bottom: 0; }
+.ayuda-pregunta { font-size: 14px; font-weight: 500; padding: 14px 0; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: var(--color-texto); }
+.ayuda-pregunta::-webkit-details-marker { display: none; }
+.ayuda-pregunta::after { content: "▾"; font-size: 12px; color: var(--color-texto-tenue); transition: transform .2s; flex-shrink: 0; }
+details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
+.ayuda-respuesta { padding: 0 0 16px 0; font-size: 13.5px; color: var(--color-texto-secundario); line-height: 1.65; }
+.ayuda-respuesta ul, .ayuda-respuesta ol { padding-left: 20px; margin: 8px 0 0; }
+.ayuda-respuesta li { margin-bottom: 6px; }
+[data-tema="oscuro"] .ayuda-pregunta { color: #E2E8F0; }
+[data-tema="oscuro"] .ayuda-item { border-color: #2D3344; }
+
+/* ---- Base de conocimiento (KB) ---- */
+.kb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.kb-card { display: flex; flex-direction: column; gap: 8px; padding: 20px; background: var(--color-fondo-suave); border: 1px solid var(--color-borde); border-radius: 10px; text-decoration: none; color: inherit; transition: border-color .15s, box-shadow .15s; }
+.kb-card:hover { border-color: var(--color-primario); box-shadow: 0 2px 8px rgba(41,107,237,.12); }
+.kb-categoria { align-self: flex-start; }
+.kb-titulo { font-size: 15px; font-weight: 600; margin: 0; color: var(--color-texto); line-height: 1.4; }
+.kb-vistas { font-size: 12px; color: var(--color-texto-tenue); margin-top: auto; }
+.kb-contenido { max-width: 800px; }
+.kb-contenido h2 { font-size: 17px; font-weight: 700; margin: 24px 0 10px; }
+.kb-contenido h3 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; }
+.kb-contenido p { font-size: 14px; line-height: 1.7; margin: 0 0 12px; color: var(--color-texto-secundario); }
+.kb-contenido ul, .kb-contenido ol { padding-left: 22px; margin: 0 0 12px; }
+.kb-contenido li { font-size: 14px; line-height: 1.65; color: var(--color-texto-secundario); margin-bottom: 4px; }
+.kb-contenido code { font-size: 13px; background: var(--color-fondo-suave); border: 1px solid var(--color-borde); border-radius: 4px; padding: 1px 5px; }
+.kb-contenido pre { background: var(--color-fondo-suave); border: 1px solid var(--color-borde); border-radius: 8px; padding: 14px 18px; overflow-x: auto; margin: 0 0 12px; }
+.kb-contenido pre code { border: 0; background: none; padding: 0; font-size: 13px; }
+.enlace-volver { font-size: 13px; color: var(--color-texto-secundario); text-decoration: none; display: inline-block; margin-bottom: 6px; }
+.enlace-volver:hover { color: var(--color-primario); }
+.pill-info { background: #EEF3FF; color: #2655C6; }
+[data-tema="oscuro"] .pill-info { background: #1D2B4A; color: #7DA6FF; }
+[data-tema="oscuro"] .kb-card { background: #1A1F2D; border-color: #2D3344; }
+[data-tema="oscuro"] .kb-card:hover { border-color: var(--color-primario); }
+[data-tema="oscuro"] .kb-titulo { color: #E2E8F0; }
+[data-tema="oscuro"] .kb-contenido code, [data-tema="oscuro"] .kb-contenido pre { background: #0F1420; border-color: #2D3344; }
 
 /* Contenido de la app: max width para pantallas grandes */
 .app-contenido > * { max-width: 1200px; margin-left: auto; margin-right: auto; }

@@ -1,0 +1,60 @@
+@page
+@model Soporte.Web.Pages.Admin.Configuracion.SlaModel
+@{
+    ViewData["Title"] = "Configuración de SLA";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Configuración de SLA</h1>
+        <p>Define el tiempo máximo de atención por prioridad</p>
+    </div>
+</header>
+
+@if (TempData["MensajeExito"] is string exito)
+{
+    <div class="alerta-exito" role="status" data-autocerrar>@exito</div>
+}
+@if (TempData["MensajeError"] is string err)
+{
+    <div class="alerta-error" role="alert">@err</div>
+}
+
+<div class="tarjeta" style="max-width:600px">
+    <p style="font-size:13.5px;color:var(--color-texto-secundario);margin:0 0 20px">
+        El SLA define cuántas horas tiene el equipo para atender un ticket antes de que aparezca como <strong>SLA vencido</strong>.
+        Los cambios aplican de inmediato a los tickets nuevos y activos.
+    </p>
+
+    <table class="tabla-sla">
+        <thead>
+            <tr>
+                <th>Prioridad</th>
+                <th>Horas actuales</th>
+                <th>Nueva configuración</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Prioridades)
+            {
+                <tr>
+                    <td>
+                        <span class="pill @SlaModel.ClasePrioridad(p.Id)">@p.Nombre</span>
+                    </td>
+                    <td class="sla-horas-actual">@p.HorasSla h</td>
+                    <td>
+                        <form method="post" asp-page-handler="Actualizar" class="fila-sla-form">
+                            <input type="hidden" name="id" value="@p.Id" />
+                            <input type="number" name="horasSla" value="@p.HorasSla"
+                                   min="1" max="720" class="campo campo-compacto sla-input"
+                                   aria-label="Horas SLA para @p.Nombre" />
+                            <span class="sla-unidad">horas</span>
+                            <button type="submit" class="boton-secundario boton-compacto">Guardar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

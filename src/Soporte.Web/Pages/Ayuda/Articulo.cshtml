@@ -1,0 +1,32 @@
+@page "{slug}"
+@model Soporte.Web.Pages.Ayuda.ArticuloModel
+@{
+    ViewData["Title"] = Model.Articulo?.Titulo ?? "Artículo";
+}
+
+@if (Model.Articulo is null)
+{
+    <div class="estado-vacio">
+        <p>Artículo no encontrado. <a asp-page="/Ayuda/Index">Volver a la ayuda</a></p>
+    </div>
+}
+else
+{
+    <header class="encabezado-pagina">
+        <div>
+            <a asp-page="/Ayuda/Index" class="enlace-volver">← Ayuda</a>
+            <h1>@Model.Articulo.Titulo</h1>
+            <p>
+                <span class="pill pill-info">@Model.Articulo.CategoriaNombre</span>
+                <span class="texto-secundario" style="font-size:13px;margin-left:8px">
+                    Por @Model.Articulo.CreadoPorNombre · @Model.Articulo.FechaCreacion.ToString("dd/MM/yyyy") · @Model.Articulo.Vistas vista@(Model.Articulo.Vistas == 1 ? "" : "s")
+                </span>
+            </p>
+        </div>
+    </header>
+
+    <div class="tarjeta kb-contenido">
+        @Html.Raw(Model.ContenidoHtml)
+    </div>
+
+}

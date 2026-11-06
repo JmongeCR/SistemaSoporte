@@ -89,7 +89,47 @@ INSERT INTO dbo.Ticket (Id, Asunto, Descripcion, CategoriaId, PrioridadId, Estad
     -- 5: Resuelto hoy por Luis
     (5, N'Impresora del segundo piso imprime en blanco',
         N'La impresora del segundo piso saca las hojas en blanco aunque indica que tiene tóner.',
-        1, 2, 3, 5, 3, DATEADD(HOUR, -20, @Ahora), @ResueltoEn);
+        1, 2, 3, 5, 3, DATEADD(HOUR, -20, @Ahora), @ResueltoEn),
+    -- 6: Abierto sin asignar, Baja, pantalla
+    (6, N'Monitor de recepción parpadea intermitentemente',
+        N'El monitor del puesto de recepción lleva dos días parpadeando. No ocurre con otros equipos en la misma regleta.',
+        1, 1, 1, 6, NULL, DATEADD(HOUR, -48, @Ahora), NULL),
+    -- 7: En Progreso con María, correo duplicado
+    (7, N'El correo aparece duplicado en Outlook',
+        N'Desde ayer cada mensaje nuevo aparece dos veces en la bandeja de entrada. Ya intenté compactar los archivos PST.',
+        2, 2, 2, 5, 4, DATEADD(HOUR, -10, @Ahora), DATEADD(HOUR, -8, @Ahora)),
+    -- 8: Resuelto por Luis, WiFi
+    (8, N'WiFi corporativo se desconecta cada 30 minutos',
+        N'En el área de contabilidad la señal WiFi cae cada media hora aproximadamente. El cable de red funciona bien.',
+        3, 3, 3, 6, 3, DATEADD(DAY, -3, @Ahora), DATEADD(DAY, -2, @Ahora)),
+    -- 9: Cerrado por María, software de diseño
+    (9, N'Solicitud de instalación de Adobe Illustrator',
+        N'Necesito Adobe Illustrator para preparar materiales de marketing. Adjunto la aprobación del jefe de área.',
+        2, 1, 4, 5, 4, DATEADD(DAY, -7, @Ahora), DATEADD(DAY, -5, @Ahora)),
+    -- 10: En Progreso con Luis, error en aplicativo contable
+    (10, N'No se puede exportar a PDF desde el sistema contable',
+        N'Al pulsar "Exportar PDF" en el módulo de balances el programa muestra un error y se cierra. Ocurre con todos los usuarios.',
+        2, 3, 2, 6, 3, DATEADD(HOUR, -15, @Ahora), DATEADD(HOUR, -12, @Ahora)),
+    -- 11: Abierto urgente sin asignar, servidor
+    (11, N'Servidor de archivos inaccesible desde todas las estaciones',
+        N'Nadie en la empresa puede acceder al servidor de archivos compartidos. El área de producción está detenida.',
+        3, 4, 1, 6, NULL, DATEADD(HOUR, -1, @Ahora), NULL),
+    -- 12: Resuelto por María, contraseña
+    (12, N'Contraseña de acceso al ERP expiró y no permite cambiarla',
+        N'El sistema indica que la contraseña venció hace 90 días, pero al intentar cambiarla dice "Política no cumplida" sin más detalles.',
+        4, 2, 3, 6, 4, DATEADD(DAY, -5, @Ahora), DATEADD(DAY, -4, @Ahora)),
+    -- 13: Cerrado por Luis, teclado
+    (13, N'Teclado inalámbrico no es detectado al encender el equipo',
+        N'Cada vez que reinicio el equipo el teclado inalámbrico tarda varios minutos en conectarse o no conecta nunca.',
+        1, 1, 4, 5, 3, DATEADD(DAY, -10, @Ahora), DATEADD(DAY, -8, @Ahora)),
+    -- 14: Abierto sin asignar, intranet
+    (14, N'La intranet no carga en el navegador corporativo',
+        N'Al ingresar la URL de la intranet aparece "ERR_CONNECTION_REFUSED". Funciona desde el celular con WiFi de la empresa.',
+        3, 3, 1, 6, NULL, DATEADD(HOUR, -6, @Ahora), NULL),
+    -- 15: En Progreso con María, portal de RRHH
+    (15, N'Error 403 al ingresar al portal de Recursos Humanos',
+        N'Al intentar acceder al portal de RRHH aparece "Acceso denegado 403". Otros compañeros del mismo departamento sí pueden ingresar.',
+        4, 4, 2, 5, 4, DATEADD(HOUR, -3, @Ahora), DATEADD(HOUR, -2, @Ahora));
 SET IDENTITY_INSERT dbo.Ticket OFF;
 
 /* ---------- Historial de estados (HU-08) ---------- */
@@ -102,7 +142,40 @@ INSERT INTO dbo.HistorialTicket (TicketId, UsuarioId, EstadoAnteriorId, EstadoNu
     (4, 4, 1,    2, DATEADD(HOUR, -24, @Ahora)),
     (5, 5, NULL, 1, DATEADD(HOUR, -20, @Ahora)),
     (5, 3, 1,    2, DATEADD(HOUR, -18, @Ahora)),
-    (5, 3, 2,    3, @ResueltoEn);
+    (5, 3, 2,    3, @ResueltoEn),
+    -- Ticket 6: solo apertura
+    (6, 6, NULL, 1, DATEADD(HOUR, -48, @Ahora)),
+    -- Ticket 7: apertura y asignación a María
+    (7, 5, NULL, 1, DATEADD(HOUR, -10, @Ahora)),
+    (7, 2, 1,    2, DATEADD(HOUR, -8, @Ahora)),
+    -- Ticket 8: apertura, en progreso y resolución
+    (8, 6, NULL, 1, DATEADD(DAY, -3, @Ahora)),
+    (8, 3, 1,    2, DATEADD(DAY, -3, DATEADD(HOUR, 2, @Ahora))),
+    (8, 3, 2,    3, DATEADD(DAY, -2, @Ahora)),
+    -- Ticket 9: apertura, en progreso, resuelto y cerrado
+    (9, 5, NULL, 1, DATEADD(DAY, -7, @Ahora)),
+    (9, 4, 1,    2, DATEADD(DAY, -6, @Ahora)),
+    (9, 4, 2,    3, DATEADD(DAY, -6, DATEADD(HOUR, 4, @Ahora))),
+    (9, 2, 3,    4, DATEADD(DAY, -5, @Ahora)),
+    -- Ticket 10: apertura y en progreso con Luis
+    (10, 6, NULL, 1, DATEADD(HOUR, -15, @Ahora)),
+    (10, 3, 1,   2, DATEADD(HOUR, -12, @Ahora)),
+    -- Ticket 11: solo apertura urgente
+    (11, 6, NULL, 1, DATEADD(HOUR, -1, @Ahora)),
+    -- Ticket 12: apertura, en progreso, resuelto
+    (12, 6, NULL, 1, DATEADD(DAY, -5, @Ahora)),
+    (12, 4, 1,   2, DATEADD(DAY, -5, DATEADD(HOUR, 3, @Ahora))),
+    (12, 4, 2,   3, DATEADD(DAY, -4, @Ahora)),
+    -- Ticket 13: apertura, en progreso, resuelto, cerrado
+    (13, 5, NULL, 1, DATEADD(DAY, -10, @Ahora)),
+    (13, 3, 1,   2, DATEADD(DAY, -9, @Ahora)),
+    (13, 3, 2,   3, DATEADD(DAY, -9, DATEADD(HOUR, 5, @Ahora))),
+    (13, 1, 3,   4, DATEADD(DAY, -8, @Ahora)),
+    -- Ticket 14: solo apertura
+    (14, 6, NULL, 1, DATEADD(HOUR, -6, @Ahora)),
+    -- Ticket 15: apertura y en progreso con María
+    (15, 5, NULL, 1, DATEADD(HOUR, -3, @Ahora)),
+    (15, 4, 1,   2, DATEADD(HOUR, -2, @Ahora));
 
 /* ---------- Comentarios (HU-09, HU-10) ---------- */
 SET IDENTITY_INSERT dbo.Comentario ON;
@@ -115,14 +188,180 @@ INSERT INTO dbo.Comentario (Id, TicketId, UsuarioId, Texto, EsNotaInterna, Fecha
     (3, 3, 3, N'El timeout viene de la consulta de ventas sin índice por fecha. Coordinar con el DBA antes de tocar producción.',
         1, DATEADD(MINUTE, -180, @Ahora)),
     (4, 5, 3, N'Se reemplazó el cartucho y se limpió el cabezal. Por favor confirme si ya imprime correctamente.',
-        0, DATEADD(MINUTE, -5, @ResueltoEn));
+        0, DATEADD(MINUTE, -5, @ResueltoEn)),
+    -- Ticket 7: María en progreso
+    (5, 7, 4, N'Revisé la cuenta y encontré que hay una regla de bandeja de entrada duplicando mensajes. La voy a corregir ahora.',
+        0, DATEADD(HOUR, -7, @Ahora)),
+    (6, 7, 5, N'Perfecto, gracias. ¿Cuándo quedará listo?', 0, DATEADD(HOUR, -6, @Ahora)),
+    -- Ticket 8: Luis resuelve WiFi
+    (7, 8, 3, N'Identifiqué un canal WiFi saturado en el área. Cambié el canal del access point y actualicé el firmware.',
+        0, DATEADD(DAY, -2, DATEADD(HOUR, 1, @Ahora))),
+    (8, 8, 6, N'Lleva más de una hora sin desconectarse. ¡Gracias!', 0, DATEADD(DAY, -2, DATEADD(HOUR, 3, @Ahora))),
+    -- Ticket 10: Luis investigando
+    (9, 10, 3, N'El error está relacionado con el driver de PDF de la versión instalada. Estoy descargando el parche del proveedor.',
+        0, DATEADD(HOUR, -11, @Ahora)),
+    -- Nota interna ticket 10
+    (10, 10, 3, N'El proveedor tiene un parche liberado el mes pasado; no se aplicó en la última actualización del sistema. Coordinar con IT para el despliegue.',
+        1, DATEADD(HOUR, -10, @Ahora)),
+    -- Ticket 11: urgente, anotación inicial
+    (11, 11, 6, N'Estamos completamente parados. Producción, contabilidad y ventas no pueden trabajar. Es crítico.',
+        0, DATEADD(MINUTE, -50, @Ahora)),
+    -- Ticket 12: María resuelve contraseña
+    (12, 12, 4, N'El problema era que la contraseña nueva no cumplía la política de longitud. Restablecí el acceso y le envié la nueva contraseña por mensaje seguro.',
+        0, DATEADD(DAY, -4, DATEADD(HOUR, 1, @Ahora))),
+    (13, 12, 6, N'Ya pude ingresar. Muchas gracias.', 0, DATEADD(DAY, -4, DATEADD(HOUR, 2, @Ahora))),
+    -- Ticket 15: María investigando acceso RRHH
+    (14, 15, 4, N'Revisé los permisos del Active Directory. Parece que tu usuario fue removido del grupo de RRHH por error en una migración reciente.',
+        0, DATEADD(HOUR, -1, @Ahora));
 SET IDENTITY_INSERT dbo.Comentario OFF;
 
 /* ---------- Lecturas (HU-09 esc. 3) ----------
    El comentario 4 queda SIN leer por Sofía, para mostrar el indicador de "no leído". */
 INSERT INTO dbo.LecturaComentario (ComentarioId, UsuarioId, FechaLectura) VALUES
     (1, 3, DATEADD(MINUTE, -240, @Ahora)),   -- Luis leyó el comentario de Sofía
-    (2, 5, DATEADD(MINUTE, -200, @Ahora));   -- Sofía leyó la respuesta de Luis
+    (2, 5, DATEADD(MINUTE, -200, @Ahora)),   -- Sofía leyó la respuesta de Luis
+    (5, 5, DATEADD(HOUR, -6, @Ahora)),       -- Sofía leyó respuesta de María (ticket 7)
+    (7, 6, DATEADD(DAY, -2, DATEADD(HOUR, 4, @Ahora))), -- Diego leyó resolución de Luis (ticket 8)
+    (9, 6, DATEADD(HOUR, -10, @Ahora)),      -- Diego leyó actualización de Luis (ticket 10)
+    (12, 6, DATEADD(DAY, -4, DATEADD(HOUR, 3, @Ahora))); -- Diego leyó resolución de María (ticket 12)
+
+/* ---------- Base de conocimiento (artículos KB) ---------- */
+SET IDENTITY_INSERT dbo.ArticuloKb ON;
+INSERT INTO dbo.ArticuloKb (Id, Titulo, Contenido, Slug, CategoriaId, CreadoPorId, FechaCreacion, Publicado) VALUES
+    (1, N'¿Qué hacer si la laptop no enciende?',
+        N'## Pasos para diagnosticar una laptop que no enciende
+
+1. Verifique que el cargador esté bien conectado y el LED del cargador encienda.
+2. Retire la batería (si es removible), espere 30 segundos y vuelva a colocarla.
+3. Mantenga presionado el botón de encendido por 15 segundos (descarga del capacitor).
+4. Intente encender sin batería conectando solo el cargador.
+5. Si tiene pantalla negra pero el equipo sí enciende (luces o ventilador), conecte un monitor externo.
+
+**Si ningún paso funciona**, escale el ticket a soporte de hardware nivel 2.',
+        N'laptop-no-enciende', 1, 1, DATEADD(DAY, -25, SYSUTCDATETIME()), 1),
+
+    (2, N'Configurar cliente VPN en Windows 10/11',
+        N'## Configuración del cliente VPN corporativo
+
+### Requisitos previos
+- Credenciales corporativas activas
+- Certificado digital instalado (solicitarlo a soporte)
+
+### Pasos
+1. Descargue el cliente VPN desde la intranet: `http://intranet/vpn-client`
+2. Ejecute el instalador como administrador
+3. Ingrese el servidor VPN: `vpn.empresa.local`
+4. Autentíquese con su usuario y contraseña de red
+
+### Problemas comunes
+- **"Tiempo de espera agotado"**: Verifique que el puerto 443 no esté bloqueado por el firewall local.
+- **"Certificado no válido"**: Reinstale el certificado corporativo raíz.',
+        N'configurar-cliente-vpn', 3, 1, DATEADD(DAY, -20, SYSUTCDATETIME()), 1),
+
+    (3, N'Cómo solicitar el restablecimiento de contraseña',
+        N'## Procedimiento de restablecimiento de contraseña
+
+### Autoservicio (recomendado)
+1. Vaya a `https://soporte.empresa.local/cuenta/restablecer`
+2. Ingrese su correo corporativo
+3. Revise su bandeja de entrada (también spam)
+4. Siga el enlace recibido y establezca una contraseña nueva
+
+### Política de contraseñas
+- Mínimo 8 caracteres
+- Al menos una mayúscula, una minúscula y un número
+- No puede repetir las últimas 5 contraseñas
+
+### Si no recibe el correo
+Abra un ticket en la categoría **Cuentas y accesos** con su nombre completo y número de empleado.',
+        N'restablecer-contrasena', 4, 2, DATEADD(DAY, -18, SYSUTCDATETIME()), 1),
+
+    (4, N'Solución a problemas de conectividad WiFi',
+        N'## Diagnóstico de problemas WiFi
+
+### Verificaciones iniciales
+1. Confirme que el WiFi del equipo está activado (tecla Fn + F2 en la mayoría de equipos)
+2. Olvide la red corporativa y vuelva a conectarse
+3. Reinicie el adaptador de red: `Administrador de dispositivos → Adaptadores de red → Deshabilitar / Habilitar`
+
+### Problemas de canal saturado
+Si varias personas del mismo área reportan cortes simultáneos, el problema puede ser saturación del canal del access point. Reporte el ticket con:
+- Hora exacta del corte
+- Área o piso donde ocurre
+- Número de personas afectadas
+
+### Cambio de DNS
+Si el WiFi conecta pero no hay acceso a internet, cambie el DNS a `8.8.8.8` y `8.8.4.4` como prueba temporal.',
+        N'problemas-wifi', 3, 1, DATEADD(DAY, -15, SYSUTCDATETIME()), 1),
+
+    (5, N'Protocolo de escalamiento de tickets urgentes',
+        N'## Cuándo y cómo escalar un ticket
+
+### Criterios para escalamiento inmediato
+- Más de 10 usuarios afectados simultáneamente
+- Sistemas críticos de producción, contabilidad o ventas fuera de servicio
+- Pérdida de datos o riesgo de pérdida inminente
+
+### Pasos para escalar
+1. Cambie la prioridad del ticket a **Urgente**
+2. Asigne al agente senior disponible
+3. Notifique al administrador por canal de mensajería inmediata
+4. Deje nota interna con evaluación de impacto
+
+### SLA urgente: 8 horas
+Los tickets urgentes deben tener primera respuesta en menos de 1 hora y resolución dentro de 8 horas hábiles.',
+        N'escalamiento-tickets-urgentes', 2, 2, DATEADD(DAY, -12, SYSUTCDATETIME()), 1),
+
+    (6, N'Instalación de software corporativo aprobado',
+        N'## Proceso de solicitud e instalación de software
+
+### Software pre-aprobado (instalación inmediata)
+- Suite de ofimática (ya instalada)
+- Antivirus corporativo
+- Cliente VPN
+- Adobe Reader
+
+### Software que requiere aprobación
+Para cualquier otro software abra un ticket de categoría **Software** con:
+1. Nombre exacto y versión del software
+2. Justificación de negocio
+3. Aprobación firmada del jefe inmediato (adjuntar imagen o PDF)
+
+### Tiempos estimados
+- Aprobación del área de TI: 1-2 días hábiles
+- Instalación una vez aprobado: mismo día si hay licencia disponible',
+        N'instalacion-software-corporativo', 2, 1, DATEADD(DAY, -10, SYSUTCDATETIME()), 1),
+
+    (7, N'Acceso al portal de Recursos Humanos',
+        N'## Problemas de acceso al portal de RRHH
+
+### Error 403 - Acceso denegado
+Este error indica que su usuario no tiene los permisos necesarios. Causas frecuentes:
+- Cambio de departamento reciente sin actualización de grupos en Active Directory
+- Cuenta nueva que no ha sido agregada al grupo correspondiente
+- Expiración de acceso temporal
+
+### Solución
+Abra un ticket en categoría **Cuentas y accesos** indicando:
+1. Su nombre completo y número de empleado
+2. Departamento actual
+3. Nombre de su jefe inmediato
+
+El equipo de soporte coordinará con RRHH para restablecer el acceso.',
+        N'acceso-portal-rrhh', 4, 2, DATEADD(DAY, -8, SYSUTCDATETIME()), 1);
+SET IDENTITY_INSERT dbo.ArticuloKb OFF;
+
+/* ---------- Vinculación de artículos a tickets ---------- */
+INSERT INTO dbo.TicketArticuloKb (TicketId, ArticuloKbId, VinculadoPorId, FechaVinculo) VALUES
+    (1,  1, 3, DATEADD(HOUR, -28, SYSUTCDATETIME())),   -- Laptop no enciende → KB laptop
+    (2,  2, 1, DATEADD(HOUR,  -1, SYSUTCDATETIME())),   -- VPN → KB VPN
+    (4,  3, 4, DATEADD(HOUR, -24, SYSUTCDATETIME())),   -- Correo bloqueado → KB contraseñas
+    (8,  4, 3, DATEADD(DAY,  -2,  SYSUTCDATETIME())),   -- WiFi cae → KB WiFi
+    (9,  6, 4, DATEADD(DAY,  -6,  SYSUTCDATETIME())),   -- Instalar software → KB software
+    (11, 5, 1, DATEADD(MINUTE, -45, SYSUTCDATETIME())), -- Servidor caído → KB escalamiento
+    (12, 3, 4, DATEADD(DAY,  -5,  SYSUTCDATETIME())),   -- Contraseña expiró → KB contraseñas
+    (14, 4, 1, DATEADD(HOUR,  -5,  SYSUTCDATETIME())),  -- Intranet no carga → KB WiFi/redes
+    (15, 7, 4, DATEADD(HOUR,  -2,  SYSUTCDATETIME()));  -- Error 403 RRHH → KB acceso RRHH
 
 COMMIT TRANSACTION;
 GO

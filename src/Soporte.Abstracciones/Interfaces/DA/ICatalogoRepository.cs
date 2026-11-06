@@ -11,4 +11,6 @@ public interface ICatalogoRepository
     Task<IReadOnlyList<CatalogoDto>> ListarRolesAsync();
     Task<bool> ExisteCategoriaActivaAsync(int categoriaId);
     Task<IReadOnlyList<Permiso>> ListarPermisosConRolesAsync();
+    Task<IReadOnlyList<PrioridadSlaDto>> ListarPrioridadesConSlaAsync();
+    Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, int horasSla);
 }

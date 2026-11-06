@@ -61,4 +61,24 @@ public class CatalogoRepository : ICatalogoRepository
             .ThenBy(p => p.Id)
             .ToListAsync();
     }
+
+    public async Task<IReadOnlyList<PrioridadSlaDto>> ListarPrioridadesConSlaAsync()
+    {
+        return await _contexto.Prioridades.AsNoTracking()
+            .OrderBy(p => p.Id)
+            .Select(p => new PrioridadSlaDto { Id = p.Id, Nombre = p.Nombre, HorasSla = p.HorasSla })
+            .ToListAsync();
+    }
+
+    public async Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, int horasSla)
+    {
+        var prioridad = await _contexto.Prioridades.FindAsync(id);
+        if (prioridad is null)
+            return ResultadoOperacion<PrioridadSlaDto>.NoEncontrado($"No existe la prioridad #{id}.");
+
+        prioridad.HorasSla = horasSla;
+        await _contexto.SaveChangesAsync();
+        return ResultadoOperacion<PrioridadSlaDto>.Ok(
+            new PrioridadSlaDto { Id = prioridad.Id, Nombre = prioridad.Nombre, HorasSla = prioridad.HorasSla });
+    }
 }

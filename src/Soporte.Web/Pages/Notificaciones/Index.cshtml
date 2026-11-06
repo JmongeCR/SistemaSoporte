@@ -1,0 +1,46 @@
+@page
+@model Soporte.Web.Pages.Notificaciones.IndexModel
+@{
+    ViewData["Title"] = "Notificaciones";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Notificaciones</h1>
+        <p>@Model.TotalNoLeidas @(Model.TotalNoLeidas == 1 ? "sin leer" : Model.TotalNoLeidas > 0 ? "sin leer" : "todas leídas")</p>
+    </div>
+    @if (Model.TotalNoLeidas > 0)
+    {
+        <form method="post" asp-page-handler="MarcarTodas">
+            <button type="submit" class="boton-secundario">Marcar todas como leídas</button>
+        </form>
+    }
+</header>
+
+@if (Model.MensajeError is not null)
+{
+    <div class="alerta-error" role="alert">@Model.MensajeError</div>
+}
+
+@if (Model.Notificaciones.Count == 0 && Model.MensajeError is null)
+{
+    <div class="tarjeta estado-vacio">No tenés notificaciones.</div>
+}
+else
+{
+    <div class="tarjeta" style="padding:0;overflow:hidden">
+        <ul style="list-style:none;margin:0;padding:0">
+            @foreach (var n in Model.Notificaciones)
+            {
+                <li style="border-bottom:1px solid var(--color-borde)">
+                    <form method="post" asp-page-handler="Abrir" asp-route-id="@n.Id">
+                        <button type="submit" class="notificacion-item @(n.Leida ? "" : "no-leida")" style="width:100%;text-align:left">
+                            <span class="notificacion-mensaje">@n.Mensaje</span>
+                            <span class="notificacion-meta">@Formato.Hace(n.FechaCreacion)@(n.Leida ? "" : " · sin leer")</span>
+                        </button>
+                    </form>
+                </li>
+            }
+        </ul>
+    </div>
+}

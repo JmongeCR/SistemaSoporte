@@ -25,4 +25,10 @@ public class CatalogosApiServicio : ICatalogosApiServicio
 
     public async Task<ResultadoOperacion<MatrizPermisosDto>> ObtenerMatrizPermisosAsync(int rolId) =>
         await _api.GetAsync<MatrizPermisosDto>($"api/catalogos/roles/{rolId}/permisos");
+
+    public async Task<ResultadoOperacion<IReadOnlyList<PrioridadSlaDto>>> ListarPrioridadesConSlaAsync() =>
+        await _api.GetAsync<IReadOnlyList<PrioridadSlaDto>>("api/catalogos/prioridades/sla");
+
+    public async Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, ActualizarSlaDto dto) =>
+        await _api.PutJsonAsync<PrioridadSlaDto>($"api/catalogos/prioridades/{id}/sla", dto);
 }

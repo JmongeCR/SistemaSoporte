@@ -1,0 +1,32 @@
+@page
+@model Soporte.Web.Pages.Ayuda.IndexModel
+@{
+    ViewData["Title"] = "Ayuda";
+}
+
+<header class="encabezado-pagina">
+    <div>
+        <h1>Base de conocimiento</h1>
+        <p>Artículos, procedimientos y preguntas frecuentes</p>
+    </div>
+</header>
+
+@if (!Model.Articulos.Any())
+{
+    <div class="estado-vacio">
+        <p>No hay artículos disponibles.</p>
+    </div>
+}
+else
+{
+    <div class="kb-grid">
+        @foreach (var art in Model.Articulos)
+        {
+            <a class="kb-card" asp-page="/Ayuda/Articulo" asp-route-slug="@art.Slug">
+                <span class="pill pill-info kb-categoria">@art.CategoriaNombre</span>
+                <h3 class="kb-titulo">@art.Titulo</h3>
+                <span class="kb-vistas">@art.Vistas vista@(art.Vistas == 1 ? "" : "s")</span>
+            </a>
+        }
+    </div>
+}

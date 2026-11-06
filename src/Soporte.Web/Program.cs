@@ -98,6 +98,7 @@ builder.Services.AddScoped<ICatalogosApiServicio, CatalogosApiServicio>();
 builder.Services.AddScoped<IUsuariosApiServicio, UsuariosApiServicio>();
 builder.Services.AddScoped<INotificacionesApiServicio, NotificacionesApiServicio>();
 builder.Services.AddScoped<IDashboardApiServicio, DashboardApiServicio>();
+builder.Services.AddScoped<IBaseConocimientoApiServicio, BaseConocimientoApiServicio>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IZonaHoraria>(new ZonaHoraria(builder.Configuration["ZonaHoraria"] ?? "America/Costa_Rica"));
 

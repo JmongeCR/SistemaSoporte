@@ -44,6 +44,32 @@ public class CatalogosController : SoporteControllerBase
     public async Task<ActionResult<IReadOnlyList<CatalogoDto>>> ListarRolesAsync() =>
         Ok(await _catalogoFlujo.ListarRolesAsync());
 
+    /// <summary>Prioridades con sus horas de SLA configuradas. Solo Administrador.</summary>
+    [HttpGet("prioridades/sla")]
+    [ProducesResponseType(typeof(IReadOnlyList<PrioridadSlaDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<IReadOnlyList<PrioridadSlaDto>>> ListarPrioridadesConSlaAsync()
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
+        if (usuario.Rol != Soporte.Abstracciones.Enumeraciones.RolTipo.Administrador)
+            return Forbid();
+        return Ok(await _catalogoFlujo.ListarPrioridadesConSlaAsync());
+    }
+
+    /// <summary>Actualiza las horas de SLA de una prioridad. Solo Administrador.</summary>
+    [HttpPut("prioridades/{id:int}/sla")]
+    [ProducesResponseType(typeof(PrioridadSlaDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PrioridadSlaDto>> ActualizarSlaAsync(int id, [FromBody] ActualizarSlaDto dto)
+    {
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
+        var resultado = await _catalogoFlujo.ActualizarSlaAsync(id, dto, usuario);
+        return resultado.Exito ? Ok(resultado.Datos) : RespuestaError(resultado);
+    }
+
     /// <summary>Permisos del rol agrupados, de solo lectura (HU-16). Solo Administrador.</summary>
     [HttpGet("roles/{rolId:int}/permisos")]
     [ProducesResponseType(typeof(MatrizPermisosDto), StatusCodes.Status200OK)]

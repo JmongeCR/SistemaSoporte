@@ -18,6 +18,14 @@ public class CatalogoFlujo : ICatalogoFlujo
     public async Task<IReadOnlyList<CatalogoDto>> ListarPrioridadesAsync() => await _catalogos.ListarPrioridadesAsync();
     public async Task<IReadOnlyList<CatalogoDto>> ListarEstadosAsync() => await _catalogos.ListarEstadosAsync();
     public async Task<IReadOnlyList<CatalogoDto>> ListarRolesAsync() => await _catalogos.ListarRolesAsync();
+    public async Task<IReadOnlyList<PrioridadSlaDto>> ListarPrioridadesConSlaAsync() => await _catalogos.ListarPrioridadesConSlaAsync();
+
+    public async Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, ActualizarSlaDto dto, UsuarioContextoDto usuario)
+    {
+        if (usuario.Rol != RolTipo.Administrador)
+            return ResultadoOperacion<PrioridadSlaDto>.SinPermiso("Solo un administrador puede modificar los SLAs.");
+        return await _catalogos.ActualizarSlaAsync(id, dto.HorasSla);
+    }
 
     public async Task<ResultadoOperacion<MatrizPermisosDto>> ObtenerMatrizPermisosAsync(int rolId, UsuarioContextoDto usuario)
     {

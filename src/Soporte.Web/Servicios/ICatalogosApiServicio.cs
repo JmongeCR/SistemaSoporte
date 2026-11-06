@@ -11,4 +11,7 @@ public interface ICatalogosApiServicio
 
     /// <summary>HU-16: permisos del rol, de solo lectura (solo Administrador).</summary>
     Task<ResultadoOperacion<MatrizPermisosDto>> ObtenerMatrizPermisosAsync(int rolId);
+
+    Task<ResultadoOperacion<IReadOnlyList<PrioridadSlaDto>>> ListarPrioridadesConSlaAsync();
+    Task<ResultadoOperacion<PrioridadSlaDto>> ActualizarSlaAsync(int id, ActualizarSlaDto dto);
 }

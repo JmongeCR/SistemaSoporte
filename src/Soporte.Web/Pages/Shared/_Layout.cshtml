@@ -14,6 +14,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Soporte</title>
+    <link rel="icon" type="image/svg+xml" href="~/img/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
@@ -39,8 +40,10 @@
                     <li><a class="app-nav-enlace @Activo("/Tickets")" asp-page="/Tickets/Index">@(esCliente ? "Mis tickets" : "Tickets")</a></li>
                     @if (esAdministrador)
                     {
-                        <li><a class="app-nav-enlace @Activo("/Admin")" asp-page="/Admin/Usuarios/Index">Usuarios</a></li>
+                        <li><a class="app-nav-enlace @Activo("/Admin/Usuarios")" asp-page="/Admin/Usuarios/Index">Usuarios</a></li>
+                        <li><a class="app-nav-enlace @Activo("/Admin/Configuracion")" asp-page="/Admin/Configuracion/Sla">Configuración</a></li>
                     }
+                    <li><a class="app-nav-enlace @Activo("/Ayuda")" asp-page="/Ayuda/Index">Ayuda</a></li>
                 </ul>
             </nav>
 
