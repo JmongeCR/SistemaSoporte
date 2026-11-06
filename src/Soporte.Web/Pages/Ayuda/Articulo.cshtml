@@ -14,8 +14,59 @@
         <p>Artículo no encontrado. <a asp-page="/Ayuda/Index">Volver a la ayuda</a></p>
     </div>
 }
+else if (!autenticado)
+{
+    <!-- ===== VISTA PORTAL PÚBLICO ===== -->
+    <div class="kb-art-portal">
+        <!-- Migas de pan -->
+        <nav class="kb-art-breadcrumb" aria-label="Ruta de navegación">
+            <a asp-page="/Ayuda/Index" class="kb-art-bc-link">Centro de Ayuda</a>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            <span class="kb-art-bc-pill">@Model.Articulo.CategoriaNombre</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            <span class="kb-art-bc-actual">@Model.Articulo.Titulo</span>
+        </nav>
+
+        <!-- Cabecera del artículo -->
+        <header class="kb-art-header">
+            <h1 class="kb-art-titulo">@Model.Articulo.Titulo</h1>
+            <div class="kb-art-meta">
+                <span class="pill pill-info">@Model.Articulo.CategoriaNombre</span>
+                <span class="kb-art-meta-sep">·</span>
+                <span class="kb-art-meta-txt">@Model.Articulo.FechaCreacion.ToString("dd/MM/yyyy")</span>
+                <span class="kb-art-meta-sep">·</span>
+                <span class="kb-art-meta-txt">@Model.Articulo.Vistas vista@(Model.Articulo.Vistas == 1 ? "" : "s")</span>
+            </div>
+        </header>
+
+        <!-- Contenido -->
+        <article class="tarjeta kb-art-cuerpo kb-contenido">
+            @Html.Raw(Model.ContenidoHtml)
+        </article>
+
+        <!-- Votos -->
+        <div class="kb-art-votos">
+            <p class="kb-art-votos-titulo">¿Te resultó útil este artículo?</p>
+            <div class="kb-votos-bloque kb-votos-anonimo">
+                <span class="kb-votos-pregunta">
+                    <a asp-page="/Cuenta/Login">Inicia sesión</a> para calificarlo.
+                </span>
+                <span class="kb-votos-counts">👍 @(Model.Votos?.UtilCount ?? 0) &nbsp; 👎 @(Model.Votos?.NoUtilCount ?? 0)</span>
+            </div>
+        </div>
+
+        <!-- Volver -->
+        <div class="kb-art-volver">
+            <a asp-page="/Ayuda/Index" class="kb-art-volver-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                Volver al Centro de Ayuda
+            </a>
+        </div>
+    </div>
+}
 else
 {
+    <!-- ===== VISTA INTERNA AUTENTICADO ===== -->
     <header class="encabezado-pagina">
         <div>
             <a asp-page="/Ayuda/Index" class="enlace-volver">← Ayuda</a>
@@ -55,29 +106,19 @@ else
         @Html.Raw(Model.ContenidoHtml)
     </div>
 
-    @if (Model.Sesion.EstaAutenticado)
-    {
-        <div class="kb-votos-bloque">
-            <span class="kb-votos-pregunta">¿Te fue útil este artículo?</span>
-            <form method="post" asp-page-handler="Votar" class="kb-votos-form">
-                <input type="hidden" name="articuloId" value="@Model.Articulo.Id" />
-                <input type="hidden" name="slug" value="@Model.Articulo.Slug" />
-                <button type="submit" name="esUtil" value="true"
-                        class="btn-voto @(Model.Votos?.MiVoto == true ? "btn-voto-activo" : "")">
-                    👍 <span class="votos-count">@(Model.Votos?.UtilCount ?? 0)</span>
-                </button>
-                <button type="submit" name="esUtil" value="false"
-                        class="btn-voto @(Model.Votos?.MiVoto == false ? "btn-voto-activo" : "")">
-                    👎 <span class="votos-count">@(Model.Votos?.NoUtilCount ?? 0)</span>
-                </button>
-            </form>
-        </div>
-    }
-    else
-    {
-        <div class="kb-votos-bloque kb-votos-anonimo">
-            <span class="kb-votos-pregunta">¿Te fue útil? <a asp-page="/Cuenta/Login">Inicia sesión</a> para calificar.</span>
-            <span>👍 @(Model.Votos?.UtilCount ?? 0) · 👎 @(Model.Votos?.NoUtilCount ?? 0)</span>
-        </div>
-    }
+    <div class="kb-votos-bloque">
+        <span class="kb-votos-pregunta">¿Te fue útil este artículo?</span>
+        <form method="post" asp-page-handler="Votar" class="kb-votos-form">
+            <input type="hidden" name="articuloId" value="@Model.Articulo.Id" />
+            <input type="hidden" name="slug" value="@Model.Articulo.Slug" />
+            <button type="submit" name="esUtil" value="true"
+                    class="btn-voto @(Model.Votos?.MiVoto == true ? "btn-voto-activo" : "")">
+                👍 <span class="votos-count">@(Model.Votos?.UtilCount ?? 0)</span>
+            </button>
+            <button type="submit" name="esUtil" value="false"
+                    class="btn-voto @(Model.Votos?.MiVoto == false ? "btn-voto-activo" : "")">
+                👎 <span class="votos-count">@(Model.Votos?.NoUtilCount ?? 0)</span>
+            </button>
+        </form>
+    </div>
 }
