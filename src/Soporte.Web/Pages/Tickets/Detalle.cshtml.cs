@@ -71,6 +71,7 @@ public class DetalleModel : PageModel
     public bool EsCliente => _sesion.Rol == RolTipo.Cliente;
     public bool EsAdministrador => _sesion.Rol == RolTipo.Administrador;
     public bool EsEquipo => !EsCliente;
+    public int  UsuarioId => _sesion.UsuarioId;
     public bool EstaCerrado => Ticket?.EstadoId == (int)EstadoTicketTipo.Cerrado;
 
     /// <summary>Administrador siempre; Agente solo si el ticket está asignado a él.</summary>
@@ -175,6 +176,32 @@ public class DetalleModel : PageModel
         var resultado = await _kbApi.DesvincularAsync(Id, articuloId);
         TempData[resultado.Exito ? "MensajeExito" : "MensajeError"] = resultado.Exito ? "Artículo desvinculado." : resultado.Mensaje;
         return RedirectToPage(null, null, new { id = Id }, "kb");
+    }
+
+    public async Task<IActionResult> OnPostCrearPlantillaAsync(
+        [Bind(Prefix = "NuevaPlantilla")] CrearPlantillaDto dto)
+    {
+        if (!EsEquipo) return Forbid();
+        var r = await _plantillasApi.CrearAsync(dto);
+        TempData[r.Exito ? "MensajeExito" : "MensajeError"] = r.Exito ? "Plantilla creada." : r.Mensaje;
+        return RedirectToPage(null, null, new { id = Id }, "plantillas");
+    }
+
+    public async Task<IActionResult> OnPostActualizarPlantillaAsync(int plantillaId,
+        [Bind(Prefix = "EditPlantilla")] CrearPlantillaDto dto)
+    {
+        if (!EsEquipo) return Forbid();
+        var r = await _plantillasApi.ActualizarAsync(plantillaId, dto);
+        TempData[r.Exito ? "MensajeExito" : "MensajeError"] = r.Exito ? "Plantilla actualizada." : r.Mensaje;
+        return RedirectToPage(null, null, new { id = Id }, "plantillas");
+    }
+
+    public async Task<IActionResult> OnPostEliminarPlantillaAsync(int plantillaId)
+    {
+        if (!EsEquipo) return Forbid();
+        var r = await _plantillasApi.EliminarAsync(plantillaId);
+        TempData[r.Exito ? "MensajeExito" : "MensajeError"] = r.Exito ? "Plantilla desactivada." : r.Mensaje;
+        return RedirectToPage(null, null, new { id = Id }, "plantillas");
     }
 
     /// <summary>HU-08 esc. 2: el cliente reabre un ticket resuelto, con un motivo opcional.</summary>

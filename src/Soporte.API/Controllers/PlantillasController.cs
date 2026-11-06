@@ -24,7 +24,11 @@ public class PlantillasController : SoporteControllerBase
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<PlantillaRespuestaDto>>> ListarAsync()
     {
-        var plantillas = await _flujo.ListarAsync();
+        var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
+        if (usuario.Rol == RolTipo.Cliente) return Forbid();
+
+        var plantillas = await _flujo.ListarAsync(usuario.UsuarioId);
         return Ok(plantillas);
     }
 
@@ -33,7 +37,7 @@ public class PlantillasController : SoporteControllerBase
     {
         var usuario = _usuarioActual.Obtener();
         if (usuario is null) return NoAutenticado();
-        if (usuario.Rol != RolTipo.Administrador) return Forbid();
+        if (usuario.Rol == RolTipo.Cliente) return Forbid();
 
         var resultado = await _flujo.CrearAsync(dto, usuario.UsuarioId);
         return resultado.Exito ? Ok(resultado.Datos) : RespuestaError(resultado);
@@ -44,9 +48,9 @@ public class PlantillasController : SoporteControllerBase
     {
         var usuario = _usuarioActual.Obtener();
         if (usuario is null) return NoAutenticado();
-        if (usuario.Rol != RolTipo.Administrador) return Forbid();
+        if (usuario.Rol == RolTipo.Cliente) return Forbid();
 
-        var resultado = await _flujo.ActualizarAsync(id, dto);
+        var resultado = await _flujo.ActualizarAsync(id, dto, usuario);
         return resultado.Exito ? Ok(resultado.Datos) : RespuestaError(resultado);
     }
 
@@ -55,9 +59,9 @@ public class PlantillasController : SoporteControllerBase
     {
         var usuario = _usuarioActual.Obtener();
         if (usuario is null) return NoAutenticado();
-        if (usuario.Rol != RolTipo.Administrador) return Forbid();
+        if (usuario.Rol == RolTipo.Cliente) return Forbid();
 
-        var resultado = await _flujo.EliminarAsync(id);
+        var resultado = await _flujo.EliminarAsync(id, usuario);
         return resultado.Exito ? NoContent() : RespuestaError(resultado);
     }
 }

@@ -12,17 +12,19 @@ public class PlantillaRespuestaRepository : IPlantillaRespuestaRepository
 
     public PlantillaRespuestaRepository(SoporteDbContext db) => _db = db;
 
-    public async Task<IReadOnlyList<PlantillaRespuestaDto>> ListarAsync(bool incluyeInactivas = false)
+    public async Task<IReadOnlyList<PlantillaRespuestaDto>> ListarAsync(int usuarioId)
     {
         return await _db.PlantillasRespuesta
-            .Where(p => incluyeInactivas || p.Activa)
+            .Where(p => p.Activa && (p.Compartida || p.CreadoPorId == usuarioId))
             .OrderBy(p => p.Titulo)
             .Select(p => new PlantillaRespuestaDto
             {
-                Id     = p.Id,
-                Titulo = p.Titulo,
-                Texto  = p.Texto,
-                Activa = p.Activa
+                Id          = p.Id,
+                Titulo      = p.Titulo,
+                Texto       = p.Texto,
+                Activa      = p.Activa,
+                Compartida  = p.Compartida,
+                CreadoPorId = p.CreadoPorId
             })
             .ToListAsync();
     }
@@ -36,21 +38,24 @@ public class PlantillaRespuestaRepository : IPlantillaRespuestaRepository
         await _db.SaveChangesAsync();
         return new PlantillaRespuestaDto
         {
-            Id     = plantilla.Id,
-            Titulo = plantilla.Titulo,
-            Texto  = plantilla.Texto,
-            Activa = plantilla.Activa
+            Id          = plantilla.Id,
+            Titulo      = plantilla.Titulo,
+            Texto       = plantilla.Texto,
+            Activa      = plantilla.Activa,
+            Compartida  = plantilla.Compartida,
+            CreadoPorId = plantilla.CreadoPorId
         };
     }
 
-    public async Task<PlantillaRespuestaDto?> ActualizarAsync(int id, string titulo, string texto)
+    public async Task<PlantillaRespuestaDto?> ActualizarAsync(int id, string titulo, string texto, bool compartida)
     {
         var p = await _db.PlantillasRespuesta.FindAsync(id);
         if (p is null) return null;
-        p.Titulo = titulo;
-        p.Texto  = texto;
+        p.Titulo     = titulo;
+        p.Texto      = texto;
+        p.Compartida = compartida;
         await _db.SaveChangesAsync();
-        return new PlantillaRespuestaDto { Id = p.Id, Titulo = p.Titulo, Texto = p.Texto, Activa = p.Activa };
+        return new PlantillaRespuestaDto { Id = p.Id, Titulo = p.Titulo, Texto = p.Texto, Activa = p.Activa, Compartida = p.Compartida, CreadoPorId = p.CreadoPorId };
     }
 
     public async Task<bool> EliminarAsync(int id)

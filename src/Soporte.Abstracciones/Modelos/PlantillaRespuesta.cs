@@ -8,6 +8,7 @@ public class PlantillaRespuesta
     public int      CreadoPorId   { get; set; }
     public DateTime FechaCreacion { get; set; }
     public bool     Activa        { get; set; } = true;
+    public bool     Compartida    { get; set; } = false;
 
     public Usuario CreadoPor { get; set; } = null!;
 }

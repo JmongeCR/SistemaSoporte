@@ -13,6 +13,7 @@ public class PlantillaRespuestaConfiguracion : IEntityTypeConfiguration<Plantill
         builder.Property(x => x.Titulo).HasMaxLength(100).IsRequired();
         builder.Property(x => x.Texto).HasMaxLength(4000).IsRequired();
         builder.Property(x => x.FechaCreacion).HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(x => x.Compartida).HasDefaultValue(false);
         builder.HasOne(x => x.CreadoPor).WithMany().HasForeignKey(x => x.CreadoPorId).OnDelete(DeleteBehavior.NoAction);
     }
 }

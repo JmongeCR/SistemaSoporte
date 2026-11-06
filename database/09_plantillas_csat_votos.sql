@@ -19,9 +19,15 @@ BEGIN
         Texto           NVARCHAR(4000) NOT NULL,
         CreadoPorId     INT            NOT NULL REFERENCES dbo.Usuario(Id),
         FechaCreacion   DATETIME2(0)   NOT NULL DEFAULT SYSUTCDATETIME(),
-        Activa          BIT            NOT NULL DEFAULT 1
+        Activa          BIT            NOT NULL DEFAULT 1,
+        Compartida      BIT            NOT NULL DEFAULT 0
     );
 END
+GO
+
+/* Agregar columna Compartida si ya existe la tabla */
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.PlantillaRespuesta') AND name = 'Compartida')
+    ALTER TABLE dbo.PlantillaRespuesta ADD Compartida BIT NOT NULL DEFAULT 0;
 GO
 
 /* ---------- CalificacionCsat ---------- */

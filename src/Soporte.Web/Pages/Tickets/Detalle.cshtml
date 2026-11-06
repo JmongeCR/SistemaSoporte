@@ -118,16 +118,20 @@
                         <label for="tipo-interna">Nota interna</label>
                     </div>
                 }
-                @if (Model.EsEquipo && Model.Plantillas.Any())
+                @if (Model.EsEquipo)
                 {
-                    <div class="plantillas-selector">
-                        <select id="selector-plantilla" class="campo campo-compacto plantillas-select" aria-label="Insertar plantilla">
-                            <option value="">📋 Insertar plantilla…</option>
-                            @foreach (var p in Model.Plantillas)
-                            {
-                                <option value="@p.Texto">@p.Titulo</option>
-                            }
-                        </select>
+                    <div class="plantillas-selector" id="plantillas">
+                        @if (Model.Plantillas.Any())
+                        {
+                            <select id="selector-plantilla" class="campo campo-compacto plantillas-select" aria-label="Insertar plantilla">
+                                <option value="">📋 Insertar plantilla…</option>
+                                @foreach (var p in Model.Plantillas)
+                                {
+                                    <option value="@p.Texto">@p.Titulo</option>
+                                }
+                            </select>
+                        }
+                        <button type="button" class="boton-secundario boton-compacto" id="btn-gestionar-plantillas">⚙ Plantillas</button>
                     </div>
                 }
                 <div class="caja-respuesta-fila">
@@ -300,6 +304,133 @@
 </div>
 }
 
+@if (Model.EsEquipo)
+{
+<dialog id="modal-plantillas" class="dialogo dialogo-ancho" aria-labelledby="modal-plantillas-titulo">
+    <header class="modal-encabezado">
+        <h2 id="modal-plantillas-titulo">Plantillas de respuesta</h2>
+        <button type="button" class="modal-cerrar" id="modal-plantillas-cerrar" aria-label="Cerrar">✕</button>
+    </header>
+
+    @if (!Model.Plantillas.Any())
+    {
+        <p class="texto-secundario" style="margin:0 0 16px">Todavía no hay plantillas. Creá la primera.</p>
+    }
+    else
+    {
+        <table class="tabla" style="margin-bottom:20px">
+            <thead>
+                <tr><th>Título</th><th>Visibilidad</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.Plantillas)
+                {
+                    <tr>
+                        <td><strong>@p.Titulo</strong><br/><span class="texto-secundario" style="font-size:12px">@(p.Texto.Length > 60 ? p.Texto[..60] + "…" : p.Texto)</span></td>
+                        <td>
+                            @if (p.Compartida) { <span class="pill pill-info">Todos</span> }
+                            else               { <span class="pill">Solo yo</span> }
+                        </td>
+                        <td style="white-space:nowrap">
+                            @if (Model.EsAdministrador || p.CreadoPorId == Model.UsuarioId)
+                            {
+                                <button type="button" class="boton-secundario boton-xs btn-editar-plantilla"
+                                        data-id="@p.Id" data-titulo="@p.Titulo"
+                                        data-texto="@p.Texto" data-compartida="@p.Compartida.ToString().ToLower()">Editar</button>
+                            }
+                            <form method="post" asp-page-handler="EliminarPlantilla" asp-route-id="@Model.Id" style="display:inline"
+                                  onsubmit="return confirm('¿Desactivar «@p.Titulo»?')">
+                                <input type="hidden" name="plantillaId" value="@p.Id" />
+                                <button type="submit" class="boton-peligro boton-xs">Quitar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <!-- Nueva plantilla -->
+    <div id="panel-nueva" style="border-top:1px solid var(--color-borde);padding-top:16px">
+        <h3 style="margin:0 0 12px;font-size:14px;font-weight:600">Nueva plantilla</h3>
+        <form method="post" asp-page-handler="CrearPlantilla" asp-route-id="@Model.Id">
+            <div class="grupo-campo">
+                <label class="etiqueta">Título</label>
+                <input type="text" name="NuevaPlantilla.Titulo" class="campo campo-completo" maxlength="100" required placeholder="Ej. Cierre por inactividad" />
+            </div>
+            <div class="grupo-campo">
+                <label class="etiqueta">Texto</label>
+                <textarea name="NuevaPlantilla.Texto" class="campo campo-completo" rows="3" maxlength="4000" required placeholder="Escribí el mensaje completo…"></textarea>
+            </div>
+            <div class="grupo-campo grupo-campo-inline" style="margin-bottom:12px">
+                <input type="checkbox" name="NuevaPlantilla.Compartida" value="true" id="nueva-compartida" />
+                <label for="nueva-compartida" class="etiqueta etiqueta-inline">Compartir con todo el equipo</label>
+            </div>
+            <button type="submit" class="boton-primario">Crear plantilla</button>
+        </form>
+    </div>
+
+    <!-- Editar plantilla (oculto por defecto) -->
+    <div id="panel-editar-plantilla" style="display:none;border-top:1px solid var(--color-borde);padding-top:16px">
+        <h3 style="margin:0 0 12px;font-size:14px;font-weight:600">Editar plantilla</h3>
+        <form method="post" asp-page-handler="ActualizarPlantilla" asp-route-id="@Model.Id">
+            <input type="hidden" name="plantillaId" id="edit-id" />
+            <div class="grupo-campo">
+                <label class="etiqueta">Título</label>
+                <input type="text" id="edit-titulo" name="EditPlantilla.Titulo" class="campo campo-completo" maxlength="100" required />
+            </div>
+            <div class="grupo-campo">
+                <label class="etiqueta">Texto</label>
+                <textarea id="edit-texto" name="EditPlantilla.Texto" class="campo campo-completo" rows="3" maxlength="4000" required></textarea>
+            </div>
+            <div class="grupo-campo grupo-campo-inline" style="margin-bottom:12px">
+                <input type="checkbox" id="edit-compartida" name="EditPlantilla.Compartida" value="true" />
+                <label for="edit-compartida" class="etiqueta etiqueta-inline">Compartir con todo el equipo</label>
+            </div>
+            <div style="display:flex;gap:8px">
+                <button type="button" class="boton-secundario" id="btn-cancelar-editar">Cancelar</button>
+                <button type="submit" class="boton-primario">Guardar</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+}
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    @if (Model.EsEquipo)
+    {
+    <script>
+    // Selector de plantilla → inserta en textarea
+    document.getElementById('selector-plantilla')?.addEventListener('change', function () {
+        if (!this.value) return;
+        const ta = document.getElementById('Respuesta_Texto');
+        if (ta) { ta.value = this.value; ta.focus(); }
+        this.value = '';
+    });
+
+    // Modal gestión de plantillas
+    const modal = document.getElementById('modal-plantillas');
+    document.getElementById('btn-gestionar-plantillas')?.addEventListener('click', () => modal.showModal());
+    document.getElementById('modal-plantillas-cerrar')?.addEventListener('click', () => modal.close());
+    modal?.addEventListener('click', e => { if (e.target === modal) modal.close(); });
+
+    // Editar plantilla
+    document.querySelectorAll('.btn-editar-plantilla').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('edit-id').value        = btn.dataset.id;
+            document.getElementById('edit-titulo').value    = btn.dataset.titulo;
+            document.getElementById('edit-texto').value     = btn.dataset.texto;
+            document.getElementById('edit-compartida').checked = btn.dataset.compartida === 'true';
+            document.getElementById('panel-nueva').style.display           = 'none';
+            document.getElementById('panel-editar-plantilla').style.display = '';
+            document.getElementById('edit-titulo').focus();
+        });
+    });
+    document.getElementById('btn-cancelar-editar')?.addEventListener('click', () => {
+        document.getElementById('panel-editar-plantilla').style.display = 'none';
+        document.getElementById('panel-nueva').style.display           = '';
+    });
+    </script>
+    }
 }

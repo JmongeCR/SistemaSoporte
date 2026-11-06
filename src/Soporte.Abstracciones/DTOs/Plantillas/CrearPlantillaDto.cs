@@ -9,4 +9,6 @@ public class CrearPlantillaDto
 
     [Required, MaxLength(4000)]
     public string Texto { get; set; } = string.Empty;
+
+    public bool Compartida { get; set; } = false;
 }
