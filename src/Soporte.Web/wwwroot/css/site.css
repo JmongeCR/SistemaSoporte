@@ -955,3 +955,13 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
 .etiqueta-inline { margin: 0; }
 .campo-validacion { display: block; margin-top: 4px; font-size: 12px; color: var(--rojo); }
 .barra-acciones-form { display: flex; gap: 10px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid var(--color-borde); margin-top: 8px; }
+
+/* ---- KB vinculada en detalle de ticket ---- */
+.kb-vinculados { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 6px; }
+.kb-vinculado-item { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.kb-vinculado-enlace { font-size: 13px; color: var(--color-primario); text-decoration: none; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kb-vinculado-enlace:hover { text-decoration: underline; }
+.btn-desvincular { border: none; background: none; color: var(--color-texto-tenue); font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px; flex-shrink: 0; }
+.btn-desvincular:hover { color: var(--rojo); }
+.kb-vacio { font-size: 13px; margin: 0 0 10px; }
+.kb-vincular-form { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--color-borde); margin-top: 4px; }

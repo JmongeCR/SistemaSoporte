@@ -21,6 +21,7 @@ public class DetalleModel : PageModel
     private readonly ITicketsApiServicio _ticketsApi;
     private readonly ICatalogosApiServicio _catalogosApi;
     private readonly IUsuariosApiServicio _usuariosApi;
+    private readonly IBaseConocimientoApiServicio _kbApi;
     private readonly IUsuarioSesion _sesion;
     private readonly IZonaHoraria _zonaHoraria;
 
@@ -28,12 +29,14 @@ public class DetalleModel : PageModel
         ITicketsApiServicio ticketsApi,
         ICatalogosApiServicio catalogosApi,
         IUsuariosApiServicio usuariosApi,
+        IBaseConocimientoApiServicio kbApi,
         IUsuarioSesion sesion,
         IZonaHoraria zonaHoraria)
     {
         _ticketsApi = ticketsApi;
         _catalogosApi = catalogosApi;
         _usuariosApi = usuariosApi;
+        _kbApi = kbApi;
         _sesion = sesion;
         _zonaHoraria = zonaHoraria;
     }
@@ -43,6 +46,8 @@ public class DetalleModel : PageModel
 
     public TicketDetalleDto? Ticket { get; private set; }
     public IReadOnlyList<ItemActividad> Actividad { get; private set; } = Array.Empty<ItemActividad>();
+    public IReadOnlyList<ArticuloKbResumenDto> ArticulosVinculados { get; private set; } = Array.Empty<ArticuloKbResumenDto>();
+    public IReadOnlyList<ArticuloKbResumenDto> ArticulosDisponibles { get; private set; } = Array.Empty<ArticuloKbResumenDto>();
     public string? MensajeError { get; private set; }
 
     /// <summary>Formularios: se conservan si el envío falla, para no perder lo escrito.</summary>
@@ -143,6 +148,20 @@ public class DetalleModel : PageModel
         return RedirectToPage(null, null, new { id = Id }, null);
     }
 
+    public async Task<IActionResult> OnPostVincularKbAsync(int articuloId)
+    {
+        var resultado = await _kbApi.VincularAsync(Id, articuloId);
+        TempData[resultado.Exito ? "MensajeExito" : "MensajeError"] = resultado.Exito ? "Artículo vinculado." : resultado.Mensaje;
+        return RedirectToPage(null, null, new { id = Id }, "kb");
+    }
+
+    public async Task<IActionResult> OnPostDesvincularKbAsync(int articuloId)
+    {
+        var resultado = await _kbApi.DesvincularAsync(Id, articuloId);
+        TempData[resultado.Exito ? "MensajeExito" : "MensajeError"] = resultado.Exito ? "Artículo desvinculado." : resultado.Mensaje;
+        return RedirectToPage(null, null, new { id = Id }, "kb");
+    }
+
     /// <summary>HU-08 esc. 2: el cliente reabre un ticket resuelto, con un motivo opcional.</summary>
     public async Task<IActionResult> OnPostReabrirAsync(string rowVersion, string? motivo)
     {
@@ -208,8 +227,15 @@ public class DetalleModel : PageModel
             RowVersion = Ticket.RowVersion
         };
 
+        var vinculadosTask = _kbApi.ListarPorTicketAsync(Id);
+
         if (!PuedeGestionar)
+        {
+            await vinculadosTask;
+            if (vinculadosTask.Result.Exito)
+                ArticulosVinculados = vinculadosTask.Result.Datos!;
             return;
+        }
 
         var estados = _catalogosApi.ListarEstadosAsync();
         var prioridades = _catalogosApi.ListarPrioridadesAsync();
@@ -217,7 +243,8 @@ public class DetalleModel : PageModel
         var agentes = EsAdministrador
             ? _usuariosApi.ListarAgentesAsync()
             : Task.FromResult(ResultadoOperacion<IReadOnlyList<UsuarioDto>>.Ok(Array.Empty<UsuarioDto>()));
-        await Task.WhenAll(estados, prioridades, categorias, agentes);
+        var todosKb = _kbApi.ListarAsync();
+        await Task.WhenAll(estados, prioridades, categorias, agentes, vinculadosTask, todosKb);
 
         Estados = Opciones(estados.Result.Datos);
         Prioridades = Opciones(prioridades.Result.Datos);
@@ -226,6 +253,17 @@ public class DetalleModel : PageModel
             .Where(a => a.Activo)
             .Select(a => new SelectListItem(a.Nombre, a.Id.ToString()))
             .ToList();
+
+        if (vinculadosTask.Result.Exito)
+            ArticulosVinculados = vinculadosTask.Result.Datos!;
+
+        if (todosKb.Result.Exito)
+        {
+            var vinculadosIds = ArticulosVinculados.Select(a => a.Id).ToHashSet();
+            ArticulosDisponibles = todosKb.Result.Datos!
+                .Where(a => !vinculadosIds.Contains(a.Id))
+                .ToList();
+        }
     }
 
     private static IReadOnlyList<SelectListItem> Opciones(IReadOnlyList<CatalogoDto>? catalogo) =>

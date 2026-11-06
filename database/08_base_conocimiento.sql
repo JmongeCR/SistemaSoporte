@@ -99,18 +99,18 @@ Abra un ticket en la categoría **Cuentas y accesos** con su nombre completo y n
             N'## Diagnóstico de problemas WiFi
 
 ### Verificaciones iniciales
-1. Confirme que el WiFi del equipo está activado (tecla Fn + F2 en la mayoría de equipos)
+1. Confirme que el WiFi del equipo está activado
 2. Olvide la red corporativa y vuelva a conectarse
-3. Reinicie el adaptador de red: `Administrador de dispositivos → Adaptadores de red → Deshabilitar / Habilitar`
+3. Reinicie el adaptador de red desde el Administrador de dispositivos
 
 ### Problemas de canal saturado
-Si varias personas del mismo área reportan cortes simultáneos, el problema puede ser saturación del canal del access point. Reporte el ticket con:
+Si varias personas del mismo área reportan cortes simultáneos puede ser saturación del access point. Reporte el ticket con:
 - Hora exacta del corte
 - Área o piso donde ocurre
 - Número de personas afectadas
 
-### Cambio de DNS
-Si el WiFi conecta pero no hay acceso a internet, cambie el DNS a `8.8.8.8` y `8.8.4.4` como prueba temporal.',
+### Cambio de DNS temporal
+Si el WiFi conecta pero no hay acceso a internet, cambie el DNS a 8.8.8.8 y 8.8.4.4 como prueba.',
             N'problemas-wifi', 3, 1, DATEADD(DAY, -15, SYSUTCDATETIME()), 1),
 
         (5, N'Protocolo de escalamiento de tickets urgentes',
