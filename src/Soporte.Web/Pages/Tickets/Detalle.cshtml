@@ -39,37 +39,6 @@
             <span class="ticket-id">#@t.Id</span> · Reportado por @t.Cliente · @Formato.Hace(t.FechaCreacion)
         </p>
 
-        <div class="ticket-info-grid">
-            <div class="ticket-info-fila">
-                <span class="ticket-info-label">Estado:</span>
-                <span class="pill @Formato.ClaseEstado(t.EstadoId)">@t.Estado</span>
-            </div>
-            <div class="ticket-info-fila">
-                <span class="ticket-info-label">Cliente:</span>
-                <span>@t.Cliente</span>
-            </div>
-            <div class="ticket-info-fila">
-                <span class="ticket-info-label">Prioridad:</span>
-                <span class="prioridad @Formato.ClasePrioridad(t.PrioridadId)">@t.Prioridad</span>
-            </div>
-            <div class="ticket-info-fila">
-                <span class="ticket-info-label">Agente:</span>
-                @if (t.AgenteAsignado is null) {
-                    <span class="texto-tenue">Sin asignar</span>
-                } else {
-                    <span><span class="avatar me-1">@Formato.Iniciales(t.AgenteAsignado)</span>@t.AgenteAsignado</span>
-                }
-            </div>
-            <div class="ticket-info-fila">
-                <span class="ticket-info-label">Categoría:</span>
-                <span>@t.Categoria</span>
-            </div>
-            <div class="ticket-info-fila">
-                <span class="ticket-info-label">Creado:</span>
-                <span>@Model.FechaLocal(t.FechaCreacion)</span>
-            </div>
-        </div>
-
         @if (t.EsperaRespuestaCliente)
         {
             <div class="aviso-info" role="status">
