@@ -38,7 +38,7 @@
 }
 
 <div class="diseno-formulario">
-    <form method="post" enctype="multipart/form-data" class="tarjeta formulario" data-envio-unico>
+    <form method="post" asp-page="./Crear" enctype="multipart/form-data" class="tarjeta formulario" data-envio-unico>
         <input type="hidden" asp-for="ClaveEnvio" />
         @if (Model.EligeSolicitante)
         {
