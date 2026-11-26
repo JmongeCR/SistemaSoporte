@@ -113,20 +113,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 
-// ---------- Correo (solo desarrollo: archivos en disco) ----------
-if (builder.Environment.IsDevelopment())
+// ---------- Correo ----------
+// Si hay API key de Resend configurada se usa Resend; de lo contrario los correos
+// se guardan como archivos HTML en disco (útil cuando no hay conexión o key).
+var resendApiKey = builder.Configuration["Correo:ResendApiKey"];
+if (!string.IsNullOrWhiteSpace(resendApiKey))
 {
-    var carpetaCorreos = builder.Configuration["Correo:CarpetaSalida"]
-        ?? throw new InvalidOperationException("Falta 'Correo:CarpetaSalida' en appsettings.json.");
-    builder.Services.AddSingleton<IEnvioCorreo>(proveedor => new EnvioCorreoArchivo(
-        Path.Combine(builder.Environment.ContentRootPath, carpetaCorreos),
-        proveedor.GetRequiredService<ILogger<EnvioCorreoArchivo>>()));
+    var remitente = builder.Configuration["Correo:RemitenteDe"]
+        ?? "Soporte <noreply@soporte.test>";
+    builder.Services.AddSingleton<IEnvioCorreo>(proveedor => new EnvioCorreoResend(
+        resendApiKey,
+        remitente,
+        proveedor.GetRequiredService<ILogger<EnvioCorreoResend>>()));
 }
 else
 {
-    throw new InvalidOperationException(
-        "No se configuró un proveedor de correo para producción. " +
-        "Implemente IEnvioCorreo con SMTP y regístrelo en el contenedor.");
+    var carpetaCorreos = builder.Configuration["Correo:CarpetaSalida"] ?? "App_Data/correos";
+    builder.Services.AddSingleton<IEnvioCorreo>(proveedor => new EnvioCorreoArchivo(
+        Path.Combine(builder.Environment.ContentRootPath, carpetaCorreos),
+        proveedor.GetRequiredService<ILogger<EnvioCorreoArchivo>>()));
 }
 
 // ---------- Rate limiting en endpoints de autenticación ----------
