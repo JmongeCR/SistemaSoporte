@@ -92,26 +92,34 @@ public class AutenticacionFlujo : IAutenticacionFlujo
                 usuario.Correo,
                 "Restablecé tu contraseña — Sistema de Soporte",
                 $"""
-                <p style="font-size:16px;margin:0 0 6px">Hola, <strong>{nombre}</strong></p>
-                <p style="color:#555;margin:0 0 24px;line-height:1.6">
-                  Recibimos una solicitud para restablecer la contraseña de tu cuenta en el
-                  <strong>Sistema de Soporte Técnico</strong>.<br/>
-                  Hacé clic en el botón de abajo para crear una nueva contraseña:
+                <p style="font-size:15px;color:#1e3a5f;margin:0 0 10px">
+                  Hola, <strong>{nombre}</strong>:
                 </p>
-                <div style="text-align:center;margin:0 0 28px">
-                  <a href="{urlSafe}"
-                     style="display:inline-block;background-color:#1a1a2e;color:#fff;
-                            text-decoration:none;padding:13px 32px;border-radius:6px;
-                            font-weight:600;font-size:15px;letter-spacing:.3px">
-                    Restablecer contraseña
-                  </a>
-                </div>
-                <p style="color:#888;font-size:12px;margin:0 0 6px">
-                  ⏱ Este enlace vence en <strong>{TokenRecuperacion.HorasVigencia}&nbsp;hora(s)</strong>.
+                <p style="font-size:14px;color:#4a5568;line-height:1.7;margin:0 0 24px">
+                  Recibimos una solicitud para restablecer la contraseña de tu cuenta
+                  en el <strong style="color:#1e3a5f">Sistema de Soporte Técnico</strong>.
+                  Si fuiste vos, hacé clic en el botón a continuación para crear una nueva contraseña.
+                  Si no realizaste esta solicitud, podés ignorar este mensaje.
                 </p>
-                <p style="color:#888;font-size:12px;margin:0">
+                <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+                       style="margin:0 0 28px">
+                  <tr>
+                    <td align="center">
+                      <a href="{urlSafe}"
+                         style="display:inline-block;background-color:#1e3a5f;color:#ffffff;
+                                font-size:14px;font-weight:700;text-decoration:none;
+                                padding:13px 40px;border-radius:4px;letter-spacing:.4px">
+                        Restablecer contraseña
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="font-size:12px;color:#718096;margin:0 0 6px">
+                  Este enlace vence en <strong style="color:#1e3a5f">{TokenRecuperacion.HorasVigencia}&nbsp;hora(s)</strong>.
+                </p>
+                <p style="font-size:12px;color:#718096;margin:0">
                   Si el botón no funciona, copiá y pegá este enlace en tu navegador:<br/>
-                  <a href="{urlSafe}" style="color:#1a1a2e;word-break:break-all">{urlSafe}</a>
+                  <a href="{urlSafe}" style="color:#1e3a5f;word-break:break-all">{urlSafe}</a>
                 </p>
                 """);
         }
