@@ -114,17 +114,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // ---------- Correo ----------
-// Si hay API key de Resend configurada se usa Resend; de lo contrario los correos
-// se guardan como archivos HTML en disco (útil cuando no hay conexión o key).
-var resendApiKey = builder.Configuration["Correo:ResendApiKey"];
-if (!string.IsNullOrWhiteSpace(resendApiKey))
+// Si hay credenciales de EmailJS configuradas se usa EmailJS; de lo contrario los
+// correos se guardan como archivos HTML en disco (útil cuando no hay conexión).
+var emailJsServiceId = builder.Configuration["EmailJs:ServiceId"];
+var emailJsPublicKey = builder.Configuration["EmailJs:PublicKey"];
+if (!string.IsNullOrWhiteSpace(emailJsServiceId) && !string.IsNullOrWhiteSpace(emailJsPublicKey))
 {
-    var remitente = builder.Configuration["Correo:RemitenteDe"]
-        ?? "Soporte <noreply@soporte.test>";
-    builder.Services.AddSingleton<IEnvioCorreo>(proveedor => new EnvioCorreoResend(
-        resendApiKey,
-        remitente,
-        proveedor.GetRequiredService<ILogger<EnvioCorreoResend>>()));
+    builder.Services.AddSingleton<IEnvioCorreo>(proveedor => new EnvioCorreoEmailJs(
+        emailJsServiceId,
+        builder.Configuration["EmailJs:TemplateId"] ?? "",
+        emailJsPublicKey,
+        builder.Configuration["EmailJs:PrivateKey"] ?? "",
+        proveedor.GetRequiredService<ILogger<EnvioCorreoEmailJs>>()));
 }
 else
 {
