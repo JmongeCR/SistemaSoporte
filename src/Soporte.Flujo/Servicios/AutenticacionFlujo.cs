@@ -86,14 +86,33 @@ public class AutenticacionFlujo : IAutenticacionFlujo
             });
 
             var enlace = $"{_configuracion.UrlRestablecer}?token={Uri.EscapeDataString(token)}";
+            var nombre  = WebUtility.HtmlEncode(usuario.Nombre);
+            var urlSafe = WebUtility.HtmlEncode(enlace);
             await _correo.EnviarAsync(
                 usuario.Correo,
-                "Restablecé tu contraseña",
+                "Restablecé tu contraseña — Sistema de Soporte",
                 $"""
-                <p>Hola {WebUtility.HtmlEncode(usuario.Nombre)},</p>
-                <p>Recibimos una solicitud para restablecer tu contraseña del Sistema de Soporte.</p>
-                <p><a href="{WebUtility.HtmlEncode(enlace)}">Restablecer contraseña</a></p>
-                <p>El enlace vence en {TokenRecuperacion.HorasVigencia} horas. Si no fuiste vos, ignorá este correo.</p>
+                <p style="font-size:16px;margin:0 0 6px">Hola, <strong>{nombre}</strong></p>
+                <p style="color:#555;margin:0 0 24px;line-height:1.6">
+                  Recibimos una solicitud para restablecer la contraseña de tu cuenta en el
+                  <strong>Sistema de Soporte Técnico</strong>.<br/>
+                  Hacé clic en el botón de abajo para crear una nueva contraseña:
+                </p>
+                <div style="text-align:center;margin:0 0 28px">
+                  <a href="{urlSafe}"
+                     style="display:inline-block;background-color:#1a1a2e;color:#fff;
+                            text-decoration:none;padding:13px 32px;border-radius:6px;
+                            font-weight:600;font-size:15px;letter-spacing:.3px">
+                    Restablecer contraseña
+                  </a>
+                </div>
+                <p style="color:#888;font-size:12px;margin:0 0 6px">
+                  ⏱ Este enlace vence en <strong>{TokenRecuperacion.HorasVigencia}&nbsp;hora(s)</strong>.
+                </p>
+                <p style="color:#888;font-size:12px;margin:0">
+                  Si el botón no funciona, copiá y pegá este enlace en tu navegador:<br/>
+                  <a href="{urlSafe}" style="color:#1a1a2e;word-break:break-all">{urlSafe}</a>
+                </p>
                 """);
         }
 
