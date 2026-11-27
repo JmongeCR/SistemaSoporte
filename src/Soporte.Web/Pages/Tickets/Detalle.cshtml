@@ -270,10 +270,8 @@
                         <div class="caja-respuesta-tipo segmentado segmentado-compacto" role="radiogroup" aria-label="Tipo de mensaje">
                             @if (!Model.EstaCerrado)
                             {
-                                <input type="radio" class="segmentado-opcion" id="tipo-publica" name="tipoRespuesta" value="publica" checked="@(Model.TipoRespuesta == "publica")" />
+                                <input type="radio" class="segmentado-opcion" id="tipo-publica" name="tipoRespuesta" value="publica" checked="@(Model.TipoRespuesta == "publica" || Model.TipoRespuesta == "solicitud")" />
                                 <label for="tipo-publica">Respuesta al cliente</label>
-                                <input type="radio" class="segmentado-opcion" id="tipo-solicitud" name="tipoRespuesta" value="solicitud" checked="@(Model.TipoRespuesta == "solicitud")" />
-                                <label for="tipo-solicitud">Solicitar info</label>
                             }
                             <input type="radio" class="segmentado-opcion" id="tipo-interna" name="tipoRespuesta" value="interna" checked="@(Model.TipoRespuesta == "interna" || Model.EstaCerrado)" />
                             <label for="tipo-interna">Nota interna</label>
