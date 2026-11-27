@@ -447,19 +447,19 @@ svg { stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: roun
     align-items: center;
     gap: 6px;
     padding: 7px 14px;
-    border: 0;
+    border: 1px solid #fecaca;
     border-radius: var(--radio);
-    background: var(--rojo-fondo);
-    color: var(--rojo);
+    background: #fff1f2;
+    color: #be123c;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background .15s;
+    transition: background .15s, border-color .15s;
     font-family: inherit;
     line-height: 1.4;
 }
-.boton-peligro:hover { background: #fecaca; }
+.boton-peligro:hover { background: #ffe4e6; border-color: #fda4af; }
 
 .boton-xs { padding: 4px 10px; font-size: 12px; }
 .boton-compacto { padding: 5px 10px; font-size: 12.5px; }
@@ -1407,11 +1407,12 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
     background: var(--superficie);
     border: 1px solid var(--color-borde);
     border-radius: var(--radio-tarjeta);
+    box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.03);
     text-decoration: none;
     color: inherit;
-    transition: border-color .15s;
+    transition: border-color .15s, box-shadow .15s, transform .1s;
 }
-.kb-card:hover { border-color: var(--color-primario); }
+.kb-card:hover { border-color: var(--color-primario); box-shadow: 0 4px 12px rgba(0,0,0,.08); transform: translateY(-1px); }
 .kb-categoria { align-self: flex-start; }
 .kb-titulo { font-size: 14px; font-weight: 600; margin: 0; color: var(--color-texto); line-height: 1.4; }
 .kb-vistas { font-size: 12px; color: var(--color-texto-tenue); margin-top: auto; }
@@ -1427,7 +1428,7 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
 .enlace-volver { font-size: 13px; color: var(--color-texto-tenue); text-decoration: none; display: inline-block; margin-bottom: 6px; }
 .enlace-volver:hover { color: var(--color-primario); }
 .kb-seccion { margin-bottom: 28px; }
-.kb-seccion-titulo { font-size: 15px; font-weight: 600; color: var(--color-texto-secundario); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 12px; font-size: 12px; }
+.kb-seccion-titulo { font-size: 11px; font-weight: 700; color: var(--color-texto-tenue); text-transform: uppercase; letter-spacing: .07em; margin: 0 0 12px; }
 .kb-card-borrador { opacity: .75; border-style: dashed; }
 .kb-lateral { padding: 12px 14px; }
 .kb-vinculados { list-style: none; padding: 0; margin: 0 0 8px; display: flex; flex-direction: column; gap: 2px; }
@@ -1457,7 +1458,7 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
 }
 .usuario-fila-btn:last-child { border-bottom: none; }
 .usuario-fila-btn:hover { background: var(--color-fondo-suave); }
-.usuario-fila-btn.activo { background: var(--azul-fondo); border-left: 3px solid var(--color-primario); padding-left: 11px; }
+.usuario-fila-btn.activo { background: #eff6ff; font-weight: 600; color: var(--color-primario); }
 .usuario-fila-info { flex: 1; min-width: 0; }
 .usuario-fila-nombre { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
 .usuario-fila-correo { font-size: 12px; color: var(--color-texto-tenue); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin-top: 1px; }
@@ -1713,7 +1714,7 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
 [data-tema="oscuro"] .estado-permiso.permitido { background: #0d2e18; color: #3cb865; }
 [data-tema="oscuro"] .usuario-fila-btn { border-color: #2d3344; }
 [data-tema="oscuro"] .usuario-fila-btn:hover { background: #1a1f2e; }
-[data-tema="oscuro"] .usuario-fila-btn.activo { background: #172447; border-color: var(--color-primario); }
+[data-tema="oscuro"] .usuario-fila-btn.activo { background: #172447; color: #93c5fd; font-weight: 600; }
 [data-tema="oscuro"] .panel-usuario-cab { border-color: #2d3344; }
 
 /* ---------- 35. Responsive ---------- */
