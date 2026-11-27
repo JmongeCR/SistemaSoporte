@@ -13,12 +13,15 @@
                 @Model.Tickets.Total @(Model.Tickets.Total == 1 ? "ticket" : "tickets")@(Model.HayFiltros ? " con estos filtros" : " en total")
                 @if (Model.TotalAbiertos is not null)
                 {
-                    <text>· @Model.TotalAbiertos @(Model.TotalAbiertos == 1 ? "abierto" : "abiertos")</text>
+                    <text>· @Model.TotalAbiertos abiertos</text>
                 }
             </p>
         }
     </div>
-    <button type="button" class="boton-primario" data-abrir-modal-crear>+ Nuevo Ticket</button>
+    <button type="button" class="boton-primario" data-abrir-modal-crear>
+        <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Nuevo ticket
+    </button>
 </header>
 
 @if (TempData["MensajeExito"] is string mensajeExito)
@@ -30,20 +33,6 @@
     <div class="alerta-error" role="alert">@mensajeErrorIndex</div>
 }
 
-<form method="get" class="barra-filtros" role="search">
-    <div class="buscador">
-        <input asp-for="Filtro.Texto" class="campo" placeholder="Buscar ticket, cliente..." aria-label="Buscar por asunto o cliente" />
-    </div>
-    <select asp-for="Filtro.PrioridadId" asp-items="Model.Prioridades" class="campo" aria-label="Prioridad" onchange="this.form.requestSubmit()">
-        <option value="">Prioridad</option>
-    </select>
-    <button type="submit" name="Filtro.EstadoId" value="" class="chip @(Model.Filtro.EstadoId is null ? "activo" : "")">Todos</button>
-    @foreach (var estado in Model.Estados)
-    {
-        <button type="submit" name="Filtro.EstadoId" value="@estado.Id" class="chip @(Model.Filtro.EstadoId == estado.Id ? "activo" : "")">@estado.Nombre</button>
-    }
-</form>
-
 @if (Model.MensajeError is not null)
 {
     <div class="alerta-error" role="alert">@Model.MensajeError</div>
@@ -51,6 +40,24 @@
 else if (Model.Tickets is not null)
 {
     <div class="tarjeta">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--color-borde);flex-wrap:wrap">
+            <form method="get" role="search" style="display:contents">
+                <div class="buscador" style="flex:1;min-width:180px;max-width:280px">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <input asp-for="Filtro.Texto" class="campo campo-compacto" placeholder="Buscar…" aria-label="Buscar por asunto o cliente" />
+                </div>
+                <select asp-for="Filtro.PrioridadId" asp-items="Model.Prioridades" class="campo campo-compacto" style="width:auto;min-width:120px" aria-label="Prioridad" onchange="this.form.requestSubmit()">
+                    <option value="">Prioridad</option>
+                </select>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-left:auto">
+                    <button type="submit" name="Filtro.EstadoId" value="" class="chip @(Model.Filtro.EstadoId is null ? "activo" : "")">Todos</button>
+                    @foreach (var estado in Model.Estados)
+                    {
+                        <button type="submit" name="Filtro.EstadoId" value="@estado.Id" class="chip @(Model.Filtro.EstadoId == estado.Id ? "activo" : "")">@estado.Nombre</button>
+                    }
+                </div>
+            </form>
+        </div>
         @if (Model.Tickets.Total == 0)
         {
             <div class="estado-vacio" role="status">No hay tickets que coincidan con los filtros.</div>
@@ -139,25 +146,31 @@ else if (Model.Tickets is not null)
 
 @if (!Model.EsCliente)
 {
-    <dialog id="modal-cambiar-estado" class="dialogo" aria-labelledby="titulo-modal-estado">
-        <form method="post" asp-page-handler="CambiarEstado" data-envio-unico>
-            <header class="modal-encabezado">
-                <h2 id="titulo-modal-estado">Cambiar estado</h2>
-                <button type="button" class="modal-cerrar" data-cerrar-modal aria-label="Cerrar">✕</button>
-            </header>
-            <input type="hidden" name="ticketId" data-campo-estado="ticket-id" />
-            <p class="modal-ticket-asunto" data-campo-estado="asunto"></p>
-            <label class="etiqueta" for="nuevo-estado-sel">Nuevo estado</label>
-            <select id="nuevo-estado-sel" name="nuevoEstadoId" class="campo campo-completo">
-                @foreach (var estado in Model.Estados)
-                {
-                    <option value="@estado.Id">@estado.Nombre</option>
-                }
-            </select>
-            <div class="modal-acciones">
-                <button type="button" class="boton-secundario" data-cerrar-modal>Cancelar</button>
-                <button type="submit" class="boton-primario">Guardar</button>
-            </div>
-        </form>
+    <dialog id="modal-cambiar-estado" class="app-dialog" style="width:min(400px,calc(100vw - 32px))" aria-labelledby="titulo-modal-estado">
+        <div class="modal-cabecera">
+            <h2 class="modal-titulo" id="titulo-modal-estado">Cambiar estado</h2>
+            <button type="button" class="modal-cerrar" data-cerrar-modal aria-label="Cerrar">
+                <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div style="padding:0 20px 20px">
+            <form method="post" asp-page-handler="CambiarEstado" data-envio-unico>
+                <input type="hidden" name="ticketId" data-campo-estado="ticket-id" />
+                <p class="modal-ticket-asunto" data-campo-estado="asunto" style="margin-bottom:12px"></p>
+                <div class="grupo-campo">
+                    <label class="etiqueta" for="nuevo-estado-sel">Nuevo estado</label>
+                    <select id="nuevo-estado-sel" name="nuevoEstadoId" class="campo campo-completo">
+                        @foreach (var estado in Model.Estados)
+                        {
+                            <option value="@estado.Id">@estado.Nombre</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-acciones">
+                    <button type="button" class="boton-secundario" data-cerrar-modal>Cancelar</button>
+                    <button type="submit" class="boton-primario">Guardar</button>
+                </div>
+            </form>
+        </div>
     </dialog>
 }
