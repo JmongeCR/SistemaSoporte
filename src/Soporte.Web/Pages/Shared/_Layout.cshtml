@@ -18,13 +18,15 @@
     <link rel="icon" type="image/svg+xml" href="~/img/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&display=swap" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script>
         (function () {
             var t = localStorage.getItem("tema");
             if (t === "oscuro") document.documentElement.setAttribute("data-tema", "oscuro");
+            var c = localStorage.getItem("sidebar-col");
+            if (c === "true") document.documentElement.setAttribute("data-sidebar-col", "true");
         })();
     </script>
 </head>
@@ -35,42 +37,51 @@
 }
 else
 {
-<div class="app app-v2">
-        <aside class="app-side" aria-label="Navegación principal">
+<div class="app app-v2" id="app-shell">
+        <aside class="app-side" aria-label="Navegación principal" id="app-side">
             <a class="app-marca" asp-page="/Dashboard/Index">
-                <svg width="26" height="22" viewBox="0 0 38 32" aria-hidden="true">
-                    <path d="M7 2h24a5 5 0 0 1 5 5v13a5 5 0 0 1-5 5H15l-8 6v-6a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" fill="#5B9BF8" />
-                    <rect x="10" y="9" width="16" height="3.2" rx="1.6" fill="#FFFFFF" />
-                    <rect x="10" y="15.5" width="10" height="3.2" rx="1.6" fill="#FFFFFF" />
+                <svg width="24" height="20" viewBox="0 0 38 32" aria-hidden="true" fill="none">
+                    <path d="M7 2h24a5 5 0 0 1 5 5v13a5 5 0 0 1-5 5H15l-8 6v-6a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" fill="#3b82f6" />
+                    <rect x="10" y="9" width="16" height="3" rx="1.5" fill="white" />
+                    <rect x="10" y="15.5" width="10" height="3" rx="1.5" fill="white" />
                 </svg>
-                Soporte
+                <span class="app-marca-texto">Soporte</span>
             </a>
 
             @if (autenticado)
             {
-                <button type="button" class="app-btn-nuevo" data-abrir-modal-crear>＋ Nuevo ticket</button>
+                <button type="button" class="app-btn-nuevo" data-abrir-modal-crear aria-label="Nuevo ticket">
+                    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                    <span>Nuevo ticket</span>
+                </button>
 
-                <nav class="app-nav-v">
-                    <a class="app-nav-item @Activo("/Dashboard")" asp-page="/Dashboard/Index">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard
+                <nav class="app-nav-v" aria-label="Menú principal">
+                    <a class="app-nav-item @Activo("/Dashboard")" asp-page="/Dashboard/Index" title="Dashboard">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+                        <span class="app-nav-label">Dashboard</span>
                     </a>
-                    <a class="app-nav-item @Activo("/Tickets")" asp-page="/Tickets/Index">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 6v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3a2 2 0 0 1 0-6V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z"/><path d="M13 5v14" stroke-dasharray="2 3"/></svg>@(esCliente ? "Mis tickets" : "Tickets")
+                    <a class="app-nav-item @Activo("/Tickets")" asp-page="/Tickets/Index" title="@(esCliente ? "Mis tickets" : "Tickets")">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 6v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3a2 2 0 0 1 0-6V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z"/></svg>
+                        <span class="app-nav-label">@(esCliente ? "Mis tickets" : "Tickets")</span>
                     </a>
-                    <a class="app-nav-item @Activo("/Ayuda")" asp-page="/Ayuda/Index">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/></svg>Ayuda
+                    <a class="app-nav-item @Activo("/Ayuda")" asp-page="/Ayuda/Index" title="Ayuda">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/></svg>
+                        <span class="app-nav-label">Ayuda</span>
                     </a>
                     @if (esAdministrador)
                     {
                         <div class="app-nav-grupo">Administración</div>
-                        <a class="app-nav-item @Activo("/Admin/Usuarios")" asp-page="/Admin/Usuarios/Index">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>Usuarios
+                        <a class="app-nav-item @Activo("/Admin/Usuarios")" asp-page="/Admin/Usuarios/Index" title="Usuarios">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>
+                            <span class="app-nav-label">Usuarios</span>
                         </a>
-                        <a class="app-nav-item @Activo("/Admin/Categorias")" asp-page="/Admin/Categorias/Index">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1"/></svg>Categorías
+                        <a class="app-nav-item @Activo("/Admin/Categorias")" asp-page="/Admin/Categorias/Index" title="Categorías">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1"/></svg>
+                            <span class="app-nav-label">Categorías</span>
                         </a>
-                        <a class="app-nav-item @Activo("/Admin/Configuracion")" asp-page="/Admin/Configuracion/Sla">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>Configuración SLA
+                        <a class="app-nav-item @Activo("/Admin/Configuracion")" asp-page="/Admin/Configuracion/Sla" title="Configuración SLA">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>
+                            <span class="app-nav-label">Configuración SLA</span>
                         </a>
                     }
                 </nav>
@@ -78,24 +89,32 @@ else
                 <div class="app-side-pie">
                     <div class="menu-usuario" id="menu-usuario">
                         <button type="button" class="menu-usuario-toggle" id="menu-usuario-toggle"
-                                aria-haspopup="true" aria-expanded="false">
+                                aria-haspopup="true" aria-expanded="false" title="@Sesion.Nombre">
                             <span class="avatar avatar-sm">@Formato.Iniciales(Sesion.Nombre)</span>
                             <span class="menu-usuario-nombre">@Sesion.Nombre<small>@Sesion.Rol</small></span>
-                            <span class="menu-usuario-flecha" aria-hidden="true">▴</span>
+                            <svg class="menu-usuario-flecha" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>
                         </button>
                         <div class="menu-usuario-dropdown" id="menu-usuario-dropdown" role="menu">
-                            <a asp-page="/Cuenta/Perfil" class="menu-usuario-item" role="menuitem">Configuración</a>
+                            <a asp-page="/Cuenta/Perfil" class="menu-usuario-item" role="menuitem">
+                                <svg width="13" height="13" viewBox="0 0 24 24" style="display:inline;margin-right:7px;vertical-align:middle" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>Perfil
+                            </a>
                             <div class="menu-usuario-sep" role="separator"></div>
                             <form method="post" asp-page="/Cuenta/Salir">
-                                <button type="submit" class="menu-usuario-item salir" role="menuitem">Salir</button>
+                                <button type="submit" class="menu-usuario-item salir" role="menuitem">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" style="display:inline;margin-right:7px;vertical-align:middle" aria-hidden="true"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1"/></svg>Salir
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
+
+                <button type="button" class="app-side-toggle" id="sidebar-toggle" aria-label="Colapsar menú">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
             }
             else
             {
-                <a asp-page="/Cuenta/Login" class="btn-iniciar-sesion app-side-login">Iniciar sesión</a>
+                <a asp-page="/Cuenta/Login" class="btn-iniciar-sesion" style="margin:12px 10px">Iniciar sesión</a>
             }
         </aside>
 
@@ -125,7 +144,9 @@ else
     <dialog id="modal-crear-ticket" class="app-dialog">
         <div class="modal-cabecera">
             <h2 class="modal-titulo">Nuevo ticket</h2>
-            <button type="button" class="modal-cerrar" data-cerrar-modal-crear aria-label="Cerrar">✕</button>
+            <button type="button" class="modal-cerrar" data-cerrar-modal-crear aria-label="Cerrar">
+                <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
         </div>
         <div id="modal-crear-contenido" class="modal-cuerpo">
             <div class="modal-cargando">Cargando formulario…</div>

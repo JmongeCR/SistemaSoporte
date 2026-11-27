@@ -338,12 +338,32 @@ document.querySelectorAll("[data-autocerrar]").forEach((aviso) => {
     const boton = document.getElementById("menu-usuario-toggle");
     if (!contenedor || !boton) return;
 
-    const abrir = () => { contenedor.classList.add("abierto"); boton.setAttribute("aria-expanded", "true"); };
-    const cerrar = () => { contenedor.classList.remove("abierto"); boton.setAttribute("aria-expanded", "false"); };
+    const dropdown = document.getElementById("menu-usuario-dropdown");
+    const abrir = () => { dropdown?.classList.add("abierto"); boton.setAttribute("aria-expanded", "true"); };
+    const cerrar = () => { dropdown?.classList.remove("abierto"); boton.setAttribute("aria-expanded", "false"); };
 
-    boton.addEventListener("click", () => contenedor.classList.contains("abierto") ? cerrar() : abrir());
+    boton.addEventListener("click", () => dropdown?.classList.contains("abierto") ? cerrar() : abrir());
     document.addEventListener("click", (e) => { if (!contenedor.contains(e.target)) cerrar(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrar(); });
+})();
+
+// ---------- Toggle sidebar ----------
+(function () {
+    const shell = document.getElementById("app-shell");
+    const toggle = document.getElementById("sidebar-toggle");
+    if (!shell || !toggle) return;
+
+    const COL = "app-v2--col";
+    const aplicar = (col) => {
+        shell.classList.toggle(COL, col);
+        const svg = toggle.querySelector("svg path");
+        if (svg) svg.setAttribute("d", col ? "M9 18l6-6-6-6" : "M15 18l-6-6 6-6");
+        toggle.setAttribute("aria-label", col ? "Expandir menú" : "Colapsar menú");
+        localStorage.setItem("sidebar-col", col ? "true" : "false");
+    };
+
+    if (localStorage.getItem("sidebar-col") === "true") aplicar(true);
+    toggle.addEventListener("click", () => aplicar(!shell.classList.contains(COL)));
 })();
 
 // Fila de ticket completa clickeable (excepto si el click es sobre un enlace, botón o form)
