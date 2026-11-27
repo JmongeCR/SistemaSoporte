@@ -94,8 +94,7 @@ else if (Model.Tickets is not null)
                             }
                             <td class="col-categoria celda-secundaria">@ticket.Categoria</td>
                             <td class="col-prioridad">
-                                <span class="prioridad-dot @Formato.ClasePrioridad(ticket.PrioridadId)" title="@ticket.Prioridad"></span>
-                                <span class="celda-secundaria">@ticket.Prioridad</span>
+                                <span class="badge-prioridad @Formato.ClasePrioridad(ticket.PrioridadId)">@ticket.Prioridad</span>
                             </td>
                             <td class="col-estado">
                                 <span class="pill @Formato.ClaseEstado(ticket.EstadoId)">@ticket.Estado</span>
