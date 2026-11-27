@@ -8,11 +8,21 @@
 :root {
     --fuente: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-    /* Menú lateral */
-    --color-sidebar: #171C29;
+    /* Identidad (azul corporativo, igual al correo de recuperación) */
+    --marino: #1e3a5f;
+    --marino-hover: #27497a;
+    --acento-claro: #5B9BF8;
+
+    /* Superficies semánticas (el tema oscuro solo redefine estas) */
+    --superficie: #FFFFFF;
+    --fondo-app: #F4F6F9;
+    --superficie-flotante: #FFFFFF;
+
+    /* Header / footer */
+    --color-sidebar: #1e3a5f;
     --color-sidebar-texto: #A4A9B8;
-    --color-sidebar-separador: #383D4D;
-    --color-sidebar-avatar: #333D52;
+    --color-sidebar-separador: #35557f;
+    --color-sidebar-avatar: #2d4d78;
 
     /* Base */
     --color-primario: #296BED;
@@ -158,7 +168,7 @@ body {
 .menu-usuario.abierto .menu-usuario-flecha { transform: rotate(180deg); }
 .menu-usuario-dropdown {
     display: none; position: absolute; right: 0; top: calc(100% + 8px);
-    min-width: 200px; background: #FFFFFF; border: 1px solid var(--color-borde);
+    min-width: 200px; background: var(--superficie-flotante); border: 1px solid var(--color-borde);
     border-radius: var(--radio); box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
     z-index: 200; overflow: hidden; padding: 6px 0;
 }
@@ -178,7 +188,7 @@ body {
 [data-tema="oscuro"] .menu-usuario-item.salir:hover { background: rgba(197,48,48,0.12); }
 
 .app-marca-acciones { display: none; }
-.app-contenido { flex: 1; min-width: 0; padding: 28px 36px; background: #F4F6F9; }
+.app-contenido { flex: 1; min-width: 0; padding: 28px 36px; background: var(--fondo-app); }
 
 /* ---------- Footer de la app ---------- */
 .app-footer {
@@ -267,7 +277,7 @@ select.campo { padding-right: 32px; }
 
 /* ---------- Tarjeta y tabla ---------- */
 /* position: relative contiene los elementos absolutos (ej. .visually-hidden) para que no ensanchen la página. */
-.tarjeta { position: relative; border: 1px solid var(--color-borde); border-radius: var(--radio-tarjeta); background: #FFFFFF; overflow: hidden; }
+.tarjeta { position: relative; border: 1px solid var(--color-borde); border-radius: var(--radio-tarjeta); background: var(--superficie); overflow: hidden; }
 
 .tabla { width: 100%; border-collapse: collapse; }
 .tabla th {
@@ -501,7 +511,7 @@ textarea.campo { height: auto; min-height: 120px; padding: 12px; resize: vertica
     min-height: 100vh;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(145deg, #0D1B3E 0%, #142454 55%, #1B3A8A 100%);
+    background: var(--marino);
     padding: 24px;
 }
 .cuenta-panel { display: none; }
@@ -510,10 +520,14 @@ textarea.campo { height: auto; min-height: 120px; padding: 12px; resize: vertica
 .cuenta-tarjeta {
     width: 100%;
     padding: 36px 40px;
-    border-radius: 16px;
-    background: #FFFFFF;
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.18);
+    border-radius: 12px;
+    background: var(--superficie);
+    border-top: 4px solid var(--acento-claro);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
 }
+.cuenta-tarjeta .boton-primario { background: var(--marino); box-shadow: none; height: 44px; }
+.cuenta-tarjeta .boton-primario:hover { background: var(--marino-hover); }
+.cuenta-tarjeta .enlace { color: var(--marino); font-weight: 500; }
 .cuenta-tarjeta h1 { margin: 0 0 8px; font-size: 22px; font-weight: 700; }
 .cuenta-subtitulo { margin: 0 0 24px; color: var(--color-texto-secundario); }
 .cuenta-enlace { display: inline-block; margin-top: 20px; }
@@ -761,6 +775,10 @@ a.aviso-info:hover { color: var(--color-primario-hover); }
 
 /* ---------- Dark mode (tema oscuro) ---------- */
 [data-tema="oscuro"] {
+    --superficie: #161B2A;
+    --fondo-app: #0C1020;
+    --superficie-flotante: #1E2435;
+    --color-sidebar: #111A30;
     --color-texto: #E8EAED;
     --color-texto-secundario: #A0A8B8;
     --color-texto-tenue: #6B7280;
@@ -788,6 +806,7 @@ a.aviso-info:hover { color: var(--color-primario-hover); }
 [data-tema="oscuro"] .panel-notificaciones,
 [data-tema="oscuro"] .boton-secundario,
 [data-tema="oscuro"] .cuenta-tarjeta { background: #161B2A; border-color: #2D3344; }
+[data-tema="oscuro"] .cuenta-tarjeta .enlace { color: var(--acento-claro); }
 [data-tema="oscuro"] .campo { background: #1A1F2E; border-color: #2D3344; color: var(--color-texto); }
 [data-tema="oscuro"] .campo:focus { border-color: var(--color-primario); }
 [data-tema="oscuro"] .encabezado-pagina { border-color: #2D3344; }
@@ -1404,3 +1423,150 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
     font-size: 15px;
     color: var(--color-texto-secundario);
 }
+
+
+/* =====================================================================
+   REDISEÑO v2 — Shell con sidebar + estilo denso (aprobado 2026-11-26)
+   Va al final para sobrescribir. Los estilos del header antiguo se
+   conservan porque _LayoutAyuda aún los usa.
+   ===================================================================== */
+.app.app-v2 { display: grid; grid-template-columns: 216px minmax(0, 1fr); min-height: 100vh; flex-direction: initial; }
+
+.app-side {
+    background: var(--color-sidebar);
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 12px 10px;
+    overflow-y: auto;
+}
+.app-side .app-marca { padding: 6px 8px 14px; font-size: 16px; }
+.app-btn-nuevo {
+    height: 32px; margin: 0 0 12px; border: 0; border-radius: 6px;
+    background: var(--color-primario); color: #FFFFFF; font-weight: 600; cursor: pointer;
+}
+.app-btn-nuevo:hover { background: var(--color-primario-hover); }
+.app-nav-v { display: flex; flex-direction: column; gap: 2px; }
+.app-nav-grupo {
+    padding: 14px 8px 5px; font-size: 10.5px; font-weight: 600;
+    letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.4);
+}
+.app-nav-item {
+    position: relative; display: flex; align-items: center; gap: 9px;
+    height: 32px; padding: 0 8px; border-radius: 6px;
+    color: rgba(255,255,255,.68); font-weight: 500; font-size: 13px; text-decoration: none;
+}
+.app-nav-item:hover { background: rgba(255,255,255,.08); color: #FFFFFF; }
+.app-nav-item.activo { background: rgba(255,255,255,.14); color: #FFFFFF; }
+.app-nav-item.activo::before {
+    content: ""; position: absolute; left: -10px; top: 6px; bottom: 6px; width: 3px;
+    border-radius: 0 3px 3px 0; background: var(--acento-claro);
+}
+.app-nav-item svg { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.app-side-login { margin-top: 8px; justify-content: center; }
+
+.app-side-pie { margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.12); }
+.app-side .menu-usuario { width: 100%; }
+.app-side .menu-usuario-toggle { width: 100%; padding: 4px 6px; text-align: left; }
+.app-side .menu-usuario-nombre { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.25; }
+.app-side .menu-usuario-nombre small { color: rgba(255,255,255,.55); font-size: 11px; }
+.app-side .menu-usuario-dropdown { top: auto; bottom: calc(100% + 8px); left: 0; right: auto; min-width: 100%; }
+
+.app-main { min-width: 0; display: flex; flex-direction: column; }
+.app-top {
+    position: sticky; top: 0; z-index: 90; height: 46px;
+    display: flex; align-items: center; gap: 10px; padding: 0 20px;
+    background: var(--superficie); border-bottom: 1px solid var(--color-borde);
+}
+.app-top-esp { flex: 1; }
+.app-bus { position: relative; width: 340px; margin: 0; }
+.app-bus input {
+    width: 100%; height: 30px; padding: 0 10px 0 30px; outline: none;
+    border: 1px solid var(--color-borde); border-radius: 6px;
+    background: var(--color-zona); color: var(--color-texto);
+}
+.app-bus input:focus { border-color: var(--color-primario); box-shadow: var(--sombra-foco); }
+.app-bus svg { position: absolute; left: 9px; top: 8px; width: 14px; height: 14px; stroke: var(--color-texto-tenue); fill: none; stroke-width: 2; }
+.app-top .campana-boton { padding: 5px 7px; }
+.app-top .campana-boton:hover, .app-top .campana-boton[aria-expanded="true"] { background: var(--color-fondo-suave); }
+.app-top .app-btn-tema { background: none; color: var(--color-texto-secundario); padding: 5px 7px; }
+.app-top .app-btn-tema:hover { background: var(--color-fondo-suave); color: var(--color-texto); }
+
+/* Contenido: más compacto y alineado a la izquierda */
+.app-contenido { padding: 16px 20px 28px; }
+.app-contenido > * { max-width: 1500px; margin-left: 0; margin-right: auto; }
+.app-contenido > .encabezado-pagina,
+[data-tema="oscuro"] .app-contenido > .encabezado-pagina {
+    max-width: 1500px; margin: 0 0 12px; padding: 0; background: none; border: 0; align-items: flex-end;
+}
+.encabezado-pagina h1 { font-size: 19px; letter-spacing: -.2px; }
+.encabezado-pagina p { margin-top: 2px; }
+
+/* Modo oscuro: el header de la app ya no existe, sidebar y topbar usan tokens */
+[data-tema="oscuro"] .app-top { background: var(--superficie); border-color: #2D3344; }
+
+@media (max-width: 900px) {
+    .app.app-v2 { grid-template-columns: 1fr; }
+    .app-side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 12px; }
+    .app-side .app-marca { padding: 0 8px 0 0; }
+    .app-btn-nuevo { margin: 0; padding: 0 12px; }
+    .app-nav-v { flex-direction: row; flex-wrap: wrap; width: 100%; order: 5; }
+    .app-nav-grupo { display: none; }
+    .app-nav-item.activo::before { display: none; }
+    .app-side-pie { margin: 0 0 0 auto; padding: 0; border: 0; }
+    .app-side .menu-usuario-nombre { display: none; }
+    .app-side .menu-usuario-dropdown { bottom: auto; top: calc(100% + 8px); left: auto; right: 0; min-width: 200px; }
+    .app-bus { width: 100%; max-width: 340px; }
+    .app-top { padding: 0 12px; }
+}
+
+/* ---------- v2: estilo denso (tipo Jira) ---------- */
+html { font-size: 13px; }
+:root { --radio: 6px; --radio-tarjeta: 8px; }
+
+.boton-primario { padding: 0 12px; height: 30px; box-shadow: none; font-size: 13px; }
+.campo { height: 30px; padding: 0 9px; font-size: 13px; }
+.campo-alto { height: 44px; }
+textarea.campo { height: auto; padding: 8px 10px; }
+.barra-filtros { gap: 6px; margin-bottom: 10px; }
+.buscador .campo { width: 230px; padding-left: 30px; }
+.chip { height: 26px; padding: 0 10px; border-radius: 13px; font-size: 12px; }
+.chip.activo { background: var(--marino); border-color: var(--marino); color: #FFFFFF; }
+[data-tema="oscuro"] .chip.activo { background: var(--color-primario); border-color: var(--color-primario); }
+
+.tabla th { padding: 7px 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.tabla td { padding: 7px 12px; border-top: 1px solid var(--color-borde); }
+.tabla-tickets td { padding: 6px 12px; }
+.tabla-tickets th { padding: 7px 12px; }
+.tabla tbody tr:hover, .lista-tickets-fila:hover { background: var(--color-fondo-suave); }
+.pill { padding: 1px 8px; font-size: 11.5px; line-height: 18px; }
+.pill::before { width: 6px; height: 6px; }
+
+.kpi-grid { gap: 10px; margin-bottom: 12px; }
+.kpi { padding: 10px 12px; border-radius: 8px; background: var(--superficie); }
+.kpi-valor { margin: 2px 0; font-size: 24px; }
+.kpi-encabezado { font-size: 11.5px; font-weight: 500; }
+.kpi-nota { font-size: 11.5px; }
+.columnas-dashboard.dos-columnas { gap: 10px; }
+.titulo-seccion { font-size: 13px; font-weight: 600; margin: 14px 0 8px; }
+.lista-tickets-fila { padding: 8px 14px; gap: 10px; }
+
+/* Detalle */
+.detalle { grid-template-columns: minmax(0, 1fr) 290px; gap: 12px; }
+.detalle-encabezado h1 { font-size: 19px; }
+.detalle-meta { margin: 6px 0 12px; padding-bottom: 12px; }
+.tarjeta-seccion { padding: 12px 14px; }
+.actividad { gap: 8px; margin-bottom: 12px; }
+.comentario-cuerpo { padding: 9px 12px; border-radius: 8px; background: var(--superficie); }
+.comentario-interno .comentario-cuerpo { background: var(--ambar-fondo); border-color: transparent; }
+.caja-respuesta { padding: 12px 14px; }
+.detalle-lateral { gap: 10px; top: 58px; }
+.dato-bloque { padding: 12px 14px; }
+.tarjeta-accion { padding: 12px 14px; gap: 6px; }
+.pill-grande { padding: 5px 10px; font-size: 13px; }
+.chip-id { background: var(--azul-fondo); }
+.chip-id:hover { background: var(--azul-fondo); filter: brightness(.96); }
+[data-tema="oscuro"] .lista-tickets-fila:hover, [data-tema="oscuro"] .tabla tbody tr:hover { background: #1A1F2E; }
