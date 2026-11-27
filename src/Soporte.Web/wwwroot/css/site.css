@@ -1710,6 +1710,33 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
     margin: 0 0 28px;
 }
 
+/* Campo contraseña con botón de visibilidad */
+.campo-contrasena {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.campo-contrasena .campo {
+    padding-right: 44px;
+}
+.boton-ver {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--color-texto-suave);
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    line-height: 0;
+}
+.boton-ver:hover { color: var(--color-texto); }
+.icono-ojo-ocultar { display: none; }
+.boton-ver[aria-pressed="true"] .icono-ojo-ver { display: none; }
+.boton-ver[aria-pressed="true"] .icono-ojo-ocultar { display: block; }
+
 /* Keep old .cuenta-logo for breadcrumb at top of card if needed */
 .cuenta-logo {
     display: flex;
