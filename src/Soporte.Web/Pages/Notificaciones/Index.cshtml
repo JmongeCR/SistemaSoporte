@@ -24,7 +24,13 @@
 
 @if (Model.Notificaciones.Count == 0 && Model.MensajeError is null)
 {
-    <div class="tarjeta estado-vacio">No tenés notificaciones.</div>
+    <div class="tarjeta estado-vacio">
+        <div class="estado-vacio-icono">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M15 17H20L18.595 15.595A2 2 0 0 1 18 14.158V11c0-2.613-1.67-4.835-4-5.659V5a2 2 0 0 0-4 0v.342C7.67 6.165 6 8.387 6 11v3.158a2 2 0 0 1-.595 1.437L4 17h5m6 0v1a3 3 0 0 1-6 0v-1m6 0H9"/></svg>
+        </div>
+        <p class="estado-vacio-titulo">Sin notificaciones</p>
+        <p class="estado-vacio-desc">Las actualizaciones de tus tickets aparecerán aquí.</p>
+    </div>
 }
 else
 {
