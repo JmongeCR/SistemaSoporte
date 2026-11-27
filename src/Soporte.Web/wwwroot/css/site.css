@@ -2183,6 +2183,164 @@ details[open] > .ayuda-pregunta::after { transform: rotate(-180deg); }
 }
 .kb-art-volver-link:hover { text-decoration: underline; }
 
+/* ---------- 35b. Clases faltantes — auditoría completa ---------- */
+
+/* boton-sm: variante pequeña de botones existentes */
+.boton-sm { padding: 5px 12px !important; font-size: 13px !important; }
+
+/* boton-enlace: botón que parece enlace (sin borde ni fondo) */
+.boton-enlace {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: inherit;
+    color: var(--color-primario);
+    text-decoration: none;
+}
+.boton-enlace:hover { text-decoration: underline; }
+
+/* cuenta-subtitulo: texto auxiliar debajo del h1 en páginas de cuenta */
+.cuenta-subtitulo {
+    font-size: 14px;
+    color: var(--color-texto-suave);
+    margin: -16px 0 24px;
+}
+
+/* titulo-seccion: h2 de sección en Perfil y similares */
+.titulo-seccion {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-texto);
+    margin: 24px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+/* avatar-oscuro: variante de avatar con fondo oscuro (perfil) */
+.avatar-oscuro { background: #1e3a8a; color: #fff; }
+
+/* migas-actual: elemento activo en breadcrumb */
+.migas-actual {
+    font-size: 13px;
+    color: var(--color-texto-suave);
+}
+
+/* zona-archivos-texto: texto dentro del dropzone */
+.zona-archivos-texto {
+    font-size: 13.5px;
+    color: var(--color-texto-suave);
+    text-align: center;
+    pointer-events: none;
+}
+
+/* lista-archivos: lista de adjuntos seleccionados */
+.lista-archivos {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--color-texto-suave);
+}
+
+/* error-archivos: mensaje de error en zona de adjuntos */
+.error-archivos {
+    font-size: 13px;
+    color: #dc2626;
+    margin-top: 4px;
+}
+
+/* fila-acciones-usuario: fila de acciones en gestión de usuarios */
+.fila-acciones-usuario {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* expediente-propbar-lectura + expediente-prop-lectura + expediente-prop-valor */
+.expediente-propbar-lectura {
+    cursor: default;
+    pointer-events: none;
+}
+.expediente-prop-lectura {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.expediente-prop-valor {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-texto);
+}
+
+/* CSAT — encuesta de satisfacción del cliente */
+.csat-form { display: flex; flex-direction: column; gap: 12px; }
+
+.estrellas-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 4px;
+    width: fit-content;
+}
+.star-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+}
+.estrellas-rating label {
+    font-size: 28px;
+    color: #d1d5db;
+    cursor: pointer;
+    transition: color .1s;
+    line-height: 1;
+}
+.estrellas-rating label:hover,
+.estrellas-rating label:hover ~ label,
+.estrellas-rating input:checked ~ label {
+    color: #f59e0b;
+}
+
+.csat-comentario { resize: vertical; }
+
+.csat-resultado {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.csat-estrellas {
+    font-size: 20px;
+    color: #f59e0b;
+    letter-spacing: 1px;
+}
+.csat-comentario-texto {
+    font-size: 13.5px;
+    color: var(--color-texto-suave);
+    font-style: italic;
+    margin: 0;
+}
+
+/* KB — vincular artículo a ticket */
+.kb-vincular-form { margin-top: 16px; }
+.kb-vincular-fila {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.kb-vincular-select { flex: 1; }
+
+/* Dark mode — clases nuevas */
+[data-tema="oscuro"] .titulo-seccion { border-color: #2d3344; }
+[data-tema="oscuro"] .csat-resultado { color: #e2e8f0; }
+[data-tema="oscuro"] .error-archivos { color: #f87171; }
+
 /* Dark mode — portal KB */
 [data-tema="oscuro"] .ayuda-portal-header { background: rgba(10,15,26,.92); border-color: #2d3344; }
 [data-tema="oscuro"] .ayuda-portal-marca { color: #e2e8f0; }
