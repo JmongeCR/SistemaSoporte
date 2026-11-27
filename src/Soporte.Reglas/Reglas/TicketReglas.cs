@@ -14,11 +14,12 @@ public class TicketReglas : ITicketReglas
     /// </summary>
     private static readonly HashSet<(EstadoTicketTipo Desde, EstadoTicketTipo Hacia)> TransicionesEquipo = new()
     {
-        (EstadoTicketTipo.Abierto, EstadoTicketTipo.EnProgreso),
+        (EstadoTicketTipo.Abierto,    EstadoTicketTipo.EnProgreso),
+        (EstadoTicketTipo.Abierto,    EstadoTicketTipo.Resuelto),
         (EstadoTicketTipo.EnProgreso, EstadoTicketTipo.Abierto),
         (EstadoTicketTipo.EnProgreso, EstadoTicketTipo.Resuelto),
-        (EstadoTicketTipo.Resuelto, EstadoTicketTipo.Abierto),
-        (EstadoTicketTipo.Resuelto, EstadoTicketTipo.Cerrado)
+        (EstadoTicketTipo.Resuelto,   EstadoTicketTipo.Abierto),
+        (EstadoTicketTipo.Resuelto,   EstadoTicketTipo.Cerrado)
     };
 
     private readonly IUsuarioRepository _usuarios;
