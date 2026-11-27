@@ -4,7 +4,7 @@
 @inject IUsuarioSesion Sesion
 @{
     ViewData["Title"] = Model.Articulo?.Titulo ?? "Artículo";
-    Layout = "_LayoutAyuda";
+    Layout = Sesion.EstaAutenticado ? "_Layout" : "_LayoutAyuda";
     var autenticado = Sesion.EstaAutenticado;
 }
 
@@ -69,7 +69,7 @@ else
     <!-- ===== VISTA INTERNA AUTENTICADO ===== -->
     <header class="encabezado-pagina">
         <div>
-            <a asp-page="/Ayuda/Index" class="enlace-volver">← Ayuda</a>
+            <a asp-page="/Ayuda/Index" class="enlace-volver">← Centro de conocimientos</a>
             <h1>
                 @Model.Articulo.Titulo
                 @if (!Model.Articulo.Publicado)

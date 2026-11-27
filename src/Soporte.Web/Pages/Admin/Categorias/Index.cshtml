@@ -7,7 +7,7 @@
 <header class="encabezado-pagina">
     <div>
         <h1>Categorías</h1>
-        <p>Categorías para tickets y artículos de la base de conocimiento</p>
+        <p>Categorías para tickets y artículos del centro de conocimientos</p>
     </div>
 </header>
 
@@ -20,15 +20,21 @@
     <div class="alerta alerta-error" role="alert">@Model.MensajeError</div>
 }
 
-<div class="layout-dos-columnas" style="gap:24px;align-items:flex-start">
+<div class="layout-dos-columnas">
 
     <!-- Tabla de categorías -->
     <div class="tarjeta" style="flex:1;min-width:0">
-        <h2 class="tarjeta-titulo" style="margin:0 0 16px">Categorías activas</h2>
+        <div class="tarjeta-seccion" style="padding-bottom:0">
+            <p class="tarjeta-titulo">Categorías activas
+                <span style="font-size:12px;font-weight:400;color:var(--color-texto-tenue);margin-left:6px">@Model.Categorias.Count total</span>
+            </p>
+        </div>
 
         @if (!Model.Categorias.Any())
         {
-            <div class="estado-vacio"><p>No hay categorías.</p></div>
+            <div class="tarjeta-seccion">
+                <div class="estado-vacio"><p>No hay categorías.</p></div>
+            </div>
         }
         else
         {
@@ -37,17 +43,17 @@
                     <tr>
                         <th>#</th>
                         <th>Nombre</th>
-                        <th style="width:200px"></th>
+                        <th style="width:160px"></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var cat in Model.Categorias)
                     {
                         <tr>
-                            <td class="texto-secundario">@cat.Id</td>
+                            <td class="texto-secundario" style="width:40px">@cat.Id</td>
                             <td><strong>@cat.Nombre</strong></td>
                             <td>
-                                <div style="display:flex;gap:8px;justify-content:flex-end">
+                                <div style="display:flex;gap:6px;justify-content:flex-end">
                                     <button type="button" class="boton-secundario boton-xs"
                                             onclick="abrirEditar(@cat.Id, '@Html.Raw(Html.Encode(cat.Nombre))')">
                                         Editar
@@ -67,37 +73,41 @@
     </div>
 
     <!-- Panel lateral: crear + editar -->
-    <div style="width:320px;flex-shrink:0;display:flex;flex-direction:column;gap:16px">
+    <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:14px">
 
         <!-- Crear -->
         <div class="tarjeta">
-            <h2 class="tarjeta-titulo" style="margin:0 0 16px">Nueva categoría</h2>
-            <form method="post" asp-page-handler="Crear">
-                <div asp-validation-summary="ModelOnly" class="alerta alerta-error"></div>
-                <div class="grupo-campo">
-                    <label asp-for="NuevaNombre" class="etiqueta">Nombre</label>
-                    <input asp-for="NuevaNombre" class="campo campo-completo" placeholder="Ej. Redes y conectividad" />
-                    <span asp-validation-for="NuevaNombre" class="campo-validacion"></span>
-                </div>
-                <button type="submit" class="boton-primario boton-bloque">Crear categoría</button>
-            </form>
+            <div class="tarjeta-seccion">
+                <p class="tarjeta-titulo">Nueva categoría</p>
+                <form method="post" asp-page-handler="Crear">
+                    <div asp-validation-summary="ModelOnly" class="alerta alerta-error"></div>
+                    <div class="grupo-campo">
+                        <label asp-for="NuevaNombre" class="etiqueta">Nombre</label>
+                        <input asp-for="NuevaNombre" class="campo campo-completo" placeholder="Ej. Redes y conectividad" />
+                        <span asp-validation-for="NuevaNombre" class="campo-validacion"></span>
+                    </div>
+                    <button type="submit" class="boton-primario boton-bloque">Crear categoría</button>
+                </form>
+            </div>
         </div>
 
         <!-- Editar (oculto por defecto) -->
         <div class="tarjeta" id="panel-editar" style="display:none">
-            <h2 class="tarjeta-titulo" style="margin:0 0 16px">Editar categoría</h2>
-            <form method="post" asp-page-handler="Editar">
-                <input type="hidden" asp-for="EditarId" id="editar-id" />
-                <div class="grupo-campo">
-                    <label asp-for="EditarNombre" class="etiqueta">Nombre</label>
-                    <input asp-for="EditarNombre" id="editar-nombre" class="campo campo-completo" />
-                    <span asp-validation-for="EditarNombre" class="campo-validacion"></span>
-                </div>
-                <div style="display:flex;gap:8px">
-                    <button type="button" class="boton-secundario" onclick="cerrarEditar()">Cancelar</button>
-                    <button type="submit" class="boton-primario" style="flex:1">Guardar</button>
-                </div>
-            </form>
+            <div class="tarjeta-seccion">
+                <p class="tarjeta-titulo">Editar categoría</p>
+                <form method="post" asp-page-handler="Editar">
+                    <input type="hidden" asp-for="EditarId" id="editar-id" />
+                    <div class="grupo-campo">
+                        <label asp-for="EditarNombre" class="etiqueta">Nombre</label>
+                        <input asp-for="EditarNombre" id="editar-nombre" class="campo campo-completo" />
+                        <span asp-validation-for="EditarNombre" class="campo-validacion"></span>
+                    </div>
+                    <div style="display:flex;gap:8px">
+                        <button type="button" class="boton-secundario" onclick="cerrarEditar()">Cancelar</button>
+                        <button type="submit" class="boton-primario" style="flex:1">Guardar</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
     </div>
