@@ -104,6 +104,7 @@ public class BaseConocimientoController : SoporteControllerBase
     public async Task<ActionResult<ArticuloKbDto>> CrearAsync([FromBody] CrearArticuloKbDto dto)
     {
         var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
         var resultado = await _flujo.CrearAsync(dto, usuario);
         return CreatedAtAction(nameof(ObtenerAsync), new { slug = resultado.Datos!.Slug }, resultado.Datos);
     }
@@ -113,6 +114,7 @@ public class BaseConocimientoController : SoporteControllerBase
     public async Task<IActionResult> VincularAsync(int ticketId, int articuloId)
     {
         var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
         await _flujo.VincularAsync(ticketId, articuloId, usuario);
         return NoContent();
     }
@@ -122,6 +124,7 @@ public class BaseConocimientoController : SoporteControllerBase
     public async Task<IActionResult> DesvincularAsync(int ticketId, int articuloId)
     {
         var usuario = _usuarioActual.Obtener();
+        if (usuario is null) return NoAutenticado();
         await _flujo.DesvincularAsync(ticketId, articuloId, usuario);
         return NoContent();
     }
